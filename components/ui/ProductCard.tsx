@@ -1,7 +1,7 @@
 // src/components/ProductCard.tsx
 import { Product } from '@/types/product';
 import { useState } from 'react';
-import { useCart } from '@/context/CartContext'; // ✅ UNCOMMENT THIS
+import { useCart } from '@/context/CartContext';
 import { useRouter } from 'next/navigation';
 import { ShoppingBag } from 'lucide-react';
 import Image from 'next/image';
@@ -111,13 +111,13 @@ export default function ProductCard({ product }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   
-  const { addToCart, cart } = useCart(); // ✅ UNCOMMENT THIS
+  const { addToCart, cart } = useCart();
   const router = useRouter();
 
   const offerInfo = getProductOfferInfo(product);
   const hasValidOffer = offerInfo.hasOffer && offerInfo.originalPrice > offerInfo.discountedPrice;
   
-  // ✅ Check if product is in cart (for "In Cart" badge)
+  // Check if product is in cart (for "In Cart" badge)
   const isInCart = cart?.items?.some(item => {
     const productId = typeof item.product === 'string' ? item.product : item.product?._id;
     return productId === product._id;
@@ -136,7 +136,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     
     try {
       setIsAddingToCart(true);
-      await addToCart(product, 1); // ✅ UNCOMMENT THIS - Add to cart without variant
+      await addToCart(product, 1);
     } catch (error) {
       console.error('Failed to add product to cart:', error);
     } finally {
@@ -153,31 +153,30 @@ export default function ProductCard({ product }: ProductCardProps) {
     >
       {/* In Cart Badge */}
       {isInCart && (
-        <div className="absolute top-2 right-2 z-10 bg-gradient-to-r from-[#D97A22] via-[#D97A22] to-[#D97A22] text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shadow-md">
+        <div className="absolute top-2 right-2 z-10 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shadow-md" style={{ backgroundColor: '#2EC4B6' }}>
           ✓
         </div>
       )}
 
-      {/* Image Section */}
       <div className="relative p-3 sm:p-4 pb-0 overflow-hidden">
-        <div className="relative w-full aspect-square bg-gray-100 flex items-center justify-center overflow-hidden">
-          {!imageError ? (
-            <div className="relative w-full h-full">
-              <Image
-                src={imageUrl}
-                alt={product.name}
-                fill
-                sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                className={`object-contain transition-transform duration-500 ${
-                  isHovered ? 'scale-110' : 'scale-100'
-                }`}
-                onError={() => setImageError(true)}
-                priority={false}
-                loading="lazy"
-                unoptimized={imageUrl.startsWith('http') && !imageUrl.includes('localhost')}
-              />
-            </div>
-          ) : (
+        <div className="relative w-full aspect-square bg-white flex items-center justify-center overflow-hidden">
+          <div className="relative w-full h-full">
+            <Image
+              src={imageUrl}
+              alt={product.name}
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              className={`object-contain transition-transform duration-500 ${
+                isHovered ? 'scale-110' : 'scale-100'
+              }`}
+              onError={() => setImageError(true)}
+              priority={false}
+              loading="lazy"
+            />
+          </div>
+
+          {/* Image Error Fallback */}
+          {imageError && (
             <div className="absolute inset-0 bg-gray-50 flex items-center justify-center">
               <svg className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -195,7 +194,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           </h3>
           
           {hasValidOffer && (
-            <div className="bg-gradient-to-r from-[#D97A22] via-[#D97A22] to-[#D97A22] text-white px-1.5 py-0.5 rounded-md text-[10px] xs:text-xs font-bold whitespace-nowrap flex-shrink-0 sm:px-2 sm:text-xs">
+            <div className="text-white px-1.5 py-0.5 rounded-md text-[10px] xs:text-xs font-bold whitespace-nowrap flex-shrink-0 sm:px-2 sm:text-xs" style={{ backgroundColor: '#2EC4B6' }}>
               {Math.round(offerInfo.discountPercentage)}% OFF
             </div>
           )}
@@ -231,7 +230,8 @@ export default function ProductCard({ product }: ProductCardProps) {
         <button 
           onClick={handleAddToCart}
           disabled={isOutOfStock || isAddingToCart}
-          className="w-full py-2 px-3 rounded-lg font-medium flex items-center justify-center gap-2 transition-all duration-300 bg-gradient-to-r from-[#D97A22] via-[#D97A22] to-[#D97A22] text-white hover:from-[#c56a1e] hover:via-[#c56a1e] hover:to-[#c56a1e] disabled:bg-gray-400 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed shadow-lg hover:shadow-[#D97A22]/25 text-xs xs:text-sm sm:text-sm transform hover:scale-105 cursor-pointer mb-2"
+          className="w-full py-2 px-3 rounded-lg font-medium flex items-center justify-center gap-2 transition-all duration-300 text-white hover:opacity-80 disabled:bg-gray-400 disabled:cursor-not-allowed shadow-lg text-xs xs:text-sm sm:text-sm transform hover:scale-105 cursor-pointer mb-2"
+          style={{ backgroundColor: '#2EC4B6' }}
         >
           <ShoppingBag size={14} className="xs:w-4 xs:h-4 sm:w-4 sm:h-4" />
           <span className="text-xs xs:text-sm sm:text-sm">

@@ -47,7 +47,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [cart, setCart] = useState<Cart>(initialCart);
   const [loading, setLoading] = useState(false);
   const [addingProductId, setAddingProductId] = useState<string | null>(null);
-const { user, isLoading: authLoading } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const isGuest = !user;
 
   // Refresh cart from backend or localStorage
@@ -64,6 +64,7 @@ const { user, isLoading: authLoading } = useAuth();
         // Authenticated user - fetch from API
         console.log('🔄 Fetching user cart from API');
         const cartData = await cartAPI.getCart();
+        console.log('🔄 Cart data received:', cartData);
         setCart(cartData);
       } else {
         // Guest user - load from localStorage
@@ -113,6 +114,7 @@ const { user, isLoading: authLoading } = useAuth();
   // Add to cart
   const addToCart = async (product: Product, quantity: number, selectedVariant?: ProductVariant) => {
     console.log('🛒 addToCart called, isGuest:', isGuest);
+    console.log('🛒 Product:', product.name, 'Quantity:', quantity, 'Variant:', selectedVariant?.variantName || selectedVariant?.name);
     
     try {
       setAddingProductId(product._id);
@@ -122,26 +124,34 @@ const { user, isLoading: authLoading } = useAuth();
         // Guest cart logic
         const guestCart = { ...cart };
         
-        const existingItemIndex = guestCart.items.findIndex(
-          item => item.product === product._id || (item.product as any)?._id === product._id
-        );
+        const existingItemIndex = guestCart.items.findIndex(item => {
+          const productId = typeof item.product === 'string' ? item.product : (item.product as any)?._id;
+          const variantMatch = !selectedVariant?._id || 
+            item.variantId === selectedVariant._id || 
+            item.selectedVariant?._id === selectedVariant._id;
+          return productId === product._id && (!selectedVariant || variantMatch);
+        });
         
         if (existingItemIndex > -1) {
           guestCart.items[existingItemIndex].quantity += quantity;
         } else {
-          const newItem: CartItem = {
-            _id: `guest-${Date.now()}-${Math.random()}`,
-            product: product._id as any,
-            quantity,
-            price: selectedVariant?.price || product.basePrice,
-            originalPrice: selectedVariant?.originalPrice || product.originalPrice,
-            variantId: selectedVariant?._id,
-            variantName: selectedVariant?.variantName,
-            productName: product.name,
-            productImage: product.images?.[0]?.image,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-          };
+        // In addToCart function, when creating newItem for guest:
+const newItem: CartItem = {
+  _id: `guest-${Date.now()}-${Math.random()}`,
+  product: product._id as any,
+  quantity,
+  price: selectedVariant?.price || product.basePrice,
+  originalPrice: selectedVariant?.originalPrice || product.originalPrice,
+  variantId: selectedVariant?._id,
+  variantName: selectedVariant?.variantName || selectedVariant?.name,
+  productName: product.name,
+  // ✅ FIX: Store variant image first, then fallback to main product image
+  productImage: selectedVariant?.images?.[0]?.image || product.images?.[0]?.image,
+  // ✅ Also store the full selectedVariant
+  selectedVariant: selectedVariant,
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString()
+};
           guestCart.items.push(newItem);
         }
         
@@ -152,12 +162,21 @@ const { user, isLoading: authLoading } = useAuth();
         setCart(guestCart);
         saveGuestCart(guestCart);
       } else {
-        // Authenticated user - call API
-        const updatedCart = await cartAPI.addToCart({
-          productId: product._id,
-          quantity,
-          variantId: selectedVariant?._id
-        });
+        // ✅ FIXED: For authenticated user
+        console.log('🛒 Adding to cart for authenticated user');
+        
+  await cartAPI.addToCart({
+  productId: product._id,
+  quantity,
+  variantId: selectedVariant?._id
+});
+        
+        // Fetch the complete updated cart
+        const updatedCart = await cartAPI.getCart();
+        console.log('🛒 Updated cart after adding:', updatedCart);
+        console.log('🛒 Cart items count:', updatedCart.items?.length);
+        console.log('🛒 Cart total items:', updatedCart.totalItems);
+        
         setCart(updatedCart);
       }
     } catch (error) {
@@ -194,6 +213,7 @@ const { user, isLoading: authLoading } = useAuth();
           saveGuestCart(guestCart);
         }
       } else {
+        // ✅ FIXED: For authenticated user
         await cartAPI.updateCartItem(itemId, { quantity });
         const updatedCart = await cartAPI.getCart();
         setCart(updatedCart);
@@ -222,6 +242,7 @@ const { user, isLoading: authLoading } = useAuth();
         setCart(guestCart);
         saveGuestCart(guestCart);
       } else {
+        // ✅ FIXED: For authenticated user
         await cartAPI.removeFromCart(itemId);
         const updatedCart = await cartAPI.getCart();
         setCart(updatedCart);
@@ -245,6 +266,7 @@ const { user, isLoading: authLoading } = useAuth();
         setCart(emptyCart);
         saveGuestCart(emptyCart);
       } else {
+        // ✅ FIXED: For authenticated user
         await cartAPI.clearCart();
         const updatedCart = await cartAPI.getCart();
         setCart(updatedCart);

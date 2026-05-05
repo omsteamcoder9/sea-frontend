@@ -1,4 +1,3 @@
-// lib/productService.ts
 import { Product, ProductsResponse } from '@/types/product';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -19,6 +18,16 @@ interface GetProductsParams {
   sortOrder?: 'asc' | 'desc';
   page?: number;
   limit?: number;
+}
+
+export interface SearchProduct {
+  _id: string;
+  name: string;
+  slug: string;
+  basePrice: number;
+  image: string | null;
+  category: string;
+  featured: boolean;
 }
 
 // Get all products with filters
@@ -136,5 +145,24 @@ export async function deleteProduct(id: string, token: string): Promise<boolean>
   } catch (error) {
     console.error('Error deleting product:', error);
     return false;
+  }
+}
+
+// Quick search products (for header search)
+export async function quickSearchProducts(query: string, limit: number = 5): Promise<{ success: boolean; data: SearchProduct[] }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/products/quick-search?q=${encodeURIComponent(query)}&limit=${limit}`, {
+      cache: 'no-store',
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to search products: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return { success: true, data: data.data || [] };
+  } catch (error) {
+    console.error('Error searching products:', error);
+    return { success: false, data: [] };
   }
 }

@@ -180,7 +180,7 @@ export default function LoginForm() {
       if (returnTo) {
         router.push(returnTo);
       } else {
-        router.push('/profile');
+        router.push('/checkout');
       }
       
     } catch (error: any) {

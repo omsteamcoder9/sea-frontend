@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Image from "next/image";
 import { useState, useEffect } from 'react';
+import { isAuthenticated } from '@/lib/otpAuth'; // Import authentication check
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -20,37 +21,15 @@ const getProductName = (item: any): string => {
   return item.productName || 'Product';
 };
 
-// Helper function to safely get product image
 const getProductImage = (item: any): string | null => {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_IMG_URL;
-  
-  const formatImageUrl = (imagePath: string): string => {
-    if (!imagePath) return '';
-    if (imagePath.startsWith('http')) return imagePath;
-    if (imagePath.startsWith('/uploads/')) {
-      return `${baseUrl}${imagePath}`;
-    }
-    return `${baseUrl}/uploads/${imagePath}`;
-  };
-  
-  // Use stored product image if available
+  // ✅ Check productImage FIRST - it already has the image!
   if (item.productImage) {
-    return formatImageUrl(item.productImage);
+    const baseUrl = process.env.NEXT_PUBLIC_IMG_URL || '';
+    const cleanPath = item.productImage.replace('/uploads/', '');
+    return `${baseUrl}/${cleanPath}`;
   }
-  
-  // Try product images
-  if (item.product?.images?.[0]?.image) {
-    return formatImageUrl(item.product.images[0].image);
-  }
-  
-  // Try ogImage
-  if (item.product?.ogImage) {
-    return formatImageUrl(item.product.ogImage);
-  }
-  
   return null;
 };
-
 // Helper function to get max stock
 const getItemMaxStock = (item: any): number => {
   if (item.product?.stock !== undefined) {
@@ -100,8 +79,21 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
   }, [isOpen]);
 
   const handleCheckout = () => {
-    onClose();
-    router.push('/checkout');
+    // Check if user is authenticated
+    const isLoggedIn = isAuthenticated();
+    
+    if (isLoggedIn) {
+      // User is logged in, proceed to checkout
+      onClose();
+      router.push('/checkout');
+    } else {
+      // User is not logged in, redirect to login page with return URL
+      onClose();
+      // Store the current cart state or intent in session storage
+      sessionStorage.setItem('redirectAfterLogin', '/checkout');
+      sessionStorage.setItem('pendingCheckout', 'true');
+      router.push('/login');
+    }
   };
 
   const handleRemoveItem = async (itemId: string) => {
@@ -115,7 +107,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
 
   const itemCount = cart.totalItems || 0;
   const subtotal = cart.totalPrice || 0;
-  const tax = subtotal * 0.18;
+  const tax = subtotal * 0.05;
   const total = subtotal + tax;
 
   return (
@@ -304,7 +296,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                 <span className="text-[#D97A22] font-medium">FREE</span>
               </div>
               <div className="flex justify-between text-xs">
-                <span className="text-gray-600">Tax (18%)</span>
+                <span className="text-gray-600">Tax (5%)</span>
                 <span className="text-gray-900">₹{tax.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-sm font-semibold pt-1.5 border-t border-gray-200 mt-1">
@@ -319,7 +311,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                 onClick={handleCheckout}
                 className="w-full py-2.5 rounded-lg font-medium text-xs transition-all duration-200 shadow-sm bg-gradient-to-r from-[#D97A22] via-[#D97A22] to-[#D97A22] text-white hover:from-[#c56a1e] hover:via-[#c56a1e] hover:to-[#c56a1e] cursor-pointer"
               >
-                Proceed to Checkout
+                Buy Now
               </button>
               
               <button

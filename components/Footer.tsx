@@ -29,8 +29,8 @@ export default function Footer() {
   ];
 
   // Static site settings
-  const siteName = 'Classic India';
-  const copyrightText = '© 2026 Classic India. All rights reserved.';
+  const siteName = 'Sea Food';
+  const copyrightText = '© 2026 Sea Food. All rights reserved.';
 
   // Static social links
   const socialLinks = {
@@ -43,18 +43,18 @@ export default function Footer() {
 
   // Define social icons and their configurations
   const socialConfigs = [
-    { key: 'facebook', icon: Facebook, url: socialLinks.facebook, color: 'hover:text-[#1877f2]', label: 'Facebook' },
-    { key: 'twitter', icon: Twitter, url: socialLinks.twitter, color: 'hover:text-[#1da1f2]', label: 'Twitter' },
-    { key: 'instagram', icon: Instagram, url: socialLinks.instagram, color: 'hover:text-[#e4405f]', label: 'Instagram' },
-    { key: 'youtube', icon: Youtube, url: socialLinks.youtube, color: 'hover:text-[#ff0000]', label: 'YouTube' },
-    { key: 'linkedin', icon: Linkedin, url: socialLinks.linkedin, color: 'hover:text-[#0077b5]', label: 'LinkedIn' },
+    { key: 'facebook', icon: Facebook, url: socialLinks.facebook, label: 'Facebook' },
+    { key: 'twitter', icon: Twitter, url: socialLinks.twitter, label: 'Twitter' },
+    { key: 'instagram', icon: Instagram, url: socialLinks.instagram, label: 'Instagram' },
+    { key: 'youtube', icon: Youtube, url: socialLinks.youtube, label: 'YouTube' },
+    { key: 'linkedin', icon: Linkedin, url: socialLinks.linkedin, label: 'LinkedIn' },
   ];
 
   // Filter only social links that have URLs
   const activeSocialLinks = socialConfigs.filter(social => social.url && social.url.trim() !== '');
 
   return (
-    <footer className="bg-black text-gray-300 pt-12 pb-8">
+    <footer className="pt-12 pb-8" style={{ backgroundColor: '#014F56', color: '#E9F5F5' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <motion.div
@@ -63,8 +63,8 @@ export default function Footer() {
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
           >
-            <h3 className="font-bold text-lg mb-4" style={{ color: '#ff6600' }}>{siteName}</h3>
-            <p className="text-sm text-gray-400 leading-relaxed">
+            <h3 className="font-bold text-lg mb-4" style={{ color: '#2EC4B6' }}>{siteName}</h3>
+            <p className="text-sm leading-relaxed" style={{ color: '#E9F5F5' }}>
               India's fastest growing classifieds platform. Post ads instantly and reach millions at minimal cost.
             </p>
             
@@ -81,7 +81,8 @@ export default function Footer() {
                       rel="noopener noreferrer"
                       whileHover={{ y: -3, scale: 1.1 }}
                       transition={{ type: "spring", stiffness: 400 }}
-                      className={`text-gray-400 transition ${social.color}`}
+                      className="transition-colors hover:text-[#2EC4B6]"
+                      style={{ color: '#E9F5F5' }}
                       aria-label={social.label}
                     >
                       <Icon size={18} />
@@ -98,7 +99,7 @@ export default function Footer() {
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
           >
-            <h4 className="text-white font-semibold mb-4">Categories</h4>
+            <h4 className="font-semibold mb-4" style={{ color: '#2EC4B6' }}>Categories</h4>
             <ul className="space-y-2 text-sm">
               {categories.map((cat) => (
                 <motion.li 
@@ -106,7 +107,11 @@ export default function Footer() {
                   whileHover={{ x: 3 }}
                   transition={{ type: "spring", stiffness: 400 }}
                 >
-                  <a href={`/category/${cat.slug}`} className="hover:text-[#ff6600] transition">
+                  <a 
+                    href={`/category/${cat.slug}`} 
+                    className="transition-colors hover:text-[#2EC4B6]"
+                    style={{ color: '#E9F5F5' }}
+                  >
                     {cat.title}
                   </a>
                 </motion.li>
@@ -120,7 +125,7 @@ export default function Footer() {
             viewport={{ once: true }}
             transition={{ delay: 0.3 }}
           >
-            <h4 className="text-white font-semibold mb-4">Top Locations</h4>
+            <h4 className="font-semibold mb-4" style={{ color: '#2EC4B6' }}>Top Locations</h4>
             <ul className="space-y-2 text-sm">
               {states.map((state) => (
                 <motion.li 
@@ -128,7 +133,11 @@ export default function Footer() {
                   whileHover={{ x: 3 }}
                   transition={{ type: "spring", stiffness: 400 }}
                 >
-                  <a href={`/${state.slug}`} className="hover:text-[#ff6600] transition">
+                  <a 
+                    href={`/${state.slug}`} 
+                    className="transition-colors hover:text-[#2EC4B6]"
+                    style={{ color: '#E9F5F5' }}
+                  >
                     {state.name}
                   </a>
                 </motion.li>
@@ -143,7 +152,7 @@ export default function Footer() {
             viewport={{ once: true }}
             transition={{ delay: 0.4 }}
           >
-            <h4 className="text-white font-semibold mb-4">Legal</h4>
+            <h4 className="font-semibold mb-4" style={{ color: '#2EC4B6' }}>Legal</h4>
             <ul className="space-y-2 text-sm">
               <motion.li
                 whileHover={{ x: 3 }}
@@ -151,7 +160,8 @@ export default function Footer() {
               >
                 <a 
                   href="/privacy-policy"
-                  className="hover:text-[#ff6600] transition"
+                  className="transition-colors hover:text-[#2EC4B6]"
+                  style={{ color: '#E9F5F5' }}
                 >
                   Privacy Policy
                 </a>
@@ -162,7 +172,8 @@ export default function Footer() {
               >
                 <a 
                   href="/terms-conditions"
-                  className="hover:text-[#ff6600] transition"
+                  className="transition-colors hover:text-[#2EC4B6]"
+                  style={{ color: '#E9F5F5' }}
                 >
                   Terms & Conditions
                 </a>
@@ -176,9 +187,10 @@ export default function Footer() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.5 }}
-          className="border-t border-gray-800 pt-8"
+          className="pt-8 mt-8"
+          style={{ borderTop: '1px solid rgba(46, 196, 182, 0.2)' }}
         >
-          <p className="text-sm text-gray-500 text-center">
+          <p className="text-sm text-center" style={{ color: '#E9F5F5' }}>
             {copyrightText}
           </p>
         </motion.div>

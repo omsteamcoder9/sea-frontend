@@ -42,6 +42,44 @@ export default function CartPage() {
     return 999;
   };
 
+  // Helper function to get product image URL
+  const getProductImageUrl = (item: any): string | null => {
+    const baseUrl = process.env.NEXT_PUBLIC_IMG_URL || '';
+    
+    const formatImageUrl = (imagePath: string): string => {
+      if (!imagePath) return '';
+      if (imagePath.startsWith('http')) return imagePath;
+      
+      // Clean the image path to avoid double slashes or duplicate /uploads
+      let cleanPath = imagePath;
+      // Remove leading /uploads/ if present (since baseUrl already includes it)
+      if (cleanPath.startsWith('/uploads/')) {
+        cleanPath = cleanPath.replace('/uploads/', '');
+      }
+      // Remove leading slash if present
+      cleanPath = cleanPath.replace(/^\//, '');
+      
+      return `${baseUrl}/${cleanPath}`;
+    };
+    
+    // Check productImage from cart item
+    if (item.productImage) {
+      return formatImageUrl(item.productImage);
+    }
+    
+    // Check product images
+    if (typeof item.product === 'object' && item.product?.images?.[0]?.image) {
+      return formatImageUrl(item.product.images[0].image);
+    }
+    
+    // Check ogImage
+    if (typeof item.product === 'object' && item.product?.ogImage) {
+      return formatImageUrl(item.product.ogImage);
+    }
+    
+    return null;
+  };
+
   if (!cart.items || cart.items.length === 0) {
     return (
       <div className="min-h-screen bg-white py-8 sm:py-12">
@@ -102,14 +140,7 @@ export default function CartPage() {
                   const productName = getProductName(item);
                   const variantName = getVariantName(item);
                   const productStock = getProductStock(item);
-                  
-                  // Get image URL
-                  let imageUrl = null;
-                  if (item.productImage) {
-                    imageUrl = `${process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_IMG_URL}${item.productImage}`;
-                  } else if (typeof item.product === 'object' && item.product?.images?.[0]?.image) {
-                    imageUrl = `${process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_IMG_URL}${item.product.images[0].image}`;
-                  }
+                  const imageUrl = getProductImageUrl(item);
                   
                   return (
                     <div key={item._id} className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 border-b border-gray-200 pb-4 sm:pb-6">
@@ -241,8 +272,7 @@ export default function CartPage() {
                 onClick={handleCheckout}
                 className="w-full bg-gradient-to-r from-[#D97A22] via-[#D97A22] to-[#D97A22] text-white py-3 rounded-lg hover:from-[#c56a1e] hover:via-[#c56a1e] hover:to-[#c56a1e] transition-all duration-200 font-medium mb-3 sm:mb-4 text-sm sm:text-base shadow-lg hover:shadow-[#D97A22]/25 cursor-pointer"
               >
-                Proceed to Checkout
-              </button>
+Buy Now              </button>
 
               {isGuest && (
                 <div className="text-center mb-3 sm:mb-4 space-y-2">

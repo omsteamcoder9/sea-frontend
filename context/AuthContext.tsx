@@ -1,4 +1,5 @@
-"use client";
+// context/AuthContext.tsx
+'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { OtpUser } from '@/types/auth';
@@ -6,6 +7,7 @@ import { otpAuth } from '@/lib/otpAuth';
 
 interface AuthContextType {
   user: OtpUser | null;
+  token: string | null; // ✅ ADD THIS
   isLoading: boolean;
   sendOtp: (phoneNumber: string) => Promise<{ sessionId: string; isNewUser: boolean }>;
   verifyOtp: (sessionId: string, otpCode: string) => Promise<OtpUser>;
@@ -18,6 +20,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<OtpUser | null>(null);
+  const [token, setToken] = useState<string | null>(null); // ✅ ADD THIS
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -25,9 +28,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const checkAuth = async () => {
       try {
         const currentUser = otpAuth.getCurrentUser();
+        const currentToken = otpAuth.getCurrentToken(); // ✅ GET TOKEN
         const isAuth = otpAuth.isAuthenticated();
         
         if (currentUser && isAuth) {
+          setToken(currentToken); // ✅ SET TOKEN
           // Try to refresh profile from server
           try {
             const freshUser = await otpAuth.getProfile();
@@ -38,10 +43,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
         } else {
           setUser(null);
+          setToken(null); // ✅ CLEAR TOKEN
         }
       } catch (error) {
         console.error('Auth check error:', error);
         setUser(null);
+        setToken(null); // ✅ CLEAR TOKEN
       } finally {
         setIsLoading(false);
       }
@@ -67,7 +74,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true);
       const user = await otpAuth.verifyAndAuthenticate(sessionId, otpCode);
+      const newToken = otpAuth.getCurrentToken(); // ✅ GET NEW TOKEN AFTER VERIFY
       setUser(user);
+      setToken(newToken); // ✅ SET TOKEN
       return user;
     } catch (error: any) {
       console.error('Verify OTP error:', error);
@@ -80,6 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     otpAuth.logout();
     setUser(null);
+    setToken(null); // ✅ CLEAR TOKEN ON LOGOUT
   };
 
   const getProfile = async () => {
@@ -100,12 +110,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider
       value={{
         user,
+        token, // ✅ EXPOSE TOKEN
         isLoading,
         sendOtp,
         verifyOtp,
         logout,
         getProfile,
-        isAuthenticated: !!user && otpAuth.isAuthenticated(),
+        isAuthenticated: !!user && !!token, // ✅ UPDATE THIS CHECK
       }}
     >
       {children}
