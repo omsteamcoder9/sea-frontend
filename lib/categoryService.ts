@@ -1,5 +1,5 @@
 // lib/categoryService.ts
-import { Category, CategoryResponse, SingleCategoryResponse } from '@/types/category';
+import { Category, CategoryResponse, SingleCategoryResponse, CreateCategoryData, UpdateCategoryData } from '@/types/category';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -41,16 +41,22 @@ export async function fetchCategoryById(id: string): Promise<Category | null> {
   }
 }
 
-// Create category (Admin only)
-export async function createCategory(name: string, token: string): Promise<Category | null> {
+// Create category (Admin only) - with image support
+export async function createCategory(data: CreateCategoryData, token: string): Promise<Category | null> {
   try {
+    const formData = new FormData();
+    formData.append('name', data.name);
+    
+    if (data.image) {
+      formData.append('image', data.image);
+    }
+    
     const response = await fetch(`${API_BASE_URL}/api/categories`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
       },
-      body: JSON.stringify({ name }),
+      body: formData,
     });
 
     if (!response.ok) {
@@ -58,24 +64,34 @@ export async function createCategory(name: string, token: string): Promise<Categ
       throw new Error(error.message || 'Failed to create category');
     }
 
-    const data = await response.json();
-    return data.category;
+    const result = await response.json();
+    return result.category;
   } catch (error) {
     console.error('Error creating category:', error);
     return null;
   }
 }
 
-// Update category (Admin only)
-export async function updateCategory(id: string, name: string, token: string): Promise<Category | null> {
+// Update category (Admin only) - with image support
+export async function updateCategory(id: string, data: UpdateCategoryData, token: string): Promise<Category | null> {
   try {
+    const formData = new FormData();
+    formData.append('name', data.name);
+    
+    if (data.image) {
+      formData.append('image', data.image);
+    }
+    
+    if (data.deleteImage) {
+      formData.append('deleteImage', 'true');
+    }
+    
     const response = await fetch(`${API_BASE_URL}/api/categories/${id}`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
       },
-      body: JSON.stringify({ name }),
+      body: formData,
     });
 
     if (!response.ok) {
@@ -83,8 +99,8 @@ export async function updateCategory(id: string, name: string, token: string): P
       throw new Error(error.message || 'Failed to update category');
     }
 
-    const data = await response.json();
-    return data.category;
+    const result = await response.json();
+    return result.category;
   } catch (error) {
     console.error('Error updating category:', error);
     return null;

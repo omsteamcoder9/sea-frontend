@@ -135,6 +135,13 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         if (existingItemIndex > -1) {
           guestCart.items[existingItemIndex].quantity += quantity;
         } else {
+          console.log('🔍 DEBUG - product object in CartContext:', {
+  name: product.name,
+  hasImages: !!product.images,
+  images: product.images,
+  imagesLength: product.images?.length,
+  firstImage: product.images?.[0]
+});
         // In addToCart function, when creating newItem for guest:
 const newItem: CartItem = {
   _id: `guest-${Date.now()}-${Math.random()}`,
@@ -146,8 +153,11 @@ const newItem: CartItem = {
   variantName: selectedVariant?.variantName || selectedVariant?.name,
   productName: product.name,
   // ✅ FIX: Store variant image first, then fallback to main product image
-  productImage: selectedVariant?.images?.[0]?.image || product.images?.[0]?.image,
-  // ✅ Also store the full selectedVariant
+productImage: selectedVariant?.images?.[0]?.image || 
+              (product as any).images?.[0]?.image || 
+              (product as any).productImage ||
+              (product as any).image ||
+              '',  // ✅ Also store the full selectedVariant
   selectedVariant: selectedVariant,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString()

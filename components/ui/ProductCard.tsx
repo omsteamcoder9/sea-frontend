@@ -71,6 +71,31 @@ const getProductOfferInfo = (product: Product) => {
   };
 };
 
+// ============= WEIGHT LOGIC =============
+const getProductWeight = (product: Product): { weight: number; weightUnit: string } | null => {
+  // Check if product has variants
+  if (product.variants && product.variants.length > 0) {
+    const defaultVariant = product.variants.find(v => v.isDefault) || product.variants[0];
+    
+    if (defaultVariant?.weight && defaultVariant?.weightUnit) {
+      return {
+        weight: defaultVariant.weight,
+        weightUnit: defaultVariant.weightUnit
+      };
+    }
+  }
+  
+  // Check if product has direct weight fields (if added to Product interface in future)
+  if ((product as any)?.weight && (product as any)?.weightUnit) {
+    return {
+      weight: (product as any).weight,
+      weightUnit: (product as any).weightUnit
+    };
+  }
+  
+  return null;
+};
+
 // Get product image
 const getProductImage = (product: Product) => {
   const imgBaseUrl = process.env.NEXT_PUBLIC_IMG_URL;
@@ -116,6 +141,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   const offerInfo = getProductOfferInfo(product);
   const hasValidOffer = offerInfo.hasOffer && offerInfo.originalPrice > offerInfo.discountedPrice;
+  const weightInfo = getProductWeight(product);
   
   // Check if product is in cart (for "In Cart" badge)
   const isInCart = cart?.items?.some(item => {
@@ -130,114 +156,132 @@ export default function ProductCard({ product }: ProductCardProps) {
     router.push(`/products/${product.slug}`);
   };
 
-  const handleAddToCart = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (isAddingToCart) return;
+const handleAddToCart = async (e: React.MouseEvent) => {
+  e.stopPropagation();
+  if (isAddingToCart) return;
+  
+  try {
+    setIsAddingToCart(true);
     
-    try {
-      setIsAddingToCart(true);
-      await addToCart(product, 1);
-    } catch (error) {
-      console.error('Failed to add product to cart:', error);
-    } finally {
-      setIsAddingToCart(false);
+    // Get the image URL that is currently DISPLAYED on screen
+    const displayedImageUrl = imageUrl;
+    
+    // Extract just the filename from the displayed URL
+    let imageFilename = '';
+    if (displayedImageUrl && displayedImageUrl !== '/placeholder-image.jpg') {
+      // Get everything after last slash
+      imageFilename = displayedImageUrl.split('/').pop() || '';
     }
-  };
+    
+    const productWithImage = {
+      ...product,
+      images: [{ image: imageFilename }]
+    };
+    
+    await addToCart(productWithImage, 1);
+  } catch (error) {
+    console.error('Failed to add product to cart:', error);
+  } finally {
+    setIsAddingToCart(false);
+  }
+};
 
   return (
-    <div 
-      className="group relative bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden cursor-pointer font-sans transform hover:scale-105"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+    <div
       onClick={handleCardClick}
+      className="group w-full max-w-[300px] bg-white rounded-3xl overflow-hidden border border-gray-100 transition-all duration-500 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] cursor-pointer"
     >
-      {/* In Cart Badge */}
-      {isInCart && (
-        <div className="absolute top-2 right-2 z-10 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shadow-md" style={{ backgroundColor: '#2EC4B6' }}>
-          ✓
+      {/* IMAGE SECTION */}
+      <div className="relative aspect-[4/3] bg-[#F3F3F3] overflow-hidden m-2 rounded-2xl">
+        <div className="relative w-full h-full">
+          <Image
+            src={imageUrl}
+            alt={product.name}
+            fill
+            priority
+            className="w-full h-full "
+            onError={() => setImageError(true)}
+          />
         </div>
-      )}
 
-      <div className="relative p-3 sm:p-4 pb-0 overflow-hidden">
-        <div className="relative w-full aspect-square bg-white flex items-center justify-center overflow-hidden">
-          <div className="relative w-full h-full">
-            <Image
-              src={imageUrl}
-              alt={product.name}
-              fill
-              sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              className={`object-contain transition-transform duration-500 ${
-                isHovered ? 'scale-110' : 'scale-100'
-              }`}
-              onError={() => setImageError(true)}
-              priority={false}
-              loading="lazy"
-            />
+        {imageError && (
+          <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+            <span className="text-gray-400 text-sm">No Image</span>
           </div>
+        )}
 
-          {/* Image Error Fallback */}
-          {imageError && (
-            <div className="absolute inset-0 bg-gray-50 flex items-center justify-center">
-              <svg className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </div>
-          )}
-        </div>
+        {/* IN CART BADGE */}
+        {isInCart && (
+          <div className="absolute top-3 right-3 z-20 rounded-full w-7 h-7 flex items-center justify-center text-sm font-bold shadow-lg" style={{ backgroundColor: "#5E0006", color: "#D53E0F" }}>
+            ✓
+          </div>
+        )}
       </div>
-      
-      {/* Content Section */}
-      <div className="p-3">
-        <div className="flex justify-between items-start mb-2 min-h-[2.5rem]">
-          <h3 className="font-semibold text-gray-900 line-clamp-2 text-[10px] sm:text-[14px] flex-1 pr-2 text-left">
-            {product.name}
-          </h3>
-          
-          {hasValidOffer && (
-            <div className="text-white px-1.5 py-0.5 rounded-md text-[10px] xs:text-xs font-bold whitespace-nowrap flex-shrink-0 sm:px-2 sm:text-xs" style={{ backgroundColor: '#2EC4B6' }}>
-              {Math.round(offerInfo.discountPercentage)}% OFF
+
+      {/* CONTENT SECTION */}
+      <div className="px-5 py-4">
+        {/* Category/Weight */}
+        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-1">
+          {weightInfo ? `Net Weight • ${weightInfo.weight} ${weightInfo.weightUnit}` : 'Essentials'}
+        </p>
+
+        {/* PRODUCT NAME */}
+        <h3 className="text-[#1A1A1A] text-[19px] font-semibold tracking-tight leading-tight mb-4 group-hover:text-[#5E0006] transition-colors truncate">
+          {product.name}
+        </h3>
+
+        {/* Stock Status */}
+        <div className="mb-3">
+          {!isOutOfStock ? (
+            <div className="flex items-center gap-1 text-xs font-medium" style={{ color: '#D53E0F' }}>
+              <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: '#D53E0F' }}></span>
+              <span className="text-[12px]">In Stock</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1 text-red-600 text-xs font-medium">
+              <span className="w-1.5 h-1.5 bg-red-500 rounded-full"></span>
+              <span className="text-[12px]">Out of Stock</span>
             </div>
           )}
         </div>
-        
-        <div className="flex justify-between items-center mb-3">
-          <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
-            <span className="text-sm xs:text-base sm:text-lg font-bold text-gray-900">
-              ₹{formatPrice(offerInfo.discountedPrice)}
-            </span>
-            
-            {hasValidOffer && (
-              <span 
-                className="text-[10px] xs:text-xs sm:text-sm text-gray-500 font-medium"
-                style={{ 
-                  textDecoration: 'line-through',
-                  textDecorationColor: '#6b7280',
-                  textDecorationThickness: '0.5px'
-                }}
-              >
-                ₹{formatPrice(offerInfo.originalPrice)}
-              </span>
-            )}
-          </div>
-          
-          <span className={`px-1.5 py-0.5 xs:px-2 xs:py-1 text-[10px] xs:text-xs rounded-full font-medium whitespace-nowrap ${
-            !isOutOfStock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-          }`}>
-            {!isOutOfStock ? 'In stock' : 'Out of stock'}
-          </span>
-        </div>
 
-        <button 
-          onClick={handleAddToCart}
-          disabled={isOutOfStock || isAddingToCart}
-          className="w-full py-2 px-3 rounded-lg font-medium flex items-center justify-center gap-2 transition-all duration-300 text-white hover:opacity-80 disabled:bg-gray-400 disabled:cursor-not-allowed shadow-lg text-xs xs:text-sm sm:text-sm transform hover:scale-105 cursor-pointer mb-2"
-          style={{ backgroundColor: '#2EC4B6' }}
-        >
-          <ShoppingBag size={14} className="xs:w-4 xs:h-4 sm:w-4 sm:h-4" />
-          <span className="text-xs xs:text-sm sm:text-sm">
-            {isAddingToCart ? 'Adding...' : (!isOutOfStock ? 'Add to Cart' : 'Out of Stock')}
-          </span>
-        </button>
+        {/* Price & Action Row */}
+        <div className="flex items-center justify-between border-t border-gray-50 pt-4">
+          <div className="flex flex-col">
+            <p className="text-[11px] text-gray-400 font-medium">Price</p>
+            <div className="flex items-center gap-2 flex-wrap">
+              {hasValidOffer && (
+                <span className="text-gray-400 line-through text-[11px] font-medium">
+                  ₹{formatPrice(offerInfo.originalPrice)}
+                </span>
+              )}
+              <span className="text-xl font-bold text-[#1A1A1A]">
+                ₹{formatPrice(offerInfo.discountedPrice)}
+              </span>
+            </div>
+          </div>
+
+          <button
+            onClick={handleAddToCart}
+            disabled={isOutOfStock || isAddingToCart}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-300 active:scale-95 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{ 
+              backgroundColor: '#9B0F06',
+              color: 'white'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#6B0A04';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#9B0F06';
+            }}
+          >
+            <ShoppingBag size={16} />
+            <span className="text-xs font-bold tracking-wide">
+              {isOutOfStock ? 'OUT' : 'ADD TO CART'}
+            </span>
+          </button>
+        </div>
       </div>
     </div>
   );
