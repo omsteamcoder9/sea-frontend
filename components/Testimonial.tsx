@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { ChevronLeft, ChevronRight, Star, Quote } from "lucide-react"
 import Image from "next/image"
+import { motion, AnimatePresence } from "framer-motion"
 
 export default function TestimonialsSection() {
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -84,13 +85,19 @@ export default function TestimonialsSection() {
   }
 
   return (
-    <section className="bg-gradient-to-br from-[#5E0006]/5 to-[#D53E0F]/5 py-8 sm:py-16 relative">
+    <motion.section 
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6 }}
+      className="bg-gradient-to-br from-[#5E0006]/5 to-[#9B0F06]/5 py-8 sm:py-16 relative"
+    >
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: `radial-gradient(circle at 1px 1px, #D53E0F 1px, transparent 0)`,
+            backgroundImage: `radial-gradient(circle at 1px 1px, #9B0F06 1px, transparent 0)`,
             backgroundSize: "40px 40px",
           }}
         ></div>
@@ -98,92 +105,152 @@ export default function TestimonialsSection() {
 
       <div className="max-w-7xl mx-auto px-3 sm:px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
-        <div className="text-center mb-8 sm:mb-16">
-          <div className="inline-flex items-center px-3 sm:px-4 py-2 rounded-full bg-[#D53E0F]/10 border border-[#D53E0F]/30 mb-4">
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.1, duration: 0.6 }}
+          className="text-center mb-8 sm:mb-16"
+        >
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2, duration: 0.4 }}
+            className="inline-flex items-center px-3 sm:px-4 py-2 rounded-full bg-[#9B0F06]/10 border border-[#9B0F06]/30 mb-4"
+          >
             <span className="text-[#5E0006] text-xs sm:text-sm font-semibold uppercase tracking-wider">
               Customer Testimonials
             </span>
-          </div>
+          </motion.div>
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-[#5E0006] mb-4 sm:mb-6 px-2">
             What Our{" "}
-            <span className="bg-gradient-to-r from-[#D53E0F] to-[#5E0006] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#9B0F06] to-[#5E0006] bg-clip-text text-transparent">
               Customers Say
             </span>
           </h2>
-          <p className="text-sm sm:text-lg text-[#5E0006]/80 max-w-3xl mx-auto leading-relaxed px-4">
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3, duration: 0.6 }}
+            className="text-sm sm:text-lg text-[#5E0006]/80 max-w-3xl mx-auto leading-relaxed px-4"
+          >
             Don't just take our word for it. Here's what our satisfied customers have to say about their experience
             getting fresh, premium quality seafood delivered by Sea Food.
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
         <div className="grid lg:grid-cols-2 gap-4 sm:gap-8 items-center">
           {/* Left Side - Testimonial Content */}
-          <div className="relative">
-            <div className="bg-gradient-to-br from-white to-[#D53E0F]/5 rounded-xl sm:rounded-2xl p-4 sm:p-8 lg:p-12 border border-[#D53E0F]/20 shadow-2xl">
+          <motion.div 
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+            className="relative"
+          >
+            <div className="bg-gradient-to-br from-white to-[#9B0F06]/5 rounded-xl sm:rounded-2xl p-4 sm:p-8 lg:p-12 border border-[#9B0F06]/20 shadow-2xl">
               {/* Quote Icon */}
-              <div className="text-[#D53E0F] mb-4 sm:mb-6">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.5 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.3, duration: 0.5 }}
+                className="text-[#9B0F06] mb-4 sm:mb-6"
+              >
                 <Quote className="w-8 h-8 sm:w-12 sm:h-12 opacity-40" />
-              </div>
+              </motion.div>
 
-              {/* Testimonial Text */}
-              <blockquote className="text-[#5E0006] text-sm sm:text-lg lg:text-xl leading-relaxed mb-4 sm:mb-8 font-light">
-                "{testimonials[currentIndex].text}"
-              </blockquote>
+              {/* Testimonial Text with Animation */}
+              <AnimatePresence mode="wait">
+                <motion.blockquote
+                  key={currentIndex}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.4 }}
+                  className="text-[#5E0006] text-sm sm:text-lg lg:text-xl leading-relaxed mb-4 sm:mb-8 font-light"
+                >
+                  "{testimonials[currentIndex].text}"
+                </motion.blockquote>
+              </AnimatePresence>
 
               {/* Customer Info */}
-              <div className="border-t border-[#D53E0F]/20 pt-4 sm:pt-8">
+              <motion.div 
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4, duration: 0.5 }}
+                className="border-t border-[#9B0F06]/20 pt-4 sm:pt-8"
+              >
                 <div className="flex items-center justify-between mb-2 sm:mb-4">
                   <div>
                     <div className="text-[#5E0006] font-semibold text-sm sm:text-xl">
                       {testimonials[currentIndex].name}
                     </div>
-                    <div className="text-[#D53E0F] text-xs sm:text-sm">{testimonials[currentIndex].location}</div>
+                    <div className="text-[#9B0F06] text-xs sm:text-sm">{testimonials[currentIndex].location}</div>
                   </div>
                   {renderStars(testimonials[currentIndex].rating)}
                 </div>
                 <div className="text-[#5E0006]/70 text-xs sm:text-sm">
                   Purchase: <span className="text-[#5E0006] font-medium">{testimonials[currentIndex].project}</span>
                 </div>
-              </div>
+              </motion.div>
 
               {/* Navigation */}
               <div className="flex items-center justify-between mt-4 sm:mt-8">
                 <div className="flex items-center space-x-2 sm:space-x-4">
-                  <button
+                  <motion.button
                     onClick={prevTestimonial}
-                    className="w-8 h-8 sm:w-12 sm:h-12 bg-[#D53E0F]/20 hover:bg-[#D53E0F]/40 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="w-8 h-8 sm:w-12 sm:h-12 bg-[#9B0F06]/20 hover:bg-[#9B0F06]/40 rounded-full flex items-center justify-center transition-all duration-300"
                   >
                     <ChevronLeft className="w-4 h-4 sm:w-6 sm:h-6 text-[#5E0006]" />
-                  </button>
-                  <button
+                  </motion.button>
+                  <motion.button
                     onClick={nextTestimonial}
-                    className="w-8 h-8 sm:w-12 sm:h-12 bg-[#D53E0F]/20 hover:bg-[#D53E0F]/40 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="w-8 h-8 sm:w-12 sm:h-12 bg-[#9B0F06]/20 hover:bg-[#9B0F06]/40 rounded-full flex items-center justify-center transition-all duration-300"
                   >
                     <ChevronRight className="w-4 h-4 sm:w-6 sm:h-6 text-[#5E0006]" />
-                  </button>
+                  </motion.button>
                 </div>
 
                 {/* Dots Indicator */}
                 <div className="flex space-x-1 sm:space-x-2">
                   {testimonials.map((_, index) => (
-                    <button
+                    <motion.button
                       key={index}
                       onClick={() => setCurrentIndex(index)}
+                      whileHover={{ scale: 1.2 }}
                       className={`h-1.5 sm:h-2 rounded-full transition-all duration-300 ${
                         index === currentIndex 
-                          ? "bg-[#D53E0F] w-4 sm:w-8" 
-                          : "bg-[#D53E0F]/30 hover:bg-[#D53E0F]/50 w-1.5 sm:w-2"
+                          ? "bg-[#9B0F06] w-4 sm:w-8" 
+                          : "bg-[#9B0F06]/30 hover:bg-[#9B0F06]/50 w-1.5 sm:w-2"
                       }`}
                     />
                   ))}
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Right Side - Image */}
-          <div className="relative">
-            <div className="relative rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl">
+          <motion.div 
+            initial={{ opacity: 0, x: 30, scale: 0.95 }}
+            whileInView={{ opacity: 1, x: 0, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3, duration: 0.6, type: "spring", stiffness: 100 }}
+            className="relative"
+          >
+            <motion.div 
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.3 }}
+              className="relative rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl"
+            >
               <Image
                 src="/images/h1.jpg"
                 alt="Happy customers with fresh seafood from Sea Food"
@@ -192,30 +259,41 @@ export default function TestimonialsSection() {
                 className="w-full h-64 sm:h-[500px] object-cover transform hover:scale-105 transition-transform duration-700"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#5E0006]/30 to-transparent"></div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
 
         {/* Additional Testimonials Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6 mt-8 sm:mt-16">
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.4, duration: 0.6 }}
+          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6 mt-8 sm:mt-16"
+        >
           {testimonials.slice(0, 3).map((testimonial, index) => (
-            <div
+            <motion.div
               key={index}
-              className="bg-white/90 rounded-lg sm:rounded-xl p-3 sm:p-6 border border-[#D53E0F]/20 hover:border-[#D53E0F]/60 transition-all duration-300 shadow-lg hover:shadow-xl"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.5 + (index * 0.1), duration: 0.5 }}
+              whileHover={{ y: -5, transition: { type: "spring", stiffness: 400 } }}
+              className="bg-white/90 rounded-lg sm:rounded-xl p-3 sm:p-6 border border-[#9B0F06]/20 hover:border-[#9B0F06]/60 transition-all duration-300 shadow-lg hover:shadow-xl"
             >
               <div className="flex items-center justify-between mb-2 sm:mb-4">
                 {renderStars(testimonial.rating)}
-                <Quote className="w-6 h-6 sm:w-8 sm:h-8 text-[#D53E0F]/30" />
+                <Quote className="w-6 h-6 sm:w-8 sm:h-8 text-[#9B0F06]/30" />
               </div>
               <p className="text-[#5E0006]/80 text-xs sm:text-sm mb-2 sm:mb-4 line-clamp-3">"{testimonial.text}"</p>
               <div>
                 <div className="text-[#5E0006] font-semibold text-xs sm:text-sm">{testimonial.name}</div>
-                <div className="text-[#D53E0F] text-xs">{testimonial.project}</div>
+                <div className="text-[#9B0F06] text-xs">{testimonial.project}</div>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
-    </section>
+    </motion.section>
   )
 }

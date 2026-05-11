@@ -110,7 +110,7 @@ export default function HomeClient({ categories, featuredCategories }: HomeClien
               transition={{ delay: 0.2 }}
               className="text-center mb-8"
             >
-              <h2 className="text-4xl font-bold mb-3 animate-gradient-text" style={{ background: 'linear-gradient(135deg, #5E0006 0%, #D53E0F 50%, #9B0F06 100%)', backgroundSize: '200% auto', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+              <h2 className="text-4xl font-bold mb-3 animate-gradient-text" style={{ background: 'linear-gradient(135deg, #5E0006 0%, #9B0F06 50%, #D53E0F 100%)', backgroundSize: '200% auto', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
                 Explore Our Fresh Seafood Collection
               </h2>
               <motion.p 
@@ -152,7 +152,7 @@ export default function HomeClient({ categories, featuredCategories }: HomeClien
                       transition={{ delay: index * 0.1 + 0.2, duration: 0.5 }}
                       className="flex justify-center"
                     >
-                      <div className="h-1 rounded-full" style={{ backgroundColor: '#D53E0F', width: '80px' }}></div>
+                      <div className="h-1 rounded-full" style={{ backgroundColor: '#9B0F06', width: '80px' }}></div>
                     </motion.div>
                   </div>
                   <ProductGrid category={category._id} limit={8} hideFilters={true} />
@@ -202,7 +202,7 @@ export default function HomeClient({ categories, featuredCategories }: HomeClien
             transition={{ delay: 0.2 }}
             className="text-center mb-8 sm:mb-12"
           >
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 tracking-tight animate-gradient-text" style={{ background: 'linear-gradient(135deg, #5E0006 0%, #D53E0F 50%, #9B0F06 100%)', backgroundSize: '200% auto', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 tracking-tight animate-gradient-text" style={{ background: 'linear-gradient(135deg, #5E0006 0%, #9B0F06 50%, #D53E0F 100%)', backgroundSize: '200% auto', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
               Why Choose Our Fresh Seafood
             </h2>
             <motion.div 
@@ -211,7 +211,7 @@ export default function HomeClient({ categories, featuredCategories }: HomeClien
               viewport={{ once: true }}
               transition={{ delay: 0.3, duration: 0.5 }}
               className="w-20 h-1 mx-auto mb-4 sm:mb-6 rounded-full"
-              style={{ backgroundColor: '#D53E0F' }}
+              style={{ backgroundColor: '#9B0F06' }}
             ></motion.div>
             <motion.p 
               initial={{ opacity: 0 }}
@@ -237,12 +237,12 @@ export default function HomeClient({ categories, featuredCategories }: HomeClien
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1, type: "spring", stiffness: 100, damping: 15 }}
                 whileHover={{ y: -5 }}
-                className="group p-5 sm:p-8 rounded-3xl transition-all duration-300 hover:shadow-[0_20px_40px_rgba(213,62,15,0.12)] flex flex-col items-center text-center bg-white border border-gray-100"
+                className="group p-5 sm:p-8 rounded-3xl transition-all duration-300 hover:shadow-[0_20px_40px_rgba(155,15,6,0.12)] flex flex-col items-center text-center bg-white border border-gray-100"
               >
                 <motion.div 
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   transition={{ type: "spring", stiffness: 400 }}
-                  className="w-12 h-12 sm:w-16 sm:h-16 mb-4 sm:mb-6 flex items-center justify-center rounded-2xl transition-all duration-500 shadow-sm bg-[#D53E0F]/10 text-[#D53E0F] group-hover:bg-[#D53E0F] group-hover:text-white"
+                  className="w-12 h-12 sm:w-16 sm:h-16 mb-4 sm:mb-6 flex items-center justify-center rounded-2xl transition-all duration-500 shadow-sm bg-[#9B0F06]/10 text-[#9B0F06] group-hover:bg-[#9B0F06] group-hover:text-white"
                 >
                   <feature.icon size={22} className="sm:w-[28px] sm:h-[28px]" strokeWidth={1.5} />
                 </motion.div>
@@ -252,7 +252,7 @@ export default function HomeClient({ categories, featuredCategories }: HomeClien
                   <motion.span 
                     whileHover={{ scale: 1.05 }}
                     transition={{ type: "spring", stiffness: 400 }}
-                    className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-[#D53E0F]/10 text-[#D53E0F] border border-[#D53E0F]/20 group-hover:bg-[#D53E0F] group-hover:text-white transition-all duration-300"
+                    className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-[#9B0F06]/10 text-[#9B0F06] border border-[#9B0F06]/20 group-hover:bg-[#9B0F06] group-hover:text-white transition-all duration-300"
                   >
                     {feature.highlight}
                   </motion.span>
@@ -289,7 +289,7 @@ export default function HomeClient({ categories, featuredCategories }: HomeClien
             transition={{ delay: 0.2 }}
             className="text-center mb-10"
           >
-            <h2 className="text-4xl font-bold mb-3 animate-gradient-text" style={{ background: 'linear-gradient(135deg, #5E0006 0%, #D53E0F 50%, #9B0F06 100%)', backgroundSize: '200% auto', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+            <h2 className="text-4xl font-bold mb-3 animate-gradient-text" style={{ background: 'linear-gradient(135deg, #5E0006 0%, #9B0F06 50%, #D53E0F 100%)', backgroundSize: '200% auto', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
               Frequently Asked Questions
             </h2>
             <motion.p 
@@ -321,7 +321,7 @@ export default function HomeClient({ categories, featuredCategories }: HomeClien
                   <motion.span 
                     animate={{ rotate: openFaqIndex === index ? 180 : 0 }}
                     transition={{ duration: 0.3 }}
-                    style={{ color: '#D53E0F' }}
+                    style={{ color: '#9B0F06' }}
                   >
                     {openFaqIndex === index ? <Minus className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
                   </motion.span>

@@ -264,7 +264,7 @@ const handleAddToCart = async (e: React.MouseEvent) => {
           <button
             onClick={handleAddToCart}
             disabled={isOutOfStock || isAddingToCart}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-300 active:scale-95 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-300 active:scale-95 shadow-sm disabled:opacity-50 cursor-pointer"
             style={{ 
               backgroundColor: '#9B0F06',
               color: 'white'

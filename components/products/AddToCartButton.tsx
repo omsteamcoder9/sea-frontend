@@ -10,13 +10,15 @@ interface AddToCartButtonProps {
   selectedVariant?: ProductVariant;
   quantity?: number;
   onQuantityChange?: (qty: number) => void;
+  compact?: boolean; // New prop for compact mode
 }
 
 export default function AddToCartButton({ 
   product, 
   selectedVariant,
   quantity: externalQuantity,
-  onQuantityChange
+  onQuantityChange,
+  compact = false // Default to false for backward compatibility
 }: AddToCartButtonProps) {
   const [internalQuantity, setInternalQuantity] = useState(1);
   const quantity = externalQuantity !== undefined ? externalQuantity : internalQuantity;
@@ -25,13 +27,11 @@ export default function AddToCartButton({
 
   const isAdding = loading && addingProductId === product._id;
 
-  // ✅ FIXED: Properly check for same variant in cart
+  // Check for same variant in cart
   const isInCart = cart?.items?.some(item => {
-    // Handle product that could be string or object
     const productId = typeof item.product === 'string' ? item.product : item.product._id;
     const sameProduct = productId === product._id;
     
-    // Check variant using available fields
     const itemVariantId = item.selectedVariant?._id || item.variantId;
     const selectedVariantId = selectedVariant?._id || selectedVariant?.variantName;
     const sameVariant = !selectedVariantId || itemVariantId === selectedVariantId;
@@ -39,7 +39,6 @@ export default function AddToCartButton({
     return sameProduct && sameVariant;
   }) || false;
 
-  // Get max quantity based on variant or product stock
   const getMaxQuantity = () => {
     if (selectedVariant) {
       return Math.max(0, selectedVariant.stock);
@@ -67,12 +66,86 @@ export default function AddToCartButton({
   const maxQuantity = getMaxQuantity();
   const isOutOfStock = selectedVariant ? selectedVariant.stock <= 0 : product.stock <= 0;
 
+  // Compact mode styles
+  if (compact) {
+    return (
+      <div className="space-y-1.5">
+        {/* Quantity Selector - Compact */}
+        {!isOutOfStock && (
+          <div className="flex items-center gap-1.5">
+            <span className="font-medium text-xs text-gray-700">Qty:</span>
+            <div className="flex items-center border border-gray-300 rounded-md">
+              <button
+                type="button"
+                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                className="px-1.5 py-0.5 hover:bg-gray-50 transition-colors disabled:opacity-50 cursor-pointer text-xs"
+                disabled={quantity <= 1}
+              >
+                -
+              </button>
+              <span className="px-1.5 py-0.5 min-w-6 text-center text-xs">{quantity}</span>
+              <button
+                type="button"
+                onClick={() => setQuantity(Math.min(maxQuantity, quantity + 1))}
+                className="px-1.5 py-0.5 hover:bg-gray-50 transition-colors disabled:opacity-50 cursor-pointer text-xs"
+                disabled={quantity >= maxQuantity}
+              >
+                +
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Add to Cart Button - Compact */}
+        <button
+          type="button"
+          onClick={handleAddToCart}
+          disabled={isOutOfStock || isAdding}
+          className="w-full py-1.5 px-2 rounded-md font-medium text-xs flex items-center justify-center gap-1.5 transition-all duration-300 active:scale-95 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          style={{
+            backgroundColor: isOutOfStock || isAdding ? '#ccc' : '#9B0F06',
+            color: 'white'
+          }}
+          onMouseEnter={(e) => {
+            if (!isOutOfStock && !isAdding) {
+              e.currentTarget.style.backgroundColor = '#6B0A04';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isOutOfStock && !isAdding) {
+              e.currentTarget.style.backgroundColor = '#9B0F06';
+            }
+          }}
+        >
+          {isAdding ? (
+            <>
+              <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+              <span>Adding...</span>
+            </>
+          ) : isOutOfStock ? (
+            <span>Out of Stock</span>
+          ) : isInCart ? (
+            <>
+              <Check size={12} />
+              <span>In Cart</span>
+            </>
+          ) : (
+            <>
+              <ShoppingBag size={12} />
+              <span>Add to Cart</span>
+            </>
+          )}
+        </button>
+      </div>
+    );
+  }
+
+  // Original mode (for backward compatibility)
   return (
     <div className="space-y-3">
-      {/* Quantity Selector - Only show if product is in stock */}
       {!isOutOfStock && (
         <div className="flex items-center gap-2">
-          <span className="font-semibold text-sm">Qty:</span>
+          <span className="font-semibold text-sm text-gray-700">Qty:</span>
           <div className="flex items-center border border-gray-300 rounded">
             <button
               type="button"
@@ -100,33 +173,44 @@ export default function AddToCartButton({
         </div>
       )}
 
-      {/* Add to Cart Button */}
       <button
         type="button"
         onClick={handleAddToCart}
         disabled={isOutOfStock || isAdding}
-        className="w-full py-2 px-4 bg-gradient-to-r from-[#D97A22] via-[#D97A22] to-[#D97A22] text-white rounded-lg font-medium flex items-center justify-center gap-2 transition-all duration-300 hover:from-[#c56a1e] hover:via-[#c56a1e] hover:to-[#c56a1e] hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed shadow cursor-pointer text-sm"
+        className="w-full py-2 px-4 rounded-lg font-medium flex items-center justify-center gap-2 transition-all duration-300 active:scale-95 shadow disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-sm"
+        style={{
+          backgroundColor: isOutOfStock || isAdding ? '#ccc' : '#9B0F06',
+          color: 'white'
+        }}
+        onMouseEnter={(e) => {
+          if (!isOutOfStock && !isAdding) {
+            e.currentTarget.style.backgroundColor = '#6B0A04';
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!isOutOfStock && !isAdding) {
+            e.currentTarget.style.backgroundColor = '#9B0F06';
+          }
+        }}
       >
-        <div className="min-w-[120px] flex items-center justify-center gap-2">
-          {isAdding ? (
-            <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-              <span>Adding...</span>
-            </>
-          ) : isOutOfStock ? (
-            <span>Out of Stock</span>
-          ) : isInCart ? (
-            <>
-              <Check size={16} />
-              <span>In Cart</span>
-            </>
-          ) : (
-            <>
-              <ShoppingBag size={16} />
-              <span>Add to Cart</span>
-            </>
-          )}
-        </div>
+        {isAdding ? (
+          <>
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+            <span>Adding...</span>
+          </>
+        ) : isOutOfStock ? (
+          <span>Out of Stock</span>
+        ) : isInCart ? (
+          <>
+            <Check size={16} />
+            <span>In Cart</span>
+          </>
+        ) : (
+          <>
+            <ShoppingBag size={16} />
+            <span>Add to Cart</span>
+          </>
+        )}
       </button>
     </div>
   );

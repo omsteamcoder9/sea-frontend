@@ -150,3 +150,20 @@ export async function fetchActiveCategories(): Promise<Category[]> {
     return [];
   }
 }
+// Add this function
+export async function fetchCategoryBySlug(slug: string): Promise<Category | null> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/categories?slug=${slug}`, {
+      cache: 'no-store',
+    });
+    
+    if (!response.ok) return null;
+    
+    const data = await response.json();
+    const categories = data.categories || [];
+    return categories.find((cat: Category) => cat.slug === slug) || null;
+  } catch (error) {
+    console.error('Error fetching category by slug:', error);
+    return null;
+  }
+}

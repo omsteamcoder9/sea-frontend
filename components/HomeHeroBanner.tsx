@@ -26,7 +26,7 @@ export default function HomeHeroBanner() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6 }}
-      className="flex flex-col w-full overflow-hidden rounded-2xl shadow-lg bg-gradient-to-r from-[#5E0006] to-[#D53E0F]"
+      className="flex flex-col w-full overflow-hidden rounded-2xl shadow-lg bg-gradient-to-r from-[#5E0006] to-[#9B0F06]"
     >
       
       {/* LEFT IMAGE - Top on mobile, left on desktop */}
@@ -146,7 +146,7 @@ export default function HomeHeroBanner() {
                   viewport={{ once: true }}
                   transition={{ delay: 0.8 + (i * 0.1), duration: 0.3 }}
                   whileHover={{ scale: 1.05, y: -2 }}
-                  className="px-3 py-1.5 md:px-4 md:py-2 bg-[#D53E0F]/20 rounded-full backdrop-blur-sm text-xs md:text-sm font-medium text-[#EED9B9] hover:bg-[#D53E0F]/30 transition-all"
+                  className="px-3 py-1.5 md:px-4 md:py-2 bg-[#9B0F06]/20 rounded-full backdrop-blur-sm text-xs md:text-sm font-medium text-[#EED9B9] hover:bg-[#9B0F06]/30 transition-all cursor-default"
                 >
                   {stat}
                 </motion.span>
@@ -200,7 +200,7 @@ export default function HomeHeroBanner() {
       
       {/* Show fallback if no images */}
       {!leftImageUrl && !rightImageUrl && (
-        <div className="hidden md:block md:w-2/3 bg-gradient-to-r from-[#5E0006] to-[#D53E0F]" />
+        <div className="hidden md:block md:w-2/3 bg-gradient-to-r from-[#5E0006] to-[#9B0F06]" />
       )}
     </motion.div>
   );

@@ -72,6 +72,13 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
     return displayName;
   };
 
+  // Handle category click with proper navigation
+  const handleCategoryClick = (category: Category | string) => {
+    const categorySlug = typeof category === 'string' ? category : (category.slug || category._id);
+    router.push(`/products?category=${encodeURIComponent(categorySlug)}`);
+    setIsMenuOpen(false);
+  };
+
   useEffect(() => {
     const performSearch = async () => {
       if (searchQuery.trim().length < 2) {
@@ -240,14 +247,14 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                 >
                   HOME
                 </Link>
-                {categoryNames.map((cat) => (
-                  <Link
-                    key={cat}
-                    href={`/category/${cat.toLowerCase().replace(/\s+/g, '-')}`}
-                    className="text-[12px] font-extrabold tracking-[1px] text-[#EED9B9]/80 hover:text-[#D53E0F] transition-all duration-300"
+                {categories.map((cat) => (
+                  <button
+                    key={cat._id}
+                    onClick={() => handleCategoryClick(cat)}
+                    className="text-[12px] font-extrabold tracking-[1px] text-[#EED9B9]/80 hover:text-[#D53E0F] transition-all duration-300 cursor-pointer"
                   >
-                    {cat.toUpperCase()}
-                  </Link>
+                    {cat.name.toUpperCase()}
+                  </button>
                 ))}
                 <Link
                   href="/about"
@@ -472,15 +479,14 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                   >
                     HOME
                   </Link>
-                  {categoryNames.map((cat) => (
-                    <Link
-                      key={cat}
-                      href={`/category/${cat.toLowerCase().replace(/\s+/g, '-')}`}
-                      className="block py-2 text-[12px] font-extrabold tracking-[1px] text-[#EED9B9]/80 hover:text-[#D53E0F] transition-all"
-                      onClick={() => setIsMenuOpen(false)}
+                  {categories.map((cat) => (
+                    <button
+                      key={cat._id}
+                      onClick={() => handleCategoryClick(cat)}
+                      className="block w-full text-left py-2 text-[12px] font-extrabold tracking-[1px] text-[#EED9B9]/80 hover:text-[#D53E0F] transition-all cursor-pointer"
                     >
-                      {cat.toUpperCase()}
-                    </Link>
+                      {cat.name.toUpperCase()}
+                    </button>
                   ))}
                   <Link
                     href="/about"

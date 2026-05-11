@@ -121,22 +121,40 @@ export const productAPI = {
     return fetchAPI<{ success: boolean; data: Product }>(`/products/${id}`);
   },
 
-  // Get product by slug with fallback
+  // ✅ FIXED: Get product by slug - direct endpoint without /slug/ prefix
   getBySlug: async (slug: string): Promise<{ success: boolean; data: Product }> => {
     try {
-      return await fetchAPI<{ success: boolean; data: Product }>(`/products/slug/${slug}`);
+      // Try direct slug endpoint first (most common pattern)
+      return await fetchAPI<{ success: boolean; data: Product }>(`/products/${slug}`);
     } catch (error: unknown) {
-      // If slug endpoint fails, try to find by slug from all products
       const apiError = error as APIError;
-      if (apiError.status === 404 || apiError.status === 500) {
-        console.warn(`Slug endpoint failed, trying search fallback for slug: ${slug}`);
-        const allProducts = await fetchAPI<{ success: boolean; data: Product[]; count: number }>('/products');
-        const product = allProducts.data.find((p: Product) => p.slug === slug);
+      
+      // If direct slug fails with 404, try alternative patterns
+      if (apiError.status === 404) {
+        console.warn(`Direct slug endpoint failed for: ${slug}, trying alternative patterns...`);
         
-        if (product) {
-          return { success: true, data: product };
+        // Try with /slug/ prefix (legacy pattern)
+        try {
+          return await fetchAPI<{ success: boolean; data: Product }>(`/products/slug/${slug}`);
+        } catch (legacyError) {
+          console.warn(`Legacy slug endpoint also failed for: ${slug}`);
+          
+          // Final fallback: search through all products
+          try {
+            const allProducts = await fetchAPI<{ success: boolean; data: Product[]; count: number }>('/products');
+            const product = allProducts.data.find((p: Product) => p.slug === slug);
+            
+            if (product) {
+              console.log(`✅ Found product by slug via search fallback: ${slug}`);
+              return { success: true, data: product };
+            }
+          } catch (searchError) {
+            console.error(`Search fallback failed for slug: ${slug}`, searchError);
+          }
         }
       }
+      
+      // Re-throw the original error if all attempts fail
       throw error;
     }
   },
