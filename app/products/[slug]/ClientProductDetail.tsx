@@ -830,7 +830,6 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
           />
         )}
 
-        <Footer />
       </div>
     </>
   );

@@ -178,7 +178,8 @@ const handleAddToCart = async (e: React.MouseEvent) => {
       images: [{ image: imageFilename }]
     };
     
-    await addToCart(productWithImage, 1);
+    const defaultVariant = product.variants?.[0];
+await addToCart(productWithImage, 1, defaultVariant);
   } catch (error) {
     console.error('Failed to add product to cart:', error);
   } finally {

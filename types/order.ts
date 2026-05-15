@@ -1,179 +1,98 @@
-// types/order.ts - UPDATED TO MATCH BACKEND MODELS
+// types/order.ts - CORRECTED FOR YOUR BACKEND
+
 export interface OrderItem {
-  product: {
+  product: string | {
     _id: string;
     name: string;
-    price: number;
-    image?: string; // ✅ CORRECT: Backend uses single 'image' string
-    // Backend Product model has 'images' array but we get 'image' from transform
+    price?: number;
+    image?: string;
   };
+  variantId?: string | null;
+  variantName?: string;
   quantity: number;
-  price: number; // ✅ Actual price paid
-  originalPrice?: number; // ✅ ADDED: For discount display
-  discountPercentage?: number; // ✅ ADDED: Discount info
-  name?: string; // ✅ Backend includes name for display
-  
-  // ✅ VARIANT SUPPORT - Check if backend includes these
-  variantId?: string; // Check if order model has this
-  variantName?: string; // Check if order model has this
-  
-  // ✅ COLOR AND SIZE - Check if backend includes these
-  selectedColor?: string; // Backend cart has 'selectedColor' as string
-  selectedSize?: string;
-  
-  // ✅ ADDED: Product image from variant or main product
+  price: number;
+  originalPrice?: number;
+  discountPercentage?: number;
+  name?: string;
   image?: string;
-  
-  // ✅ ADDED: SKU for inventory tracking
-  sku?: string;
+  _id?: string;
 }
 
 export interface Order {
   _id: string;
-  orderId: string; // ✅ Backend uses 'orderId'
-  sNo?: number; // ✅ ADDED: Serial number field
+  orderId: string;
+  sNo: number;
   
-  // ✅ USER REFERENCES - Backend has multiple user references
-  user?: {
+  // User
+  user: string | {
     _id: string;
     name: string;
     email: string;
   };
-  guestUser?: {
-    _id: string;
-    name: string;
-    email: string;
-    phone?: string;
-  };
   
-  // ✅ GUEST ORDER FLAG
-  isGuestOrder?: boolean;
-  
-  // ✅ PRODUCTS ARRAY - Backend uses 'products' not 'items'
+  // Products
   products: OrderItem[];
   
-  // ✅ AMOUNT FIELDS - Backend has multiple amount fields
-  totalAmount: number; // ✅ Subtotal before tax/shipping
-  subtotal?: number; // ✅ ADDED: Price before discounts
-  discountAmount?: number; // ✅ ADDED: Total discount
-  shippingFee?: number;
-  taxAmount?: number;
-  finalAmount?: number; // ✅ Total after all adjustments
-  
-  // ✅ PAYMENT FIELDS - Backend uses these
-  razorpayOrderId?: string;
-  paymentId?: string;
-  paymentSignature?: string;
-  
-  // ✅ SHIPPING ADDRESS - Backend structure
+  // Shipping
   shippingAddress: {
-    firstName?: string;
-    lastName?: string;
-    fullName?: string; // ✅ Backend has fullName
-    email?: string; // ✅ ADDED: For guest orders
-    phone: string;
-    address: string;
+    street: string;
     city: string;
     state: string;
-    pincode?: string; // ✅ Some orders use pincode
-    postalCode?: string; // ✅ Some orders use postalCode
+    postalCode: string;
     country: string;
+    phone: string;
   };
   
-  // ✅ PAYMENT INFO - Backend enums
-  paymentMethod: 'razorpay' | 'stripe' | 'cod' | 'paypal';
-  paymentStatus: 'pending' | 'completed' | 'failed' | 'refunded' | 'partially_refunded';
-  orderStatus: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'refunded' | 'partially_refunded';
+  // Ward Info
+  wardId?: number | null;
+  wardName?: string | null;
+  deliveryZone?: string;
   
-  // ✅ SHIPPING FIELDS - For ShipRocket integration
-  shipmentId?: string;
-  shippingStatus?: string;
-  awbNumber?: string;
-  courierName?: string;
-  
-  // ✅ TIMESTAMPS
+  // Payment
+  paymentMethod: 'cod' | 'razorpay' | 'card';
+  paymentId?: string;
+  paymentStatus: 'pending' | 'completed' | 'failed';
   paidAt?: string;
-  deliveredAt?: string;
+  
+  // Amounts
+  totalAmount: number;
+  shippingFee: number;
+  taxAmount: number;
+  discountAmount: number;
+  finalAmount: number;
+  
+  // Status
+  orderStatus: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   cancelledAt?: string;
+  cancellationReason?: string;
+  deliveredAt?: string;
+  
+  // Timestamps
   createdAt: string;
   updatedAt: string;
-  
-  // ✅ CANCELLATION INFO
-  cancelledBy?: string;
-  cancellationReason?: string;
-  
-  // ✅ REFUND HISTORY
-  refunds?: Array<{
-    refundId: string;
-    amount: number;
-    razorpayPaymentId: string;
-    type: 'full' | 'partial';
-    createdAt: string;
-    notes?: any;
-  }>;
+}
+
+export interface CreateOrderRequest {
+  shippingAddress: {
+    street: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+    phone: string;
+  };
+  paymentMethod: 'cod' | 'razorpay' | 'card';
+  paymentId?: string;
 }
 
 export interface OrdersResponse {
   success: boolean;
   orders: Order[];
-  message?: string;
-  pagination?: {
-    page: number;
-    pages: number;
-    total: number;
-  };
 }
 
 export interface OrderResponse {
   success: boolean;
   order: Order;
   message?: string;
-}
-
-export interface CreateOrderRequest {
-  shippingAddress: {
-    firstName?: string;
-    lastName?: string;
-    fullName: string;
-    email?: string; // ✅ ADDED: For guest orders
-    phone: string;
-    address: string;
-    city: string;
-    state: string;
-    pincode?: string;
-    postalCode: string;
-    country: string;
-  };
-  paymentMethod: 'razorpay' | 'stripe' | 'cod' | 'paypal';
-  paymentId?: string; // For Razorpay/Stripe
-  products?: Array<{ // For direct order creation (guest orders)
-    product: string;
-    variantId?: string;
-    variantName?: string;
-    quantity: number;
-    price?: number; // Optional, will use product/variant price
-  }>;
-}
-
-export interface GuestOrderRequest extends CreateOrderRequest {
-  guestUser: {
-    name: string;
-    email: string;
-    phone: string;
-  };
-  products: Array<{
-    product: string;
-    variantId?: string;
-    variantName?: string;
-    quantity: number;
-  }>;
-}
-
-export interface UpdateOrderStatusRequest {
-  orderStatus: Order['orderStatus'];
-  cancellationReason?: string;
-}
-
-export interface CancelOrderRequest {
-  cancellationReason?: string;
+  requiresPayment?: boolean;
 }

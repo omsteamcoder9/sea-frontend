@@ -1,106 +1,51 @@
-// order-api.ts - FULLY CORRECTED AND ENHANCED
+// lib/order-api.ts - CORRECTED FOR YOUR BACKEND
+
 import { 
   Order, 
   OrdersResponse, 
   OrderResponse, 
-  CreateOrderRequest,
-  GuestOrderRequest,
-  UpdateOrderStatusRequest 
+  CreateOrderRequest 
 } from '@/types/order';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export async function getUserOrders(token: string): Promise<Order[]> {
-  try {
-    console.log('🔄 Fetching orders from:', `${API_BASE_URL}/orders/my-orders`);
-    
-    const response = await fetch(`${API_BASE_URL}/orders/my-orders`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include'
-    });
-
-    console.log('📡 Response status:', response.status);
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Failed to fetch orders: ${response.status} - ${errorText}`);
-    }
-
-    const data: OrdersResponse = await response.json();
-    console.log('✅ Backend response:', { success: data.success, count: data.orders?.length || 0 });
-    
-    // ✅ FIXED: Use 'orders' instead of 'data'
-    return data.orders || [];
-  } catch (error) {
-    console.error('❌ Error fetching orders:', error);
-    throw error;
+// Helper to get token
+const getToken = (): string | null => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('otp_auth_token');
   }
-}
+  return null;
+};
 
-export async function getOrderById(orderId: string, token: string): Promise<Order> {
+// Create Order (Registered User)
+export async function createOrder(orderData: CreateOrderRequest): Promise<OrderResponse> {
   try {
-    console.log('🔄 Fetching order details for:', orderId);
+    const token = getToken();
     
-    const response = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include'
-    });
-
-    console.log('📡 Response status:', response.status);
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Failed to fetch order: ${response.status} - ${errorText}`);
+    if (!token) {
+      throw new Error('Authentication required to create order');
     }
-
-    const data: OrderResponse = await response.json();
-    console.log('✅ Order details fetched successfully');
     
-    // ✅ FIXED: Use 'order' instead of 'data'
-    return data.order;
-  } catch (error) {
-    console.error('❌ Error fetching order:', error);
-    throw error;
-  }
-}
-
-export async function createOrder(
-  orderData: CreateOrderRequest, 
-  token: string
-): Promise<{ success: boolean; order: Order; message: string; requiresPayment?: boolean }> {
-  try {
-    console.log('🔄 Creating new order');
+    console.log('🔄 Creating order:', orderData);
     
-    const response = await fetch(`${API_BASE_URL}/orders`, {
+    const response = await fetch(`${API_BASE_URL}/api/orders`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(orderData),
-      credentials: 'include'
     });
 
     console.log('📡 Create order response status:', response.status);
     
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Failed to create order: ${response.status} - ${errorText}`);
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to create order');
     }
 
-    const data = await response.json();
-    console.log('✅ Order created successfully:', { 
-      orderId: data.order?.orderId,
-      requiresPayment: data.requiresPayment 
-    });
+    const data: OrderResponse = await response.json();
+    console.log('✅ Order created:', data.order.orderId);
     
     return data;
   } catch (error) {
@@ -109,224 +54,103 @@ export async function createOrder(
   }
 }
 
-export async function createGuestOrder(
-  orderData: GuestOrderRequest
-): Promise<{ success: boolean; order: Order; message: string; requiresPayment?: boolean }> {
+// Get User's Orders
+export async function getUserOrders(): Promise<Order[]> {
   try {
-    console.log('🔄 Creating guest order');
+    const token = getToken();
     
-    const response = await fetch(`${API_BASE_URL}/payments/guest-order`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(orderData),
-      credentials: 'include'
-    });
-
-    console.log('📡 Create guest order response status:', response.status);
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Failed to create guest order: ${response.status} - ${errorText}`);
+    if (!token) {
+      throw new Error('Authentication required');
     }
-
-    const data = await response.json();
-    console.log('✅ Guest order created successfully:', { 
-      orderId: data.order?.orderId,
-      requiresPayment: data.requiresPayment 
-    });
     
-    return data;
-  } catch (error) {
-    console.error('❌ Error creating guest order:', error);
-    throw error;
-  }
-}
-
-export async function cancelOrder(
-  orderId: string, 
-  token: string, 
-  cancellationReason?: string
-): Promise<Order> {
-  try {
-    console.log('🔄 Cancelling order:', orderId);
+    console.log('🔄 Fetching user orders');
     
-    // ✅ FIXED: Using Partial to make all properties optional
-    const requestBody: { cancellationReason?: string } = {};
-    if (cancellationReason) {
-      requestBody.cancellationReason = cancellationReason;
-    }
-
-    const response = await fetch(`${API_BASE_URL}/orders/${orderId}/cancel`, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestBody),
-      credentials: 'include'
-    });
-
-    console.log('📡 Cancel response status:', response.status);
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Failed to cancel order: ${response.status} - ${errorText}`);
-    }
-
-    const data: OrderResponse = await response.json();
-    console.log('✅ Order cancelled successfully:', { orderId: data.order.orderId });
-    
-    return data.order;
-  } catch (error) {
-    console.error('❌ Error cancelling order:', error);
-    throw error;
-  }
-}
-
-export async function updateOrderStatus(
-  orderId: string, 
-  statusData: UpdateOrderStatusRequest, 
-  token: string
-): Promise<Order> {
-  try {
-    console.log('🔄 Updating order status for:', orderId, statusData);
-    
-    const response = await fetch(`${API_BASE_URL}/orders/${orderId}/status`, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(statusData),
-      credentials: 'include'
-    });
-
-    console.log('📡 Update status response status:', response.status);
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Failed to update order status: ${response.status} - ${errorText}`);
-    }
-
-    const data: OrderResponse = await response.json();
-    console.log('✅ Order status updated successfully');
-    
-    return data.order;
-  } catch (error) {
-    console.error('❌ Error updating order status:', error);
-    throw error;
-  }
-}
-
-export async function getOrderReceipt(
-  orderId: string, 
-  token: string, 
-  format: 'json' | 'pdf' = 'json'
-): Promise<Blob | any> {
-  try {
-    console.log('🔄 Getting order receipt for:', orderId, 'format:', format);
-    
-    const url = `${API_BASE_URL}/orders/${orderId}/receipt${format === 'pdf' ? '/pdf' : ''}`;
-    
-    const response = await fetch(url, {
+    const response = await fetch(`${API_BASE_URL}/api/orders/my-orders`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
-        'Accept': format === 'pdf' ? 'application/pdf' : 'application/json',
-      },
-      credentials: 'include'
-    });
-
-    console.log('📡 Receipt response status:', response.status);
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Failed to get receipt: ${response.status} - ${errorText}`);
-    }
-
-    if (format === 'pdf') {
-      const pdfBlob = await response.blob();
-      console.log('✅ PDF receipt received:', pdfBlob.size, 'bytes');
-      return pdfBlob;
-    } else {
-      const data = await response.json();
-      console.log('✅ JSON receipt received');
-      return data;
-    }
-  } catch (error) {
-    console.error('❌ Error getting order receipt:', error);
-    throw error;
-  }
-}
-
-export async function getOrderByOrderId(orderId: string): Promise<Order> {
-  try {
-    console.log('🔄 Getting order by orderId:', orderId);
-    
-    const response = await fetch(`${API_BASE_URL}/orders/order/${orderId}`, {
-      method: 'GET',
-      headers: {
         'Content-Type': 'application/json',
       },
-      credentials: 'include'
     });
 
     console.log('📡 Response status:', response.status);
     
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Failed to fetch order by orderId: ${response.status} - ${errorText}`);
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to fetch orders');
     }
 
-    const data: OrderResponse = await response.json();
-    console.log('✅ Order fetched successfully by orderId');
+    const data: OrdersResponse = await response.json();
+    console.log('✅ Orders fetched:', data.orders?.length || 0);
     
-    return data.order;
+    return data.orders || [];
   } catch (error) {
-    console.error('❌ Error fetching order by orderId:', error);
+    console.error('❌ Error fetching orders:', error);
     throw error;
   }
 }
 
-export async function updateOrderPaymentStatus(
-  orderId: string,
-  paymentStatus: 'success' | 'failed',
-  paymentId?: string
-): Promise<Order> {
+// Get Order by ID
+export async function getOrderById(orderId: string): Promise<Order> {
   try {
-    console.log('🔄 Updating payment status for order:', orderId, paymentStatus);
+    const token = getToken();
     
-    const endpoint = paymentStatus === 'success' 
-      ? `${API_BASE_URL}/orders/payment-success`
-      : `${API_BASE_URL}/orders/payment-failed`;
+    if (!token) {
+      throw new Error('Authentication required');
+    }
     
-    const response = await fetch(endpoint, {
-      method: 'PUT',
+    console.log('🔄 Fetching order:', orderId);
+    
+    const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}`, {
+      method: 'GET',
       headers: {
+        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ 
-        orderId, 
-        ...(paymentId && { paymentId }) 
-      }),
-      credentials: 'include'
     });
 
-    console.log('📡 Payment status update response:', response.status);
-    
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Failed to update payment status: ${response.status} - ${errorText}`);
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to fetch order');
     }
 
     const data: OrderResponse = await response.json();
-    console.log('✅ Payment status updated successfully');
-    
     return data.order;
   } catch (error) {
-    console.error('❌ Error updating payment status:', error);
+    console.error('❌ Error fetching order:', error);
+    throw error;
+  }
+}
+
+// Cancel Order
+export async function cancelOrder(orderId: string, cancellationReason?: string): Promise<Order> {
+  try {
+    const token = getToken();
+    
+    if (!token) {
+      throw new Error('Authentication required');
+    }
+    
+    console.log('🔄 Cancelling order:', orderId);
+    
+    const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}/cancel`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ cancellationReason }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to cancel order');
+    }
+
+    const data = await response.json();
+    return data.order;
+  } catch (error) {
+    console.error('❌ Error cancelling order:', error);
     throw error;
   }
 }

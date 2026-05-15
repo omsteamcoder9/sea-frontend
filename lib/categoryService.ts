@@ -7,7 +7,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 export async function fetchCategories(): Promise<Category[]> {
   try {
     const response = await fetch(`${API_BASE_URL}/api/categories`, {
-      cache: 'no-store',
+next: { revalidate: 300 },
     });
 
     if (!response.ok) {
