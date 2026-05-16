@@ -1,4 +1,3 @@
-// components/CartDrawer.tsx
 'use client';
 
 import { useCart } from '@/context/CartContext';
@@ -130,7 +129,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
         {/* Header - Fixed at top */}
         <div className="flex-shrink-0">
           <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className="text-lg font-semibold text-[#5E0006]">
               Cart ({itemCount})
             </h2>
             <button
@@ -146,10 +145,10 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
 
           {/* Guest Warning */}
           {isGuest && (
-            <div className="bg-[#D97A22]/10 border-b border-[#D97A22]/20 text-[#D97A22] px-4 py-1 text-xs">
+            <div className="border-b px-4 py-1 text-xs" style={{ backgroundColor: '#9B0F06/10', borderColor: '#9B0F06/20', color: '#9B0F06' }}>
               <p>
                 🛒 Guest •{' '}
-                <Link href="/signup" className="font-semibold underline hover:text-[#D97A22]/80">
+                <Link href="/signup" className="font-semibold underline hover:opacity-80" style={{ color: '#9B0F06' }}>
                   Sign up to save
                 </Link>
               </p>
@@ -168,7 +167,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                 <p className="text-gray-600 mb-4">Your cart is empty</p>
                 <button
                   onClick={onClose}
-                  className="text-[#D97A22] hover:text-[#D97A22]/80 font-medium transition-colors cursor-pointer"
+                  className="font-medium transition-colors cursor-pointer" style={{ color: '#9B0F06' }}
                 >
                   Continue Shopping
                 </button>
@@ -224,7 +223,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                           
                           {/* Variant info */}
                           {variantName && (
-                            <p className="text-[#D97A22] text-[10px] font-medium mt-0.5">
+                            <p className="text-[#D53E0F] text-[10px] font-medium mt-0.5">
                               {variantName}
                             </p>
                           )}
@@ -237,7 +236,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                               <button 
                                 onClick={() => updateCartItem(item._id, item.quantity - 1)}
                                 disabled={item.quantity <= 1 || isRemoving}
-                                className="w-6 h-6 flex items-center justify-center text-gray-600 hover:text-[#D97A22] hover:bg-gray-50 disabled:opacity-30 text-sm cursor-pointer"
+                                className="w-6 h-6 flex items-center justify-center text-gray-600 hover:text-[#9B0F06] hover:bg-gray-50 disabled:opacity-30 text-sm cursor-pointer"
                               >
                                 -
                               </button>
@@ -245,7 +244,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                               <button 
                                 onClick={() => updateCartItem(item._id, item.quantity + 1)}
                                 disabled={item.quantity >= maxStock || isRemoving}
-                                className="w-6 h-6 flex items-center justify-center text-gray-600 hover:text-[#D97A22] hover:bg-gray-50 disabled:opacity-30 text-sm cursor-pointer"
+                                className="w-6 h-6 flex items-center justify-center text-gray-600 hover:text-[#9B0F06] hover:bg-gray-50 disabled:opacity-30 text-sm cursor-pointer"
                               >
                                 +
                               </button>
@@ -293,7 +292,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-gray-600">Shipping</span>
-                <span className="text-[#D97A22] font-medium">FREE</span>
+                <span className="font-medium" style={{ color: '#D53E0F' }}>FREE</span>
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-gray-600">Tax (5%)</span>
@@ -309,7 +308,14 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
             <div className="space-y-1.5">
               <button
                 onClick={handleCheckout}
-                className="w-full py-2.5 rounded-lg font-medium text-xs transition-all duration-200 shadow-sm bg-gradient-to-r from-[#D97A22] via-[#D97A22] to-[#D97A22] text-white hover:from-[#c56a1e] hover:via-[#c56a1e] hover:to-[#c56a1e] cursor-pointer"
+                className="w-full py-2.5 rounded-lg font-medium text-xs transition-all duration-200 shadow-sm text-white cursor-pointer"
+                style={{ backgroundColor: '#9B0F06' }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#5E0006';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#9B0F06';
+                }}
               >
                 Buy Now
               </button>

@@ -92,7 +92,8 @@ export default function CartPage() {
             <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">Add some farm tools to your cart to see them here.</p>
             <Link 
               href="/products"
-              className="inline-block bg-gradient-to-r from-[#D97A22] via-[#D97A22] to-[#D97A22] text-white px-6 py-3 rounded-lg hover:from-[#c56a1e] hover:via-[#c56a1e] hover:to-[#c56a1e] transition-all duration-200 font-medium text-sm sm:text-base shadow-lg hover:shadow-[#D97A22]/25"
+              className="inline-block text-white px-6 py-3 rounded-lg transition-all duration-200 font-medium text-sm sm:text-base shadow-lg"
+              style={{ backgroundColor: '#9B0F06' }}
             >
               Continue Shopping
             </Link>
@@ -106,12 +107,12 @@ export default function CartPage() {
     <div className="min-h-screen bg-white py-8 sm:py-12">
       <div className="container mx-auto px-4 sm:px-6">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Shopping Cart</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#5E0006]">Shopping Cart</h1>
           {isGuest && (
-            <div className="bg-gradient-to-r from-[#D97A22]/10 via-[#D97A22]/10 to-[#D97A22]/10 border border-[#D97A22]/20 text-[#D97A22] px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm">
+            <div className="border px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm" style={{ backgroundColor: '#9B0F06/10', borderColor: '#9B0F06/20', color: '#9B0F06' }}>
               <p>
                 🛒 Shopping as Guest •{' '}
-                <Link href="/signup" className="font-semibold underline hover:text-[#D97A22] transition-colors duration-200">
+                <Link href="/signup" className="font-semibold underline hover:opacity-80 transition-colors duration-200" style={{ color: '#9B0F06' }}>
                   Sign up to save your cart
                 </Link>
               </p>
@@ -124,7 +125,7 @@ export default function CartPage() {
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
               <div className="flex justify-between items-center mb-4 sm:mb-6">
-                <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
+                <h2 className="text-lg sm:text-xl font-semibold text-[#5E0006]">
                   Cart Items ({itemCount})
                 </h2>
                 <button 
@@ -168,7 +169,7 @@ export default function CartPage() {
                             {productName}
                           </h3>
                           {variantName && (
-                            <p className="text-[#D97A22] text-xs font-medium">📦 Variant: {variantName}</p>
+                            <p className="text-xs font-medium" style={{ color: '#D53E0F' }}>📦 Variant: {variantName}</p>
                           )}
                           <p className="text-gray-600 text-xs">₹{item.price || 0}</p>
                           {productStock && productStock < 10 && (
@@ -185,7 +186,7 @@ export default function CartPage() {
                           {productName}
                         </h3>
                         {variantName && (
-                          <p className="text-[#D97A22] text-sm font-medium">📦 Variant: {variantName}</p>
+                          <p className="text-sm font-medium" style={{ color: '#D53E0F' }}>📦 Variant: {variantName}</p>
                         )}
                         <p className="text-gray-600 text-sm">₹{item.price || 0}</p>
                         {productStock && productStock < 10 && (
@@ -201,7 +202,8 @@ export default function CartPage() {
                           <button 
                             onClick={() => updateCartItem(item._id, item.quantity - 1)}
                             disabled={item.quantity <= 1}
-                            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gradient-to-r hover:from-[#D97A22]/10 hover:via-[#D97A22]/10 hover:to-[#D97A22]/10 hover:border-[#D97A22] hover:text-[#D97A22] disabled:opacity-50 disabled:cursor-not-allowed text-sm transition-all duration-200 cursor-pointer"
+                            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border disabled:opacity-50 disabled:cursor-not-allowed text-sm transition-all duration-200 cursor-pointer"
+                            style={{ color: '#9B0F06', borderColor: '#9B0F06' }}
                           >
                             -
                           </button>
@@ -209,7 +211,8 @@ export default function CartPage() {
                           <button 
                             onClick={() => updateCartItem(item._id, item.quantity + 1)}
                             disabled={item.quantity >= productStock}
-                            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gradient-to-r hover:from-[#D97A22]/10 hover:via-[#D97A22]/10 hover:to-[#D97A22]/10 hover:border-[#D97A22] hover:text-[#D97A22] disabled:opacity-50 disabled:cursor-not-allowed text-sm transition-all duration-200 cursor-pointer"
+                            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border disabled:opacity-50 disabled:cursor-not-allowed text-sm transition-all duration-200 cursor-pointer"
+                            style={{ color: '#9B0F06', borderColor: '#9B0F06' }}
                           >
                             +
                           </button>
@@ -247,7 +250,7 @@ export default function CartPage() {
           {/* Order Summary */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 sticky top-4">
-              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3 sm:mb-4">Order Summary</h2>
+              <h2 className="text-lg sm:text-xl font-semibold text-[#5E0006] mb-3 sm:mb-4">Order Summary</h2>
               
               <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
                 <div className="flex justify-between text-sm sm:text-base">
@@ -256,7 +259,7 @@ export default function CartPage() {
                 </div>
                 <div className="flex justify-between text-sm sm:text-base">
                   <span>Shipping</span>
-                  <span className="text-[#D97A22]">FREE</span>
+                  <span className="font-medium" style={{ color: '#D53E0F' }}>FREE</span>
                 </div>
                 <div className="flex justify-between text-sm sm:text-base">
                   <span>Tax (5%)</span>
@@ -270,7 +273,14 @@ export default function CartPage() {
 
               <button 
                 onClick={handleCheckout}
-                className="w-full bg-gradient-to-r from-[#D97A22] via-[#D97A22] to-[#D97A22] text-white py-3 rounded-lg hover:from-[#c56a1e] hover:via-[#c56a1e] hover:to-[#c56a1e] transition-all duration-200 font-medium mb-3 sm:mb-4 text-sm sm:text-base shadow-lg hover:shadow-[#D97A22]/25 cursor-pointer"
+                className="w-full text-white py-3 rounded-lg transition-all duration-200 font-medium mb-3 sm:mb-4 text-sm sm:text-base shadow-lg hover:shadow-md active:scale-95 cursor-pointer"
+                style={{ backgroundColor: '#9B0F06' }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#5E0006';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#9B0F06';
+                }}
               >
 Buy Now              </button>
 
@@ -280,13 +290,29 @@ Buy Now              </button>
                   <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
                     <Link 
                       href="/login"
-                      className="bg-gradient-to-r from-[#D97A22] via-[#D97A22] to-[#D97A22] text-white py-2 px-4 rounded-lg hover:from-[#c56a1e] hover:via-[#c56a1e] hover:to-[#c56a1e] transition-all duration-200 font-medium text-center text-xs sm:text-sm shadow-lg hover:shadow-[#D97A22]/25"
+                      className="text-white py-2 px-4 rounded-lg transition-all duration-200 font-medium text-center text-xs sm:text-sm shadow-lg hover:shadow-md"
+                      style={{ backgroundColor: '#9B0F06' }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#5E0006';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = '#9B0F06';
+                      }}
                     >
                       Login
                     </Link>
                     <Link 
                       href="/signup"
-                      className="border border-[#D97A22] text-[#D97A22] py-2 px-4 rounded-lg hover:bg-gradient-to-r hover:from-[#D97A22] hover:via-[#D97A22] hover:to-[#D97A22] hover:text-white transition-all duration-200 font-medium text-center text-xs sm:text-sm"
+                      className="py-2 px-4 rounded-lg transition-all duration-200 font-medium text-center text-xs sm:text-sm"
+                      style={{ border: '1px solid #9B0F06', color: '#9B0F06' }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#9B0F06';
+                        e.currentTarget.style.color = 'white';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                        e.currentTarget.style.color = '#9B0F06';
+                      }}
                     >
                       Sign Up
                     </Link>
@@ -296,7 +322,16 @@ Buy Now              </button>
               
               <Link 
                 href="/products"
-                className="w-full border border-[#D97A22] text-[#D97A22] py-3 rounded-lg hover:bg-gradient-to-r hover:from-[#D97A22] hover:via-[#D97A22] hover:to-[#D97A22] hover:text-white transition-all duration-200 font-medium text-center block text-sm sm:text-base"
+                className="w-full py-3 rounded-lg transition-all duration-200 font-medium text-center block text-sm sm:text-base"
+                style={{ border: '1px solid #9B0F06', color: '#9B0F06' }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#9B0F06';
+                  e.currentTarget.style.color = 'white';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = '#9B0F06';
+                }}
               >
                 Continue Shopping
               </Link>

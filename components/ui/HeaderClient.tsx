@@ -317,7 +317,7 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                       {isDropdownOpen && (
                         <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-2 z-20 border border-gray-100">
                           <Link
-                            href="/orders"
+                            href="/profile"
                             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                             onClick={() => setIsDropdownOpen(false)}
                           >

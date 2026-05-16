@@ -74,7 +74,7 @@ export default function OrderSuccessPage() {
       <div className="min-h-screen bg-[#f2f2f2] flex items-center justify-center py-12">
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto text-center bg-white rounded-lg shadow-md p-8 border border-gray-300">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#D97A22] mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#9B0F06] mx-auto mb-4"></div>
             <p className="text-gray-600">Loading order details...</p>
           </div>
         </div>
@@ -103,13 +103,23 @@ export default function OrderSuccessPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link 
                 href="/"
-                className="bg-gradient-to-r from-[#D97A22] via-[#D97A22] to-[#D97A22] text-white px-6 py-3 rounded-lg hover:from-[#c56a1e] hover:via-[#c56a1e] hover:to-[#c56a1e] transition-all duration-200 font-medium text-center shadow-md hover:shadow-lg hover:shadow-[#D97A22]/25"
+                className="text-white px-6 py-3 rounded-lg transition-all duration-200 font-medium text-center shadow-md hover:shadow-lg"
+                style={{ backgroundColor: '#9B0F06' }}
               >
                 Return to Home
               </Link>
               <Link 
                 href="/cart"
-                className="border border-[#D97A22] text-[#D97A22] px-6 py-3 rounded-lg hover:bg-gradient-to-r hover:from-[#D97A22] hover:via-[#D97A22] hover:to-[#D97A22] hover:text-white transition-all duration-200 font-medium text-center"
+                className="px-6 py-3 rounded-lg transition-all duration-200 font-medium text-center"
+                style={{ border: '1px solid #9B0F06', color: '#9B0F06' }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#9B0F06';
+                  e.currentTarget.style.color = 'white';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = '#9B0F06';
+                }}
               >
                 Back to Cart
               </Link>
@@ -125,13 +135,13 @@ export default function OrderSuccessPage() {
     <div className="min-h-screen bg-[#f2f2f2] flex items-center justify-center py-12">
       <div className="container mx-auto px-4">
         <div className="max-w-2xl mx-auto text-center bg-white rounded-lg shadow-md p-8 border border-gray-300">
-          <div className="w-16 h-16 bg-gradient-to-r from-[#D97A22]/10 via-[#D97A22]/10 to-[#D97A22]/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-[#D97A22]/20">
-            <svg className="w-8 h-8 text-[#D97A22]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border" style={{ backgroundColor: '#9B0F06/10', borderColor: '#9B0F06/20' }}>
+            <svg className="w-8 h-8" style={{ color: '#9B0F06' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
           
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Order Placed Successfully!</h1>
+          <h1 className="text-3xl font-bold text-[#5E0006] mb-4">Order Placed Successfully!</h1>
           
           <p className="text-gray-600 mb-2">
             Thank you for your purchase. Your order has been confirmed and will be shipped soon.
@@ -141,8 +151,8 @@ export default function OrderSuccessPage() {
           </p>
 
           <div className="space-y-4 mb-8">
-            <div className="bg-gradient-to-r from-[#D97A22]/10 via-[#D97A22]/10 to-[#D97A22]/10 border border-[#D97A22]/20 rounded-lg p-4">
-              <p className="text-[#D97A22] text-sm">
+            <div className="rounded-lg p-4" style={{ backgroundColor: '#9B0F06/10', border: '1px solid #9B0F06/20' }}>
+              <p className="text-sm" style={{ color: '#9B0F06' }}>
                 You will receive an order confirmation email shortly with all the details.
               </p>
               <p className="text-gray-700 text-sm mt-2 font-medium">
@@ -154,13 +164,29 @@ export default function OrderSuccessPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
               href="/products"
-              className="bg-gradient-to-r from-[#D97A22] via-[#D97A22] to-[#D97A22] text-white px-6 py-3 rounded-lg hover:from-[#c56a1e] hover:via-[#c56a1e] hover:to-[#c56a1e] transition-all duration-200 font-medium text-center shadow-md hover:shadow-lg hover:shadow-[#D97A22]/25"
+              className="text-white px-6 py-3 rounded-lg transition-all duration-200 font-medium text-center shadow-md hover:shadow-lg"
+              style={{ backgroundColor: '#9B0F06' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#5E0006';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#9B0F06';
+              }}
             >
               Continue Shopping
             </Link>
             <Link 
               href="/"
-              className="border border-[#D97A22] text-[#D97A22] px-6 py-3 rounded-lg hover:bg-gradient-to-r hover:from-[#D97A22] hover:via-[#D97A22] hover:to-[#D97A22] hover:text-white transition-all duration-200 font-medium text-center"
+              className="px-6 py-3 rounded-lg transition-all duration-200 font-medium text-center"
+              style={{ border: '1px solid #9B0F06', color: '#9B0F06' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#9B0F06';
+                e.currentTarget.style.color = 'white';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.color = '#9B0F06';
+              }}
               onClick={(e) => {
                 e.preventDefault();
                 router.push('/');

@@ -1,93 +1,54 @@
-// app/profile/page.tsx - COMPLETE CORRECTED VERSION
+// app/profile/page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getUserOrders } from '@/lib/order-api';
+import { getUserOrders, getOrderById, cancelOrder } from '@/lib/order-api';
 import { Order, OrderItem } from '@/types/order';
 import { useRouter } from 'next/navigation';
 
-// Cancel order function for profile page
-interface CancelOrderRequest {
-  cancellationReason?: string;
-}
-
-const cancelOrder = async (orderId: string, token: string, cancellationReason?: string): Promise<Order> => {
-  try {
-    const cancelData: CancelOrderRequest = {};
-    if (cancellationReason) {
-      cancelData.cancellationReason = cancellationReason;
-    }
-
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/${orderId}/cancel`, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(cancelData),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Failed to cancel order: ${response.status} - ${errorText}`);
-    }
-
-    const data = await response.json();
-    return data.order;
-  } catch (error) {
-    console.error('Error cancelling order:', error);
-    throw error;
-  }
-};
-
-// ✅ ADDED: Helper function to calculate order total
+// Helper function to calculate order total
 const calculateOrderTotal = (order: Order): number => {
-  // First try finalAmount (most accurate)
   if (order.finalAmount && order.finalAmount > 0) {
     return order.finalAmount;
   }
-  
-  // Then try totalAmount
   if (order.totalAmount && order.totalAmount > 0) {
     return order.totalAmount;
   }
-  
-  // Calculate from products if available
   if (order.products && order.products.length > 0) {
     return order.products.reduce((total, item) => {
-      // Use item.price (actual price paid) if available
-      const itemPrice = item.price || item.product?.price || 0;
+      const itemPrice = item.price || 0;
       return total + (itemPrice * item.quantity);
     }, 0);
   }
-  
   return 0;
 };
 
-// ✅ ADDED: Helper function to calculate subtotal from products
+// Helper function to calculate subtotal
 const calculateSubtotal = (products: OrderItem[]): number => {
   if (!products || products.length === 0) return 0;
-  
   return products.reduce((total, item) => {
-    const itemPrice = item.price || item.product?.price || 0;
+    const itemPrice = item.price || 0;
     return total + (itemPrice * item.quantity);
   }, 0);
 };
 
-// ✅ ADDED: Helper function to get product display name with variant
+// Helper function to get product display name with variant
 const getProductDisplayName = (item: OrderItem): string => {
-  // First try item.name (contains product + variant for guest orders)
   if (item.name) {
     return item.name;
   }
-  
-  // Then try product.name + variantName
-  const productName = item.product?.name || 'Product';
+  // Handle product being string or object
+  const productName = typeof item.product === 'string' ? 'Product' : (item.product?.name || 'Product');
   if (item.variantName) {
     return `${productName} - ${item.variantName}`;
   }
-  
   return productName;
+};
+
+// Helper to get item total
+const getItemTotal = (item: OrderItem): number => {
+  const price = item.price || 0;
+  return price * item.quantity;
 };
 
 export default function UserProfile() {
@@ -112,7 +73,7 @@ export default function UserProfile() {
         setLoading(true);
         setError(null);
         
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('otp_auth_token');
         
         if (!token) {
           setError('Please log in to view your orders');
@@ -121,29 +82,10 @@ export default function UserProfile() {
         }
 
         console.log('🔄 Fetching user orders...');
+        // ✅ getUserOrders expects 1 argument (token)
         const userOrders = await getUserOrders(token);
         
         console.log('📦 Orders fetched:', userOrders);
-        
-        // Log order details for debugging
-        userOrders.forEach((order, index) => {
-          console.log(`Order ${index + 1}:`, {
-            orderId: order.orderId,
-            isGuestOrder: order.isGuestOrder,
-            totalAmount: order.totalAmount,
-            finalAmount: order.finalAmount,
-            subtotal: order.subtotal,
-            productsCount: order.products?.length,
-            products: order.products?.map(p => ({
-              name: p.name,
-              productName: p.product?.name,
-              variantName: p.variantName,
-              price: p.price,
-              quantity: p.quantity,
-              itemTotal: (p.price || 0) * p.quantity
-            }))
-          });
-        });
         
         setOrders(userOrders);
         
@@ -167,29 +109,15 @@ export default function UserProfile() {
 
   const fetchOrderDetails = async (orderId: string) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('otp_auth_token');
       if (!token) {
         setError('Please log in to view order details');
         return;
       }
       
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/${orderId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Failed to load order: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      
-      if (data.success && data.order) {
-        setSelectedOrder(data.order);
-      } else {
-        throw new Error('Order data not found in response');
-      }
+      // ✅ getOrderById expects 2 arguments (orderId, token)
+      const order = await getOrderById(orderId, token);
+      setSelectedOrder(order);
       
     } catch (err: unknown) {
       console.error('Error fetching order details:', err);
@@ -206,23 +134,23 @@ export default function UserProfile() {
     if (!selectedOrder) return;
 
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('otp_auth_token');
       if (!token) {
         setError('Please log in to cancel order');
         return;
       }
 
       setCancellingOrderId(selectedOrder._id);
+      // ✅ cancelOrder expects 3 arguments (orderId, token, cancellationReason)
       await cancelOrder(selectedOrder._id, token, cancellationReason);
       
       // Update the orders state
-      setOrders(prevOrders => 
-        prevOrders.map(order => 
-          order._id === selectedOrder._id 
-            ? { ...order, orderStatus: 'cancelled' }
-            : order
-        )
+      const updatedOrders = orders.map(order => 
+        order._id === selectedOrder._id 
+          ? { ...order, orderStatus: 'cancelled' as const }
+          : order
       );
+      setOrders(updatedOrders);
       
       // Move from active to cancelled
       setActiveOrders(prevOrders => 
@@ -250,7 +178,7 @@ export default function UserProfile() {
   const handleViewPDF = async (orderId: string) => {
     try {
       setPdfLoading(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('otp_auth_token');
       if (!token) {
         setError('Please log in to view receipt');
         setPdfLoading(false);
@@ -304,12 +232,12 @@ export default function UserProfile() {
         confirmed: 'bg-blue-100 text-blue-800 border border-blue-200',
         processing: 'bg-purple-100 text-purple-800 border border-purple-200',
         shipped: 'bg-purple-100 text-purple-800 border border-purple-200',
-        delivered: 'bg-gradient-to-r from-[#D97A22]/10 to-[#D97A22]/10 text-[#D97A22] border border-[#D97A22]/20',
+        delivered: 'bg-green-100 text-green-800 border border-green-200',
         cancelled: 'bg-red-100 text-red-800 border border-red-200'
       },
       payment: {
         pending: 'bg-yellow-100 text-yellow-800 border border-yellow-200',
-        completed: 'bg-gradient-to-r from-[#D97A22]/10 to-[#D97A22]/10 text-[#D97A22] border border-[#D97A22]/20',
+        completed: 'bg-green-100 text-green-800 border border-green-200',
         failed: 'bg-red-100 text-red-800 border border-red-200'
       }
     };
@@ -334,19 +262,13 @@ export default function UserProfile() {
     });
   };
 
-  // ✅ ADDED: Get item total for display
-  const getItemTotal = (item: OrderItem): number => {
-    const price = item.price || item.product?.price || 0;
-    return price * item.quantity;
-  };
-
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#f2f2f2] py-12">
+      <div className="min-h-screen bg-gray-50 py-12">
         <div className="container mx-auto px-4">
           <div className="flex justify-center items-center py-12">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#D97A22] mx-auto"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#9B0F06] mx-auto"></div>
               <p className="mt-4 text-gray-600">Loading your orders...</p>
             </div>
           </div>
@@ -357,13 +279,13 @@ export default function UserProfile() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#f2f2f2] py-12">
+      <div className="min-h-screen bg-gray-50 py-12">
         <div className="container mx-auto px-4">
           <div className="bg-white rounded-lg shadow-md p-8 text-center border border-gray-300">
             <div className="text-red-600 mb-4 font-medium">{error}</div>
             <button 
               onClick={() => window.location.reload()}
-              className="bg-gradient-to-r from-[#D97A22] to-[#D97A22] text-white px-6 py-3 rounded-lg hover:opacity-90 transition-all duration-200 font-medium cursor-pointer"
+              className="bg-[#9B0F06] text-white px-6 py-3 rounded-lg hover:bg-[#5E0006] transition-all duration-200 font-medium cursor-pointer"
             >
               Try Again
             </button>
@@ -374,7 +296,7 @@ export default function UserProfile() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f2f2f2] py-12">
+    <div className="min-h-screen bg-gray-50 py-12">
       <div className="container mx-auto px-4">
         {/* Header Section */}
         <div className="mb-8">
@@ -385,8 +307,8 @@ export default function UserProfile() {
         {activeOrders.length === 0 && cancelledOrders.length === 0 ? (
           <div className="bg-white rounded-lg shadow-md p-8 text-center border border-gray-300">
             <div className="max-w-md mx-auto">
-              <div className="w-20 h-20 bg-gradient-to-r from-[#D97A22]/10 to-[#D97A22]/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-[#D97A22]/20">
-                <svg className="w-10 h-10 text-[#D97A22]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                 </svg>
               </div>
@@ -394,7 +316,7 @@ export default function UserProfile() {
               <p className="text-gray-600 mb-6">Start shopping to see your orders here</p>
               <button
                 onClick={() => router.push('/products')}
-                className="bg-gradient-to-r from-[#D97A22] to-[#D97A22] text-white px-6 py-3 rounded-lg hover:opacity-90 transition-all duration-200 font-medium cursor-pointer"
+                className="bg-[#9B0F06] text-white px-6 py-3 rounded-lg hover:bg-[#5E0006] transition-all duration-200 font-medium cursor-pointer"
               >
                 Start Shopping
               </button>
@@ -437,9 +359,9 @@ export default function UserProfile() {
                     {cancelledOrders.length > 0 && (
                       <button
                         onClick={() => setShowCancelledOrdersModal(true)}
-                        className="w-full px-4 py-3 bg-gradient-to-r from-[#D97A22]/10 to-[#D97A22]/10 text-[#D97A22] rounded-lg hover:bg-gradient-to-r hover:from-[#D97A22]/20 hover:to-[#D97A22]/20 font-medium transition-colors text-left flex items-center gap-3 border border-[#D97A22]/20 cursor-pointer"
+                        className="w-full px-4 py-3 bg-gray-50 text-gray-700 rounded-lg hover:bg-gray-100 font-medium transition-colors text-left flex items-center gap-3 border border-gray-300 cursor-pointer"
                       >
-                        <svg className="w-5 h-5 text-[#D97A22]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
                         View Cancelled Orders ({cancelledOrders.length})
@@ -449,7 +371,7 @@ export default function UserProfile() {
                       onClick={() => router.push('/products')}
                       className="w-full px-4 py-3 bg-gray-50 text-gray-700 rounded-lg hover:bg-gray-100 font-medium transition-colors text-left flex items-center gap-3 border border-gray-300 cursor-pointer"
                     >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                       </svg>
                       Continue Shopping
@@ -461,7 +383,6 @@ export default function UserProfile() {
 
             {/* Main Content - Active Orders */}
             <div className="lg:col-span-3">
-              {/* Active Orders Card */}
               <div className="bg-white rounded-lg shadow-md border border-gray-300 overflow-hidden">
                 <div className="px-6 py-4 border-b border-gray-300 bg-gray-50">
                   <div className="flex justify-between items-center">
@@ -474,7 +395,7 @@ export default function UserProfile() {
                     {cancelledOrders.length > 0 && (
                       <button
                         onClick={() => setShowCancelledOrdersModal(true)}
-                        className="text-[#D97A22] hover:text-[#D97A22]/80 font-medium text-sm flex items-center gap-2 cursor-pointer"
+                        className="text-[#9B0F06] hover:text-[#5E0006] font-medium text-sm flex items-center gap-2 cursor-pointer"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -496,7 +417,7 @@ export default function UserProfile() {
                     <p className="text-gray-600 mb-4">All your current orders are completed or cancelled</p>
                     <button
                       onClick={() => router.push('/products')}
-                      className="bg-gradient-to-r from-[#D97A22] to-[#D97A22] text-white px-6 py-2 rounded-lg hover:opacity-90 transition-all duration-200 font-medium cursor-pointer"
+                      className="bg-[#9B0F06] text-white px-6 py-2 rounded-lg hover:bg-[#5E0006] transition-all duration-200 font-medium cursor-pointer"
                     >
                       Start Shopping
                     </button>
@@ -504,7 +425,6 @@ export default function UserProfile() {
                 ) : (
                   <div className="divide-y divide-gray-200">
                     {activeOrders.map((order) => {
-                      // ✅ FIXED: Calculate order total properly
                       const orderTotal = calculateOrderTotal(order);
                       const subtotal = calculateSubtotal(order.products || []);
                       
@@ -512,7 +432,7 @@ export default function UserProfile() {
                         <div
                           key={order._id}
                           className={`p-6 hover:bg-gray-50 cursor-pointer transition-all duration-200 group ${
-                            selectedOrder?._id === order._id ? 'bg-gray-100 border-l-4 border-l-[#D97A22]' : ''
+                            selectedOrder?._id === order._id ? 'bg-gray-100 border-l-4 border-l-[#9B0F06]' : ''
                           }`}
                           onClick={() => fetchOrderDetails(order._id)}
                         >
@@ -537,7 +457,6 @@ export default function UserProfile() {
                               <div className="flex flex-wrap items-center gap-3 text-sm">
                                 <span className="text-gray-600">{order.products?.length || 0} items</span>
                                 <span className="text-gray-400">•</span>
-                                {/* ✅ FIXED: Show correct price */}
                                 <span className="font-semibold text-gray-900">
                                   ₹{orderTotal.toFixed(2)}
                                 </span>
@@ -560,16 +479,9 @@ export default function UserProfile() {
                                   
                                   return (
                                     <div key={index} className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 border border-gray-300">
-                                      {/* ✅ FIX 1: Use getProductDisplayName helper */}
                                       <span className="text-sm text-gray-700">
                                         {getProductDisplayName(item)}
                                       </span>
-                                      
-                                      {item.selectedSize && (
-                                        <span className="text-xs bg-gradient-to-r from-[#D97A22]/10 to-[#D97A22]/10 text-[#D97A22] px-2 py-1 rounded-full font-medium">
-                                          Size: {item.selectedSize}
-                                        </span>
-                                      )}
                                       <span className="text-xs text-gray-500 bg-white px-1 rounded border">
                                         x{item.quantity}
                                       </span>
@@ -591,7 +503,6 @@ export default function UserProfile() {
 
                             {/* Action Buttons */}
                             <div className="flex flex-col gap-2 lg:items-end">
-                              {/* Cancel Button */}
                               {canCancelOrder(order) && (
                                 <button 
                                   onClick={(e) => {
@@ -617,18 +528,17 @@ export default function UserProfile() {
                                 </button>
                               )}
                               
-                              {/* View PDF Button */}
                               <button 
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleViewPDF(order._id);
                                 }}
                                 disabled={pdfLoading}
-                                className="border border-[#D97A22] text-[#D97A22] px-4 py-2 rounded-lg hover:bg-gradient-to-r hover:from-[#D97A22] hover:to-[#D97A22] hover:text-white transition-colors font-medium text-sm flex items-center gap-2 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                                className="border border-[#9B0F06] text-[#9B0F06] px-4 py-2 rounded-lg hover:bg-[#9B0F06] hover:text-white transition-colors font-medium text-sm flex items-center gap-2 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                               >
                                 {pdfLoading ? (
                                   <>
-                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#D97A22]"></div>
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#9B0F06]"></div>
                                     Loading...
                                   </>
                                 ) : (
@@ -673,7 +583,7 @@ export default function UserProfile() {
                   value={cancellationReason}
                   onChange={(e) => setCancellationReason(e.target.value)}
                   placeholder="Please provide a reason for cancellation..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#D97A22] focus:border-[#D97A22] transition-all duration-200"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#9B0F06] focus:border-[#9B0F06] transition-all duration-200"
                   rows={3}
                 />
               </div>
@@ -693,7 +603,7 @@ export default function UserProfile() {
                 <button
                   onClick={confirmCancelOrder}
                   disabled={cancellingOrderId !== null}
-                  className="px-4 py-2 bg-gradient-to-r from-[#D97A22] to-[#D97A22] text-white rounded-lg hover:opacity-90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
                 >
                   {cancellingOrderId ? (
                     <>
@@ -716,11 +626,10 @@ export default function UserProfile() {
               <div className="px-6 py-4 border-b border-gray-300 bg-gray-50 flex justify-between items-center">
                 <h3 className="text-xl font-semibold text-gray-900">Order Receipt</h3>
                 <div className="flex items-center gap-3">
-                  {/* Download Button */}
                   <a
                     href={pdfUrl}
                     download={`receipt-${selectedOrder?.orderId || selectedOrder?._id?.slice(-8)}.pdf`}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#D97A22] to-[#D97A22] text-white rounded-lg hover:opacity-90 transition-colors font-medium text-sm cursor-pointer"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-[#9B0F06] text-white rounded-lg hover:bg-[#5E0006] transition-colors font-medium text-sm cursor-pointer"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -742,7 +651,7 @@ export default function UserProfile() {
                 {pdfLoading ? (
                   <div className="flex items-center justify-center h-96">
                     <div className="text-center">
-                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#D97A22] mx-auto"></div>
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#9B0F06] mx-auto"></div>
                       <p className="mt-4 text-gray-600">Loading PDF...</p>
                     </div>
                   </div>
@@ -843,7 +752,7 @@ export default function UserProfile() {
                                     e.stopPropagation();
                                     handleViewPDF(order._id);
                                   }}
-                                  className="inline-flex items-center gap-1 text-[#D97A22] hover:text-[#D97A22]/80 font-medium text-sm cursor-pointer"
+                                  className="inline-flex items-center gap-1 text-[#9B0F06] hover:text-[#5E0006] font-medium text-sm cursor-pointer"
                                 >
                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
@@ -859,15 +768,9 @@ export default function UserProfile() {
                                   
                                   return (
                                     <div key={index} className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 border border-gray-300">
-                                      {/* ✅ FIX 2: Use getProductDisplayName in cancelled orders too */}
                                       <span className="text-sm text-gray-700">
                                         {getProductDisplayName(item)}
                                       </span>
-                                      {item.selectedSize && (
-                                        <span className="text-xs bg-gradient-to-r from-[#D97A22]/10 to-[#D97A22]/10 text-[#D97A22] px-2 py-1 rounded-full font-medium">
-                                          Size: {item.selectedSize}
-                                        </span>
-                                      )}
                                       <span className="text-xs text-gray-500 bg-white px-1 rounded border">
                                         x{item.quantity}
                                       </span>
