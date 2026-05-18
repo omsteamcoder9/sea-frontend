@@ -5,8 +5,6 @@ import { settingsAPI } from '@/lib/settings-api';
 // Define the contact info type
 interface ContactInfo {
   contactNumber: string;
-  whatsappNumber: string;
-  callNumber: string;
   contactEmail: string;
   companyAddress: string;
 }
@@ -14,8 +12,6 @@ interface ContactInfo {
 export default function ContactInfo() {
   const [contactInfo, setContactInfo] = useState<ContactInfo>({
     contactNumber: '+91 7200074221',
-    whatsappNumber: '+91 7200074221',
-    callNumber: '+91 7200074221',
     contactEmail: 'support@seafood.com',
     companyAddress: '123 Seafood Street, Mumbai, India'
   });
@@ -27,17 +23,19 @@ export default function ContactInfo() {
     const fetchContactInfo = async () => {
       try {
         setLoading(true);
-        const data = await settingsAPI.getContactInfo();
-        // Merge fetched data with defaults to ensure all fields exist
-        setContactInfo(prev => ({
-          ...prev,
-          ...data
-        }));
+        const response = await settingsAPI.getPublicSettings();
+        if (response.success && response.data) {
+          const data = response.data;
+          setContactInfo({
+            contactNumber: data.contactNumber || '+91 7200074221',
+            contactEmail: data.contactEmail || 'support@seafood.com',
+            companyAddress: data.companyAddress || '123 Seafood Street, Mumbai, India'
+          });
+        }
         setError(null);
       } catch (err) {
         console.error('Failed to fetch contact info:', err);
         setError('Failed to load contact information. Using default values.');
-        // Keep using default values on error
       } finally {
         setLoading(false);
       }
@@ -83,28 +81,15 @@ export default function ContactInfo() {
     }
   ];
 
-  // Optional: Add WhatsApp specific contact method
-  const whatsappMethod = {
-    icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-      </svg>
-    ),
-    title: 'WhatsApp',
-    details: contactInfo.whatsappNumber,
-    description: 'Chat with us on WhatsApp',
-    action: `https://wa.me/${contactInfo.whatsappNumber.replace(/\s/g, '')}`
-  };
-
   if (loading) {
     return (
-      <div className="rounded-lg p-8 border" style={{ borderColor: '#D53E0F' }}>
+      <div className="rounded-lg p-8 border" style={{ borderColor: '#9B0F06' }}>
         <div className="animate-pulse">
-          <div className="h-8 rounded w-48 mb-6" style={{ backgroundColor: 'rgba(213, 62, 15, 0.1)' }}></div>
+          <div className="h-8 rounded w-48 mb-6" style={{ backgroundColor: 'rgba(155, 15, 6, 0.1)' }}></div>
           <div className="space-y-6">
-            <div className="h-24 rounded" style={{ backgroundColor: 'rgba(213, 62, 15, 0.05)' }}></div>
-            <div className="h-24 rounded" style={{ backgroundColor: 'rgba(213, 62, 15, 0.05)' }}></div>
-            <div className="h-24 rounded" style={{ backgroundColor: 'rgba(213, 62, 15, 0.05)' }}></div>
+            <div className="h-24 rounded" style={{ backgroundColor: 'rgba(155, 15, 6, 0.05)' }}></div>
+            <div className="h-24 rounded" style={{ backgroundColor: 'rgba(155, 15, 6, 0.05)' }}></div>
+            <div className="h-24 rounded" style={{ backgroundColor: 'rgba(155, 15, 6, 0.05)' }}></div>
           </div>
         </div>
       </div>
@@ -112,11 +97,11 @@ export default function ContactInfo() {
   }
 
   return (
-    <div className="rounded-lg p-8 border" style={{ borderColor: '#D53E0F' }}>
-      <h3 className="text-2xl font-bold mb-6" style={{ color: '#D53E0F' }}>Contact Information</h3>
+    <div className="rounded-lg p-8 border" style={{ borderColor: '#9B0F06' }}>
+      <h3 className="text-2xl font-bold mb-6" style={{ color: '#5E0006' }}>Contact Information</h3>
       
       {error && (
-        <div className="mb-4 p-3 rounded-lg text-sm" style={{ backgroundColor: 'rgba(213, 62, 15, 0.1)', border: '1px solid #D53E0F', color: '#5E0006' }}>
+        <div className="mb-4 p-3 rounded-lg text-sm" style={{ backgroundColor: 'rgba(155, 15, 6, 0.1)', border: '1px solid #9B0F06', color: '#5E0006' }}>
           {error}
         </div>
       )}
@@ -126,18 +111,16 @@ export default function ContactInfo() {
         <a 
           href={contactMethods[0].action}
           className="block group cursor-pointer transition-all duration-200 hover:shadow-lg"
-          target={contactMethods[0].title === 'Address' ? '_blank' : undefined}
-          rel={contactMethods[0].title === 'Address' ? 'noopener noreferrer' : undefined}
         >
           <div 
-            className="flex items-start space-x-4 p-4 rounded-lg border transition-all duration-200 hover:border-[#D53E0F]"
-            style={{ borderColor: 'rgba(213, 62, 15, 0.2)' }}
+            className="flex items-start space-x-4 p-4 rounded-lg border transition-all duration-200 hover:border-[#9B0F06]"
+            style={{ borderColor: 'rgba(155, 15, 6, 0.2)' }}
           >
-            <div className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center transition-transform duration-200 group-hover:scale-110" style={{ backgroundColor: 'rgba(213, 62, 15, 0.1)', color: '#D53E0F' }}>
+            <div className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center transition-transform duration-200 group-hover:scale-110" style={{ backgroundColor: 'rgba(155, 15, 6, 0.1)', color: '#9B0F06' }}>
               {contactMethods[0].icon}
             </div>
             <div>
-              <h4 className="font-semibold" style={{ color: '#D53E0F' }}>{contactMethods[0].title}</h4>
+              <h4 className="font-semibold" style={{ color: '#9B0F06' }}>{contactMethods[0].title}</h4>
               <p className="font-medium text-gray-800">{contactMethods[0].details}</p>
               <p className="text-sm text-gray-600">{contactMethods[0].description}</p>
             </div>
@@ -150,38 +133,16 @@ export default function ContactInfo() {
           className="block group cursor-pointer transition-all duration-200 hover:shadow-lg"
         >
           <div 
-            className="flex items-start space-x-4 p-4 rounded-lg border transition-all duration-200 hover:border-[#D53E0F]"
-            style={{ borderColor: 'rgba(213, 62, 15, 0.2)' }}
+            className="flex items-start space-x-4 p-4 rounded-lg border transition-all duration-200 hover:border-[#9B0F06]"
+            style={{ borderColor: 'rgba(155, 15, 6, 0.2)' }}
           >
-            <div className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center transition-transform duration-200 group-hover:scale-110" style={{ backgroundColor: 'rgba(213, 62, 15, 0.1)', color: '#D53E0F' }}>
+            <div className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center transition-transform duration-200 group-hover:scale-110" style={{ backgroundColor: 'rgba(155, 15, 6, 0.1)', color: '#9B0F06' }}>
               {contactMethods[1].icon}
             </div>
             <div>
-              <h4 className="font-semibold" style={{ color: '#D53E0F' }}>{contactMethods[1].title}</h4>
+              <h4 className="font-semibold" style={{ color: '#9B0F06' }}>{contactMethods[1].title}</h4>
               <p className="font-medium text-gray-800">{contactMethods[1].details}</p>
               <p className="text-sm text-gray-600">{contactMethods[1].description}</p>
-            </div>
-          </div>
-        </a>
-
-        {/* WhatsApp Contact - Optional */}
-        <a 
-          href={whatsappMethod.action}
-          className="block group cursor-pointer transition-all duration-200 hover:shadow-lg"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <div 
-            className="flex items-start space-x-4 p-4 rounded-lg border transition-all duration-200 hover:border-[#25D366]"
-            style={{ borderColor: 'rgba(213, 62, 15, 0.2)' }}
-          >
-            <div className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center transition-transform duration-200 group-hover:scale-110" style={{ backgroundColor: 'rgba(37, 211, 102, 0.1)', color: '#25D366' }}>
-              {whatsappMethod.icon}
-            </div>
-            <div>
-              <h4 className="font-semibold" style={{ color: '#25D366' }}>{whatsappMethod.title}</h4>
-              <p className="font-medium text-gray-800">{whatsappMethod.details}</p>
-              <p className="text-sm text-gray-600">{whatsappMethod.description}</p>
             </div>
           </div>
         </a>
@@ -194,38 +155,20 @@ export default function ContactInfo() {
           rel="noopener noreferrer"
         >
           <div 
-            className="flex items-start space-x-4 p-4 rounded-lg border transition-all duration-200 hover:border-[#D53E0F]"
-            style={{ borderColor: 'rgba(213, 62, 15, 0.2)' }}
+            className="flex items-start space-x-4 p-4 rounded-lg border transition-all duration-200 hover:border-[#9B0F06]"
+            style={{ borderColor: 'rgba(155, 15, 6, 0.2)' }}
           >
-            <div className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center transition-transform duration-200 group-hover:scale-110" style={{ backgroundColor: 'rgba(213, 62, 15, 0.1)', color: '#D53E0F' }}>
+            <div className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center transition-transform duration-200 group-hover:scale-110" style={{ backgroundColor: 'rgba(155, 15, 6, 0.1)', color: '#9B0F06' }}>
               {contactMethods[2].icon}
             </div>
             <div>
-              <h4 className="font-semibold" style={{ color: '#D53E0F' }}>{contactMethods[2].title}</h4>
+              <h4 className="font-semibold" style={{ color: '#9B0F06' }}>{contactMethods[2].title}</h4>
               <p className="font-medium text-gray-800">{contactMethods[2].details}</p>
               <p className="text-sm text-gray-600">{contactMethods[2].description}</p>
             </div>
           </div>
         </a>
       </div>
-
-      <div className="mt-8 pt-8 border-t" style={{ borderTopColor: 'rgba(213, 62, 15, 0.2)' }}>
-        <h4 className="font-semibold mb-4" style={{ color: '#D53E0F' }}>Business Hours</h4>
-        <div className="space-y-3">
-          <div className="flex justify-between items-center p-2 rounded-lg transition-colors hover:bg-[#D53E0F]/5">
-            <span className="text-gray-700">Monday - Friday</span>
-            <span className="font-medium" style={{ color: '#D53E0F' }}>9:00 AM - 6:00 PM</span>
-          </div>
-          <div className="flex justify-between items-center p-2 rounded-lg transition-colors hover:bg-[#D53E0F]/5">
-            <span className="text-gray-700">Saturday</span>
-            <span className="font-medium" style={{ color: '#D53E0F' }}>10:00 AM - 4:00 PM</span>
-          </div>
-          <div className="flex justify-between items-center p-2 rounded-lg transition-colors hover:bg-[#D53E0F]/5">
-            <span className="text-gray-700">Sunday</span>
-            <span className="font-medium" style={{ color: '#ff6b6b' }}>Closed</span>
-          </div>
-        </div>
-      </div>
     </div>
-  );    
+  );
 }

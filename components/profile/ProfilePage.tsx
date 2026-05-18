@@ -32,16 +32,12 @@ const calculateSubtotal = (products: OrderItem[]): number => {
   }, 0);
 };
 
-// Helper function to get product display name with variant
+// Helper function to get product display name without variant
 const getProductDisplayName = (item: OrderItem): string => {
   if (item.name) {
     return item.name;
   }
-  // Handle product being string or object
   const productName = typeof item.product === 'string' ? 'Product' : (item.product?.name || 'Product');
-  if (item.variantName) {
-    return `${productName} - ${item.variantName}`;
-  }
   return productName;
 };
 
@@ -73,17 +69,9 @@ export default function UserProfile() {
         setLoading(true);
         setError(null);
         
-        const token = localStorage.getItem('otp_auth_token');
-        
-        if (!token) {
-          setError('Please log in to view your orders');
-          setLoading(false);
-          return;
-        }
-
         console.log('🔄 Fetching user orders...');
-        // ✅ getUserOrders expects 1 argument (token)
-        const userOrders = await getUserOrders(token);
+        // ✅ CORRECT: No token argument - function gets it internally
+        const userOrders = await getUserOrders();
         
         console.log('📦 Orders fetched:', userOrders);
         
@@ -109,14 +97,8 @@ export default function UserProfile() {
 
   const fetchOrderDetails = async (orderId: string) => {
     try {
-      const token = localStorage.getItem('otp_auth_token');
-      if (!token) {
-        setError('Please log in to view order details');
-        return;
-      }
-      
-      // ✅ getOrderById expects 2 arguments (orderId, token)
-      const order = await getOrderById(orderId, token);
+      // ✅ CORRECT: Only one argument - orderId (token from localStorage)
+      const order = await getOrderById(orderId);
       setSelectedOrder(order);
       
     } catch (err: unknown) {
@@ -134,15 +116,9 @@ export default function UserProfile() {
     if (!selectedOrder) return;
 
     try {
-      const token = localStorage.getItem('otp_auth_token');
-      if (!token) {
-        setError('Please log in to cancel order');
-        return;
-      }
-
       setCancellingOrderId(selectedOrder._id);
-      // ✅ cancelOrder expects 3 arguments (orderId, token, cancellationReason)
-      await cancelOrder(selectedOrder._id, token, cancellationReason);
+      // ✅ CORRECT: Two arguments (orderId, cancellationReason) - no token
+      await cancelOrder(selectedOrder._id, cancellationReason);
       
       // Update the orders state
       const updatedOrders = orders.map(order => 
@@ -174,44 +150,43 @@ export default function UserProfile() {
       setCancellingOrderId(null);
     }
   };
-
-  const handleViewPDF = async (orderId: string) => {
-    try {
-      setPdfLoading(true);
-      const token = localStorage.getItem('otp_auth_token');
-      if (!token) {
-        setError('Please log in to view receipt');
-        setPdfLoading(false);
-        return;
-      }
-
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-      const pdfEndpoint = `${apiUrl}/orders/${orderId}/receipt/pdf`;
-      
-      const response = await fetch(pdfEndpoint, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch PDF');
-      }
-      
-      const blob = await response.blob();
-      const blobUrl = URL.createObjectURL(blob);
-      
-      setPdfUrl(blobUrl);
-      setShowPDFModal(true);
-      
-    } catch (err: unknown) {
-      console.error('Error opening PDF:', err);
-      setError('Failed to load PDF. Please try again.');
-    } finally {
+const handleViewPDF = async (orderId: string) => {
+  try {
+    setPdfLoading(true);
+    const token = localStorage.getItem('otp_auth_token');
+    if (!token) {
+      setError('Please log in to view receipt');
       setPdfLoading(false);
+      return;
     }
-  };
 
+    // Use env as is (http://localhost:5000) and add /api in the path
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    const pdfEndpoint = `${apiUrl}/api/orders/${orderId}/receipt/pdf`;
+    
+    const response = await fetch(pdfEndpoint, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch PDF');
+    }
+    
+    const blob = await response.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    
+    setPdfUrl(blobUrl);
+    setShowPDFModal(true);
+    
+  } catch (err: unknown) {
+    console.error('Error opening PDF:', err);
+    setError('Failed to load PDF. Please try again.');
+  } finally {
+    setPdfLoading(false);
+  }
+};
   const closePDFModal = () => {
     if (pdfUrl) {
       URL.revokeObjectURL(pdfUrl);
@@ -431,17 +406,12 @@ export default function UserProfile() {
                       return (
                         <div
                           key={order._id}
-                          className={`p-6 hover:bg-gray-50 cursor-pointer transition-all duration-200 group ${
-                            selectedOrder?._id === order._id ? 'bg-gray-100 border-l-4 border-l-[#9B0F06]' : ''
-                          }`}
-                          onClick={() => fetchOrderDetails(order._id)}
+                          className="p-6 hover:bg-gray-50 transition-all duration-200 group"
                         >
                           <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
                             <div className="flex-1">
                               <div className="flex flex-col lg:flex-row lg:items-center gap-3 mb-3">
-                                <h3 className={`text-lg font-semibold group-hover:text-gray-700 transition-colors ${
-                                  selectedOrder?._id === order._id ? 'text-gray-800' : 'text-gray-900'
-                                }`}>
+                                <h3 className="text-lg font-semibold text-gray-900">
                                   Order #{order.orderId || order._id?.slice(-8)}
                                 </h3>
                                 <div className="flex flex-wrap gap-2">
@@ -505,10 +475,7 @@ export default function UserProfile() {
                             <div className="flex flex-col gap-2 lg:items-end">
                               {canCancelOrder(order) && (
                                 <button 
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleCancelOrder(order);
-                                  }}
+                                  onClick={() => handleCancelOrder(order)}
                                   disabled={cancellingOrderId === order._id}
                                   className="border border-red-600 text-red-600 px-4 py-2 rounded-lg hover:bg-red-600 hover:text-white transition-colors font-medium text-sm flex items-center gap-2 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                                 >
@@ -529,10 +496,7 @@ export default function UserProfile() {
                               )}
                               
                               <button 
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleViewPDF(order._id);
-                                }}
+                                onClick={() => handleViewPDF(order._id)}
                                 disabled={pdfLoading}
                                 className="border border-[#9B0F06] text-[#9B0F06] px-4 py-2 rounded-lg hover:bg-[#9B0F06] hover:text-white transition-colors font-medium text-sm flex items-center gap-2 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                               >
@@ -623,7 +587,7 @@ export default function UserProfile() {
         {showPDFModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col border border-gray-300">
-              <div className="px-6 py-4 border-b border-gray-300 bg-gray-50 flex justify-between items-center">
+              <div className="px-6 py-4 border-b border-gray-300 bg-gray-50 flex justify-between items-center flex-shrink-0">
                 <h3 className="text-xl font-semibold text-gray-900">Order Receipt</h3>
                 <div className="flex items-center gap-3">
                   <a
@@ -647,9 +611,9 @@ export default function UserProfile() {
                 </div>
               </div>
               
-              <div className="flex-1 overflow-hidden">
+              <div className="flex-1 overflow-hidden min-h-[500px]">
                 {pdfLoading ? (
-                  <div className="flex items-center justify-center h-96">
+                  <div className="flex items-center justify-center h-full">
                     <div className="text-center">
                       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#9B0F06] mx-auto"></div>
                       <p className="mt-4 text-gray-600">Loading PDF...</p>
@@ -662,7 +626,7 @@ export default function UserProfile() {
                     title="Order Receipt"
                   />
                 ) : (
-                  <div className="flex items-center justify-center h-96">
+                  <div className="flex items-center justify-center h-full">
                     <div className="text-center">
                       <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -683,7 +647,7 @@ export default function UserProfile() {
         {showCancelledOrdersModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden border border-gray-300">
-              <div className="px-6 py-4 border-b border-gray-300 bg-gray-50 flex justify-between items-center">
+              <div className="px-6 py-4 border-b border-gray-300 bg-gray-50 flex justify-between items-center flex-shrink-0">
                 <h3 className="text-xl font-semibold text-gray-900">
                   Cancelled Orders ({cancelledOrders.length})
                 </h3>
@@ -746,19 +710,6 @@ export default function UserProfile() {
                                 </span>
                                 <span className="text-gray-400">•</span>
                                 <span className="text-gray-600 capitalize">{order.paymentMethod}</span>
-                                <span className="text-gray-400">•</span>
-                                <button 
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleViewPDF(order._id);
-                                  }}
-                                  className="inline-flex items-center gap-1 text-[#9B0F06] hover:text-[#5E0006] font-medium text-sm cursor-pointer"
-                                >
-                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
-                                  </svg>
-                                  View PDF
-                                </button>
                               </div>
 
                               {/* Order Items Preview */}
@@ -788,6 +739,21 @@ export default function UserProfile() {
                                   </div>
                                 )}
                               </div>
+                            </div>
+
+                            <div className="flex flex-col gap-2 lg:items-end">
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleViewPDF(order._id);
+                                }}
+                                className="border border-[#9B0F06] text-[#9B0F06] px-4 py-2 rounded-lg hover:bg-[#9B0F06] hover:text-white transition-colors font-medium text-sm flex items-center gap-2 whitespace-nowrap cursor-pointer"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
+                                </svg>
+                                View PDF
+                              </button>
                             </div>
                           </div>
                         </div>

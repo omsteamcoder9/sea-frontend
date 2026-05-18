@@ -262,26 +262,26 @@ await addToCart(productWithImage, 1, defaultVariant);
             </div>
           </div>
 
-          <button
-            onClick={handleAddToCart}
-            disabled={isOutOfStock || isAddingToCart}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-300 active:scale-95 shadow-sm disabled:opacity-50 cursor-pointer"
-            style={{ 
-              backgroundColor: '#9B0F06',
-              color: 'white'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#6B0A04';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#9B0F06';
-            }}
-          >
-            <ShoppingBag size={16} />
-            <span className="text-xs font-bold tracking-wide">
-              {isOutOfStock ? 'OUT' : 'ADD TO CART'}
-            </span>
-          </button>
+<button
+  onClick={handleAddToCart}
+  disabled={isOutOfStock || isAddingToCart}
+  className="flex items-center justify-center gap-1 sm:gap-2 px-1.5 sm:px-4 py-1.5 sm:py-2 rounded-xl transition-all duration-300 active:scale-95 shadow-sm disabled:opacity-50 cursor-pointer min-w-[90px] sm:min-w-0"
+  style={{ 
+    backgroundColor: '#9B0F06',
+    color: 'white'
+  }}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.backgroundColor = '#6B0A04';
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.backgroundColor = '#9B0F06';
+  }}
+>
+  <ShoppingBag size={12} className="sm:w-4 sm:h-4" />
+  <span className="text-[9px] sm:text-xs font-bold tracking-wide whitespace-nowrap">
+    {isOutOfStock ? 'OUT' : 'Add To Cart'}
+  </span>
+</button>
         </div>
       </div>
     </div>

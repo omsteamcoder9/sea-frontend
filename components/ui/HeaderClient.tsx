@@ -7,9 +7,10 @@ import { useState, useEffect, useRef } from 'react';
 import { quickSearchProducts } from '@/lib/productService';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { ShoppingCart, Menu, X, User, Search, Instagram, Twitter, Facebook, Youtube, Phone, Mail } from 'lucide-react';
+import { ShoppingCart, Menu, X, User, Search, Instagram, Twitter, Facebook, Youtube, Linkedin, Phone, Mail } from 'lucide-react';
 import { Category } from '@/types/category';
 import CartDrawer from '@/components/CartDrawer';
+import { settingsAPI } from '@/lib/settings-api';
 
 interface SearchProduct {
   _id: string;
@@ -38,12 +39,82 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
   const [searchResults, setSearchResults] = useState<SearchProduct[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   
+  // Site settings state
+  const [siteName, setSiteName] = useState('Sea Food');
+  const [contactEmail, setContactEmail] = useState('contact@seafood.com');
+  const [contactNumber, setContactNumber] = useState('+91 98765 43210');
+  const [socialMedia, setSocialMedia] = useState({
+    facebook: '',
+    instagram: '',
+    twitter: '',
+    youtube: '',
+    linkedin: ''
+  });
+  
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const profileDropdownRef = useRef<HTMLDivElement>(null);
   
   const categoryNames = categories.map(cat => cat.name);
   const cartCount = cart?.totalItems || 0;
+
+  // Fetch settings on component mount
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  const fetchSettings = async () => {
+    try {
+      const response = await settingsAPI.getPublicSettings();
+      if (response.success && response.data) {
+        const data = response.data;
+        
+        // Update site name
+        if (data.siteName) {
+          setSiteName(data.siteName);
+        }
+        
+        // Update contact info
+        if (data.contactEmail) {
+          setContactEmail(data.contactEmail);
+        }
+        if (data.contactNumber) {
+          setContactNumber(data.contactNumber);
+        }
+        
+        // Update social media
+        if (data.socialMedia) {
+          setSocialMedia({
+            facebook: data.socialMedia.facebook || '',
+            instagram: data.socialMedia.instagram || '',
+            twitter: data.socialMedia.twitter || '',
+            youtube: data.socialMedia.youtube || '',
+            linkedin: data.socialMedia.linkedin || ''
+          });
+        }
+        
+        // Also handle frontend format if needed
+        if (data.facebookUrl) {
+          setSocialMedia(prev => ({ ...prev, facebook: data.facebookUrl || '' }));
+        }
+        if (data.instagramUrl) {
+          setSocialMedia(prev => ({ ...prev, instagram: data.instagramUrl || '' }));
+        }
+        if (data.twitterUrl) {
+          setSocialMedia(prev => ({ ...prev, twitter: data.twitterUrl || '' }));
+        }
+        if (data.youtubeUrl) {
+          setSocialMedia(prev => ({ ...prev, youtube: data.youtubeUrl || '' }));
+        }
+        if (data.linkedinUrl) {
+          setSocialMedia(prev => ({ ...prev, linkedin: data.linkedinUrl || '' }));
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching settings:', error);
+      // Keep default values if fetch fails
+    }
+  };
 
   const openCartDrawer = () => {
     setIsCartDrawerOpen(true);
@@ -192,48 +263,68 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
   return (
     <>
       {/* ================= TOP HEADER ================= */}
-    <div className="hidden lg:block w-full bg-[#9B0F06]">
-  <div className="max-w-[1350px] mx-auto">
-    <div className="flex items-center justify-between h-[40px] px-6">
-      {/* LEFT SIDE - Email and Phone */}
-      <div className="flex items-center gap-8 text-[#EED9B9] text-[12px] font-semibold">
-        <div className="flex items-center gap-2">
-          <Mail className="w-[12px] h-[12px]" />
-          <span>contact@seafood.com</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Phone className="w-[12px] h-[12px]" />
-          <span>+91 98765 43210</span>
-        </div>
-      </div>
+      <div className="hidden lg:block w-full bg-[#9B0F06]">
+        <div className="max-w-[1350px] mx-auto">
+          <div className="flex items-center justify-between h-[40px] px-6">
+            {/* LEFT SIDE - Email and Phone from DB */}
+            <div className="flex items-center gap-8 text-[#EED9B9] text-[12px] font-semibold">
+              <div className="flex items-center gap-2">
+                <Mail className="w-[12px] h-[12px]" />
+                <span>{contactEmail}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Phone className="w-[12px] h-[12px]" />
+                <span>{contactNumber}</span>
+              </div>
+            </div>
 
-      {/* RIGHT SIDE - Contact Link and Social Icons */}
-      <div className="flex items-center gap-4 text-[#EED9B9] text-[12px] font-semibold">
-        <a href="#" className="hover:text-white transition-all duration-300">
-          Contact
-        </a>
-        <div className="flex items-center gap-3">
-          <Facebook className="w-[12px] h-[12px] cursor-pointer hover:text-white transition-all duration-300" />
-          <Twitter className="w-[12px] h-[12px] cursor-pointer hover:text-white transition-all duration-300" />
-          <Instagram className="w-[12px] h-[12px] cursor-pointer hover:text-white transition-all duration-300" />
-          <Youtube className="w-[12px] h-[12px] cursor-pointer hover:text-white transition-all duration-300" />
+            {/* RIGHT SIDE - Contact Link and Social Icons from DB */}
+            <div className="flex items-center gap-4 text-[#EED9B9] text-[12px] font-semibold">
+              <a href="/contact" className="hover:text-white transition-all duration-300">
+                Contact
+              </a>
+              <div className="flex items-center gap-3">
+                {socialMedia.facebook && (
+                  <a href={socialMedia.facebook} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-all duration-300">
+                    <Facebook className="w-[12px] h-[12px] cursor-pointer" />
+                  </a>
+                )}
+                {socialMedia.twitter && (
+                  <a href={socialMedia.twitter} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-all duration-300">
+                    <Twitter className="w-[12px] h-[12px] cursor-pointer" />
+                  </a>
+                )}
+                {socialMedia.instagram && (
+                  <a href={socialMedia.instagram} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-all duration-300">
+                    <Instagram className="w-[12px] h-[12px] cursor-pointer" />
+                  </a>
+                )}
+                {socialMedia.youtube && (
+                  <a href={socialMedia.youtube} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-all duration-300">
+                    <Youtube className="w-[12px] h-[12px] cursor-pointer" />
+                  </a>
+                )}
+                {socialMedia.linkedin && (
+                  <a href={socialMedia.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-all duration-300">
+                    <Linkedin className="w-[12px] h-[12px] cursor-pointer" />
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-</div>
 
       {/* ================= MAIN NAVBAR with STICKY ================= */}
       <header className="sticky top-0 z-50 w-full bg-[#5E0006] border-b border-[#D53E0F]/30">
         <div className="w-full lg:max-w-[1350px] lg:mx-auto">
-          {/* Mobile flex layout, Desktop grid layout - NO padding on mobile */}
           <div className="flex items-center justify-between lg:grid lg:grid-cols-[220px_1fr_320px] h-[60px] lg:h-[72px] px-0 lg:px-0">
-            {/* LEFT LOGO */}
+            {/* LEFT LOGO - Dynamic Site Name from DB */}
             <div className="flex items-center px-3 lg:px-6 bg-transparent">
               <Link href="/" className="relative">
                 <div className="absolute -top-3 left-0 w-8 lg:w-11 h-[3px] lg:h-[4px] bg-[#D53E0F]"></div>
                 <h1 className="text-[20px] lg:text-[28px] font-black tracking-[3px] lg:tracking-[5px] text-[#EED9B9] leading-none">
-                  Sea Food
+                  {siteName}
                 </h1>
               </Link>
             </div>
@@ -297,7 +388,7 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                     )}
                   </button>
 
-                  {/* Profile / Login Button - Hide on mobile, show on desktop */}
+                  {/* Profile / Login Button */}
                   {!isAuthenticated ? (
                     <Link href="/login" className="hidden lg:block">
                       <button className="border border-[#D53E0F]/50 bg-white/10 backdrop-blur-sm h-[40px] px-6 text-[#EED9B9] text-[11px] font-black tracking-[1.5px] uppercase hover:bg-[#D53E0F] hover:text-white transition-all duration-300 rounded-full">
@@ -464,7 +555,7 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
             <div className="flex flex-col h-full">
               <div className="flex items-center justify-between p-4 border-b border-[#D53E0F]/30">
                 <Link href="/" onClick={() => setIsMenuOpen(false)}>
-                  <h1 className="text-xl font-black tracking-[3px] text-[#EED9B9]">Sea Food</h1>
+                  <h1 className="text-xl font-black tracking-[3px] text-[#EED9B9]">{siteName}</h1>
                 </Link>
                 <button onClick={() => setIsMenuOpen(false)} className="text-[#EED9B9]/80 hover:text-[#D53E0F]">
                   <X className="w-5 h-5" />

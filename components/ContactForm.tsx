@@ -81,13 +81,13 @@ export default function ContactForm() {
   // Don't render form until mounted on client
   if (!isMounted) {
     return (
-      <div className="max-w-2xl mx-auto p-6 rounded-lg border" style={{ borderColor: '#D53E0F' }}>
+      <div className="max-w-2xl mx-auto p-6 rounded-lg border" style={{ borderColor: '#9B0F06' }}>
         <div className="animate-pulse">
-          <div className="h-8 rounded mb-6" style={{ backgroundColor: 'rgba(213, 62, 15, 0.1)' }}></div>
+          <div className="h-8 rounded mb-6" style={{ backgroundColor: 'rgba(155, 15, 6, 0.1)' }}></div>
           <div className="space-y-4">
-            <div className="h-4 rounded" style={{ backgroundColor: 'rgba(213, 62, 15, 0.05)' }}></div>
-            <div className="h-4 rounded" style={{ backgroundColor: 'rgba(213, 62, 15, 0.05)' }}></div>
-            <div className="h-24 rounded" style={{ backgroundColor: 'rgba(213, 62, 15, 0.05)' }}></div>
+            <div className="h-4 rounded" style={{ backgroundColor: 'rgba(155, 15, 6, 0.05)' }}></div>
+            <div className="h-4 rounded" style={{ backgroundColor: 'rgba(155, 15, 6, 0.05)' }}></div>
+            <div className="h-24 rounded" style={{ backgroundColor: 'rgba(155, 15, 6, 0.05)' }}></div>
           </div>
         </div>
       </div>
@@ -95,8 +95,8 @@ export default function ContactForm() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-6 rounded-lg border" style={{ borderColor: '#D53E0F' }}>
-      <h2 className="text-3xl font-bold mb-6 text-center" style={{ color: '#D53E0F' }}>Get In Touch</h2>
+    <div className="max-w-2xl mx-auto p-6 rounded-lg border" style={{ borderColor: '#9B0F06' }}>
+      <h2 className="text-3xl font-bold mb-6 text-center" style={{ color: '#5E0006' }}>Get In Touch</h2>
       
       {message && (
         <div
@@ -133,8 +133,8 @@ export default function ContactForm() {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D53E0F] focus:border-[#D53E0F] transition-all duration-200"
-              style={{ backgroundColor: 'white', borderColor: 'rgba(213, 62, 15, 0.2)' }}
+              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B0F06] focus:border-[#9B0F06] transition-all duration-200"
+              style={{ backgroundColor: 'white', borderColor: 'rgba(155, 15, 6, 0.2)' }}
               placeholder="Enter your full name"
             />
           </div>
@@ -149,8 +149,8 @@ export default function ContactForm() {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D53E0F] focus:border-[#D53E0F] transition-all duration-200"
-              style={{ backgroundColor: 'white', borderColor: 'rgba(213, 62, 15, 0.2)' }}
+              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B0F06] focus:border-[#9B0F06] transition-all duration-200"
+              style={{ backgroundColor: 'white', borderColor: 'rgba(155, 15, 6, 0.2)' }}
               placeholder="Enter your email address"
             />
           </div>
@@ -166,8 +166,8 @@ export default function ContactForm() {
             name="phone"
             value={formData.phone}
             onChange={handleChange}
-            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D53E0F] focus:border-[#D53E0F] transition-all duration-200"
-            style={{ backgroundColor: 'white', borderColor: 'rgba(213, 62, 15, 0.2)' }}
+            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B0F06] focus:border-[#9B0F06] transition-all duration-200"
+            style={{ backgroundColor: 'white', borderColor: 'rgba(155, 15, 6, 0.2)' }}
             placeholder="Enter your phone number"
           />
         </div>
@@ -183,8 +183,8 @@ export default function ContactForm() {
             value={formData.subject}
             onChange={handleChange}
             required
-            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D53E0F] focus:border-[#D53E0F] transition-all duration-200"
-            style={{ backgroundColor: 'white', borderColor: 'rgba(213, 62, 15, 0.2)' }}
+            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B0F06] focus:border-[#9B0F06] transition-all duration-200"
+            style={{ backgroundColor: 'white', borderColor: 'rgba(155, 15, 6, 0.2)' }}
             placeholder="What is this regarding?"
           />
         </div>
@@ -200,8 +200,8 @@ export default function ContactForm() {
             onChange={handleChange}
             required
             rows={6}
-            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D53E0F] focus:border-[#D53E0F] transition-all duration-200 resize-vertical"
-            style={{ backgroundColor: 'white', borderColor: 'rgba(213, 62, 15, 0.2)' }}
+            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B0F06] focus:border-[#9B0F06] transition-all duration-200 resize-vertical"
+            style={{ backgroundColor: 'white', borderColor: 'rgba(155, 15, 6, 0.2)' }}
             placeholder="Tell us how we can help you..."
           />
         </div>
@@ -210,9 +210,9 @@ export default function ContactForm() {
           type="submit"
           disabled={isSubmitting}
           className="w-full py-3 px-6 rounded-lg font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{ backgroundColor: '#D53E0F', color: 'white' }}
+          style={{ backgroundColor: '#9B0F06', color: 'white' }}
           onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#5E0006'}
-          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#D53E0F'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#9B0F06'}
         >
           {isSubmitting ? (
             <div className="flex items-center justify-center">
