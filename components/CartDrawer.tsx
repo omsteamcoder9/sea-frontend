@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Image from "next/image";
 import { useState, useEffect } from 'react';
-import { isAuthenticated } from '@/lib/otpAuth'; // Import authentication check
+import { isAuthenticated } from '@/lib/otpAuth';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -21,7 +21,6 @@ const getProductName = (item: any): string => {
 };
 
 const getProductImage = (item: any): string | null => {
-  // ✅ Check productImage FIRST - it already has the image!
   if (item.productImage) {
     const baseUrl = process.env.NEXT_PUBLIC_IMG_URL || '';
     const cleanPath = item.productImage.replace('/uploads/', '');
@@ -29,6 +28,18 @@ const getProductImage = (item: any): string | null => {
   }
   return null;
 };
+
+// ✅ ADD WEIGHT DISPLAY HELPER
+const getWeightDisplay = (item: any): string | null => {
+  const weight = item.weight || item.selectedVariant?.weight;
+  const weightUnit = item.weightUnit || item.selectedVariant?.weightUnit || 'gram';
+  
+  if (weight && weight > 0) {
+    return `${weight} ${weightUnit}`;
+  }
+  return null;
+};
+
 // Helper function to get max stock
 const getItemMaxStock = (item: any): number => {
   if (item.product?.stock !== undefined) {
@@ -78,17 +89,13 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
   }, [isOpen]);
 
   const handleCheckout = () => {
-    // Check if user is authenticated
     const isLoggedIn = isAuthenticated();
     
     if (isLoggedIn) {
-      // User is logged in, proceed to checkout
       onClose();
       router.push('/checkout');
     } else {
-      // User is not logged in, redirect to login page with return URL
       onClose();
-      // Store the current cart state or intent in session storage
       sessionStorage.setItem('redirectAfterLogin', '/checkout');
       sessionStorage.setItem('pendingCheckout', 'true');
       router.push('/login');
@@ -178,6 +185,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                   const imageUrl = getProductImage(item);
                   const productName = getProductName(item);
                   const variantName = getVariantDisplayName(item);
+                  const weightDisplay = getWeightDisplay(item);
                   const maxStock = getItemMaxStock(item);
                   const isRemoving = removingItems.includes(item._id);
                   
@@ -225,6 +233,13 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                           {variantName && (
                             <p className="text-[#D53E0F] text-[10px] font-medium mt-0.5">
                               {variantName}
+                            </p>
+                          )}
+                          
+                          {/* ✅ ADD WEIGHT DISPLAY */}
+                          {weightDisplay && (
+                            <p className="text-gray-500 text-[10px] mt-0.5">
+                              ⚖️ {weightDisplay}
                             </p>
                           )}
                           

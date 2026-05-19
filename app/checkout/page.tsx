@@ -64,7 +64,9 @@ interface RazorpayErrorResponse {
   };
 }
 
+// ✅ ADDED email to FormData
 interface FormData {
+  email: string;
   phone: string;
   street: string;
   city: string;
@@ -102,7 +104,9 @@ export default function CheckoutPage() {
   const { user, token } = useAuth();
   const router = useRouter();
 
+  // ✅ ADDED email to initial state
   const [formData, setFormData] = useState<FormData>({
+    email: '',
     phone: '',
     street: '',
     city: '',
@@ -152,12 +156,17 @@ export default function CheckoutPage() {
     });
   };
 
-  // Auto-fill phone if user is logged in
+  // Auto-fill phone and email if user is logged in
   useEffect(() => {
-    if (user?.phoneNumber && !formData.phone) {
-      setFormData(prev => ({ ...prev, phone: user.phoneNumber || '' }));
+    if (user) {
+      if (user.phoneNumber && !formData.phone) {
+        setFormData(prev => ({ ...prev, phone: user.phoneNumber || '' }));
+      }
+      if (user.email && !formData.email) {
+        setFormData(prev => ({ ...prev, email: user.email || '' }));
+      }
     }
-  }, [user, formData.phone]);
+  }, [user, formData.phone, formData.email]);
 
   // Redirect if cart is empty
   useEffect(() => {
@@ -180,31 +189,30 @@ export default function CheckoutPage() {
     fetchPaymentSettings();
   }, []);
 
-const fetchPaymentSettings = async () => {
-  try {
-    setSettingsLoading(true);
-    const API_URL = process.env.NEXT_PUBLIC_API_URL; // http://localhost:5000
-    
-    // ✅ Add /api/ to the URL
-    const response = await fetch(`${API_URL}/api/settings/public`);
-    const data = await response.json();
-    
-    console.log('🔍 Settings response:', data);
-    
-    if (data.success) {
-      const settings = data.data;
-      setPaymentSettings({
-        razorpayEnabled: settings.razorpayEnabled,
-        razorpayKeyId: settings.razorpayKeyId || '',
-        cashOnDeliveryEnabled: settings.cashOnDeliveryEnabled
-      });
+  const fetchPaymentSettings = async () => {
+    try {
+      setSettingsLoading(true);
+      const API_URL = process.env.NEXT_PUBLIC_API_URL;
+      
+      const response = await fetch(`${API_URL}/api/settings/public`);
+      const data = await response.json();
+      
+      console.log('🔍 Settings response:', data);
+      
+      if (data.success) {
+        const settings = data.data;
+        setPaymentSettings({
+          razorpayEnabled: settings.razorpayEnabled,
+          razorpayKeyId: settings.razorpayKeyId || '',
+          cashOnDeliveryEnabled: settings.cashOnDeliveryEnabled
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching payment settings:', error);
+    } finally {
+      setSettingsLoading(false);
     }
-  } catch (error) {
-    console.error('Error fetching payment settings:', error);
-  } finally {
-    setSettingsLoading(false);
-  }
-};
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -229,13 +237,13 @@ const fetchPaymentSettings = async () => {
     });
   };
 
-  // Cash on Delivery handler
+  // Cash on Delivery handler - ✅ ADDED email validation
   const handleCashOnDelivery = async (): Promise<void> => {
     try {
       setLoading(true);
       setAuthError('');
 
-      if (!formData.phone || !formData.street || !formData.city || 
+      if (!formData.email || !formData.phone || !formData.street || !formData.city || 
           !formData.state || !formData.postalCode) {
         showErrorPopup('Please fill all the required fields before placing order.');
         setLoading(false);
@@ -249,8 +257,10 @@ const fetchPaymentSettings = async () => {
         return;
       }
 
+      // ✅ ADDED email to shippingAddress
       const orderData: CreateOrderRequest = {
         shippingAddress: {
+          email: formData.email,
           street: formData.street,
           city: formData.city,
           state: formData.state,
@@ -301,7 +311,7 @@ const fetchPaymentSettings = async () => {
     }
   };
 
-  // Razorpay handler - UPDATED
+  // Razorpay handler - ✅ ADDED email validation
   const handleRazorpayPayment = async (): Promise<void> => {
     try {
       setPaymentLoading(true);
@@ -313,7 +323,7 @@ const fetchPaymentSettings = async () => {
         return;
       }
 
-      if (!formData.phone || !formData.street || !formData.city || 
+      if (!formData.email || !formData.phone || !formData.street || !formData.city || 
           !formData.state || !formData.postalCode) {
         showErrorPopup('Please fill all the required fields before proceeding to payment.');
         setPaymentLoading(false);
@@ -327,9 +337,10 @@ const fetchPaymentSettings = async () => {
         return;
       }
 
-      // Step 1: Create order in database
+      // Step 1: Create order in database - ✅ ADDED email
       const orderData: CreateOrderRequest = {
         shippingAddress: {
+          email: formData.email,
           street: formData.street,
           city: formData.city,
           state: formData.state,
@@ -360,7 +371,7 @@ const fetchPaymentSettings = async () => {
       
       console.log('Razorpay order created:', razorpayOrder);
 
-      // Step 4: Open Razorpay checkout
+      // Step 4: Open Razorpay checkout - ✅ Use actual email from form
       const options: RazorpayOptions = {
         key: razorpayOrder.key || paymentSettings.razorpayKeyId,
         amount: razorpayOrder.amount,
@@ -394,8 +405,8 @@ const fetchPaymentSettings = async () => {
           setPaymentLoading(false);
         },
         prefill: {
-          name: 'Customer',
-          email: 'customer@example.com',
+          name: user?.name || 'Customer',
+          email: formData.email,  // ✅ Use actual email from form
           contact: formData.phone,
         },
         notes: {
@@ -573,6 +584,20 @@ const fetchPaymentSettings = async () => {
               </h2>
               
               <div className="space-y-3 sm:space-y-4">
+                {/* ✅ ADDED EMAIL FIELD */}
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Email Address *</label>
+                  <input
+                    type="email"
+                    name="email"
+                    required
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#9B0F06] focus:border-[#9B0F06] transition-all duration-200"
+                    placeholder="your@email.com"
+                  />
+                </div>
+
                 <div>
                   <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
                   <input

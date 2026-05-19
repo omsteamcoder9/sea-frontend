@@ -8,9 +8,11 @@ export interface CartItem {
   originalPrice?: number;
   variantId?: string;
   variantName?: string;
-  selectedVariant?: ProductVariant; // ✅ ADD THIS
+  selectedVariant?: ProductVariant;
   productName?: string;
   productImage?: string;
+  weight?: number;
+  weightUnit?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -64,6 +66,8 @@ export interface GuestCartItem {
   variantName?: string;
   productName?: string;
   productImage?: string;
+  weight?: number;
+  weightUnit?: string;
 }
 
 export interface GuestCart {

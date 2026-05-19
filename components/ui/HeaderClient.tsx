@@ -414,15 +414,16 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                           >
                             My Orders
                           </Link>
-                          <button
-                            onClick={() => {
-                              setIsDropdownOpen(false);
-                              logout();
-                            }}
-                            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                          >
-                            Logout
-                          </button>
+                    <button
+  onClick={() => {
+    setIsDropdownOpen(false);
+    logout();
+    router.push('/');  // ← Add this line to redirect to home
+  }}
+  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+>
+  Logout
+</button>
                         </div>
                       )}
                     </div>
@@ -746,7 +747,7 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
             </Link>
 
             {isAuthenticated ? (
-              <Link href="/orders" className="flex flex-col items-center justify-center flex-1 p-1 transition-colors cursor-pointer min-w-0 text-[#EED9B9]/80 hover:text-[#D53E0F]">
+              <Link href="/profile" className="flex flex-col items-center justify-center flex-1 p-1 transition-colors cursor-pointer min-w-0 text-[#EED9B9]/80 hover:text-[#D53E0F]">
                 <div className="w-4 h-4 rounded-full bg-gradient-to-br from-[#D53E0F] to-[#9B0F06] flex items-center justify-center text-[9px] font-bold mb-0.5 text-[#EED9B9] border border-white/30">
                   {getUserInitial()}
                 </div>

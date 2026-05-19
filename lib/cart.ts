@@ -1,4 +1,3 @@
-// src/lib/cart.ts
 import { Cart, AddToCartData, UpdateCartItemData, AddToCartResponse, CartResponse } from '@/types/cart';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -6,7 +5,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 // Helper function to get token from localStorage
 const getToken = (): string | null => {
   if (typeof window !== 'undefined') {
-    return localStorage.getItem('otp_auth_token');  // ✅ Correct key
+    return localStorage.getItem('otp_auth_token');
   }
   return null;
 };

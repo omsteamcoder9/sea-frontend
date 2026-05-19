@@ -1,7 +1,7 @@
 // components/home/HomeClient.tsx
 'use client';
 
-import { Truck, Shield, Minus, Plus, Clock } from 'lucide-react';
+import { Truck, Shield, Minus, Plus, Clock, Calendar, AlarmClock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useRef, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
@@ -26,6 +26,13 @@ export default function HomeClient({ categories, featuredCategories }: HomeClien
   
   const [categoriesWithProducts, setCategoriesWithProducts] = useState<string[]>([]);
   const [checkingProducts, setCheckingProducts] = useState(true);
+
+  // Get tomorrow's date for display
+  const getTomorrowDate = () => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  };
 
   useEffect(() => {
     const checkCategoriesForProducts = async () => {
@@ -56,7 +63,11 @@ export default function HomeClient({ categories, featuredCategories }: HomeClien
   const faqItems = [
     {
       question: "How fresh is the sea fish you deliver?",
-      answer: "Our sea fish is sourced daily from local fishermen and packed with ice. We ensure same-day delivery for maximum freshness."
+      answer: "Our sea fish is sourced daily from local fishermen and packed with ice. We ensure next-day delivery for maximum freshness. Order today, get fresh catch delivered tomorrow!"
+    },
+    {
+      question: "When will I receive my order?",
+      answer: `We follow a next-day delivery policy. Orders placed today will be delivered tomorrow (${getTomorrowDate()}). This ensures you receive the freshest catch possible.`
     },
     {
       question: "Is the fish cleaned and cut before delivery?",
@@ -73,6 +84,10 @@ export default function HomeClient({ categories, featuredCategories }: HomeClien
     {
       question: "Do you offer bulk orders for restaurants?",
       answer: "Yes, we provide bulk ordering options for restaurants, hotels, and seafood businesses. Contact us for wholesale pricing."
+    },
+    {
+      question: "What is your delivery policy?",
+      answer: "We operate on a next-day delivery model. All orders placed today are prepared fresh and delivered tomorrow. Cutoff time for same-day processing is 8:00 PM. Orders placed after cutoff will be delivered the day after tomorrow."
     }
   ];
 
@@ -89,6 +104,44 @@ export default function HomeClient({ categories, featuredCategories }: HomeClien
       {categories && categories.length > 0 && (
         <CategoryCarousel displayCategories={categories} />
       )}
+
+      {/* Delivery Info Banner - Order Today, Get Tomorrow */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="bg-gradient-to-r from-[#5E0006] via-[#9B0F06] to-[#D53E0F] text-white py-3 px-4 relative overflow-hidden"
+      >
+        <div className="container mx-auto">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-center">
+            {/* Countdown Timer or Delivery Promise */}
+            <div className="flex items-center gap-2">
+              <Calendar className="w-5 h-5 animate-pulse" />
+              <span className="font-semibold text-sm sm:text-base">
+                Order Today • Get Tomorrow ({getTomorrowDate()})
+              </span>
+            </div>
+            
+            <div className="hidden sm:block w-px h-6 bg-white/30"></div>
+            
+            <div className="flex items-center gap-2">
+              <AlarmClock className="w-5 h-5" />
+              <span className="text-sm sm:text-base">
+                Cutoff: 8:00 PM for next-day delivery
+              </span>
+            </div>
+            
+            <div className="hidden sm:block w-px h-6 bg-white/30"></div>
+            
+          
+          </div>
+        </div>
+        
+        {/* Animated background effect */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -inset-10 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-[shimmer_2s_infinite] transform -skew-x-12"></div>
+        </div>
+      </motion.div>
 
       {/* Hero Section Component */}
       <HeroSection />
@@ -186,6 +239,17 @@ export default function HomeClient({ categories, featuredCategories }: HomeClien
         <HomeHeroBanner />
       </motion.div>
 
+      {/* Next Day Delivery Promise Card */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+        className="container mx-auto px-4 -mt-4 mb-8"
+      >
+     
+      </motion.div>
+
       {/* Why Choose Us Section */}
       <motion.section 
         initial={{ opacity: 0 }}
@@ -226,9 +290,9 @@ export default function HomeClient({ categories, featuredCategories }: HomeClien
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto">
             {[
-              { icon: Truck, title: 'Fast Delivery', desc: 'Quick and safe delivery with ice packing to your doorstep.', highlight: 'Same Day' },
-              { icon: Shield, title: 'Premium Quality', desc: '100% Fresh seafood sourced directly from harbour.', highlight: 'Certified Fresh' },
-              { icon: Clock, title: 'Fresh Arrivals', desc: 'Daily fresh catch delivered to maintain peak quality.', highlight: 'Daily Fresh' },
+              { icon: Calendar, title: 'Next-Day Delivery', desc: 'Order today, get fresh seafood delivered tomorrow. Guaranteed same-day dispatch.', highlight: 'Tomorrow Delivery' },
+              { icon: Truck, title: 'Fast & Safe Delivery', desc: 'Quick and safe delivery with ice packing to your doorstep.', highlight: 'Ice Packed' },
+              { icon: Shield, title: 'Premium Quality', desc: '100% Fresh seafood sourced directly from harbour daily.', highlight: 'Certified Fresh' },
             ].map((feature, idx) => (
               <motion.div 
                 key={idx}
@@ -366,6 +430,10 @@ export default function HomeClient({ categories, featuredCategories }: HomeClien
           0% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
           100% { background-position: 0% 50%; }
+        }
+        @keyframes shimmer {
+          0% { transform: translateX(-100%) skewX(-12deg); }
+          100% { transform: translateX(200%) skewX(-12deg); }
         }
         .animate-slide-in { animation: slide-in 0.6s ease-out forwards; }
         .animate-fade-in-up { animation: fade-in-up 0.6s ease-out forwards; }

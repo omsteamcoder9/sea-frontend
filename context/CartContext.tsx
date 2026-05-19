@@ -115,6 +115,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const addToCart = async (product: Product, quantity: number, selectedVariant?: ProductVariant) => {
     console.log('🛒 addToCart called, isGuest:', isGuest);
     console.log('🛒 Product:', product.name, 'Quantity:', quantity, 'Variant:', selectedVariant?.variantName || selectedVariant?.name);
+    console.log('🛒 Variant weight:', selectedVariant?.weight, selectedVariant?.weightUnit);
     
     try {
       setAddingProductId(product._id);
@@ -135,33 +136,31 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         if (existingItemIndex > -1) {
           guestCart.items[existingItemIndex].quantity += quantity;
         } else {
-          console.log('🔍 DEBUG - product object in CartContext:', {
-  name: product.name,
-  hasImages: !!product.images,
-  images: product.images,
-  imagesLength: product.images?.length,
-  firstImage: product.images?.[0]
-});
-        // In addToCart function, when creating newItem for guest:
-const newItem: CartItem = {
-  _id: `guest-${Date.now()}-${Math.random()}`,
-  product: product._id as any,
-  quantity,
-  price: selectedVariant?.price || product.basePrice,
-  originalPrice: selectedVariant?.originalPrice || product.originalPrice,
-  variantId: selectedVariant?._id,
-  variantName: selectedVariant?.variantName || selectedVariant?.name,
-  productName: product.name,
-  // ✅ FIX: Store variant image first, then fallback to main product image
-productImage: selectedVariant?.images?.[0]?.image || 
-              (product as any).images?.[0]?.image || 
-              (product as any).productImage ||
-              (product as any).image ||
-              '',  // ✅ Also store the full selectedVariant
-  selectedVariant: selectedVariant,
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString()
-};
+          // Get variant image
+          let variantImage = '';
+          if (selectedVariant?.images && selectedVariant.images.length > 0) {
+            variantImage = selectedVariant.images[0].image;
+          } else if ((product as any).images && (product as any).images.length > 0) {
+            variantImage = (product as any).images[0]?.image || '';
+          }
+          
+          const newItem: CartItem = {
+            _id: `guest-${Date.now()}-${Math.random()}`,
+            product: product._id as any,
+            quantity,
+            price: selectedVariant?.price || product.basePrice,
+            originalPrice: selectedVariant?.originalPrice || product.originalPrice,
+            variantId: selectedVariant?._id,
+            variantName: selectedVariant?.variantName || selectedVariant?.name,
+            productName: product.name,
+            productImage: variantImage,
+            // ✅ ADD WEIGHT FIELDS
+            weight: selectedVariant?.weight || 0,
+            weightUnit: selectedVariant?.weightUnit || 'gram',
+            selectedVariant: selectedVariant,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          };
           guestCart.items.push(newItem);
         }
         
@@ -172,20 +171,19 @@ productImage: selectedVariant?.images?.[0]?.image ||
         setCart(guestCart);
         saveGuestCart(guestCart);
       } else {
-        // ✅ FIXED: For authenticated user
+        // For authenticated user
         console.log('🛒 Adding to cart for authenticated user');
         
-  await cartAPI.addToCart({
-  productId: product._id,
-  quantity,
-  variantId: selectedVariant?._id
-});
+        await cartAPI.addToCart({
+          productId: product._id,
+          quantity,
+          variantId: selectedVariant?._id
+        });
         
         // Fetch the complete updated cart
         const updatedCart = await cartAPI.getCart();
         console.log('🛒 Updated cart after adding:', updatedCart);
         console.log('🛒 Cart items count:', updatedCart.items?.length);
-        console.log('🛒 Cart total items:', updatedCart.totalItems);
         
         setCart(updatedCart);
       }
@@ -223,7 +221,6 @@ productImage: selectedVariant?.images?.[0]?.image ||
           saveGuestCart(guestCart);
         }
       } else {
-        // ✅ FIXED: For authenticated user
         await cartAPI.updateCartItem(itemId, { quantity });
         const updatedCart = await cartAPI.getCart();
         setCart(updatedCart);
@@ -252,7 +249,6 @@ productImage: selectedVariant?.images?.[0]?.image ||
         setCart(guestCart);
         saveGuestCart(guestCart);
       } else {
-        // ✅ FIXED: For authenticated user
         await cartAPI.removeFromCart(itemId);
         const updatedCart = await cartAPI.getCart();
         setCart(updatedCart);
@@ -276,7 +272,6 @@ productImage: selectedVariant?.images?.[0]?.image ||
         setCart(emptyCart);
         saveGuestCart(emptyCart);
       } else {
-        // ✅ FIXED: For authenticated user
         await cartAPI.clearCart();
         const updatedCart = await cartAPI.getCart();
         setCart(updatedCart);

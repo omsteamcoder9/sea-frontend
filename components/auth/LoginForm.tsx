@@ -180,7 +180,7 @@ export default function LoginForm() {
       if (returnTo) {
         router.push(returnTo);
       } else {
-        router.push('/checkout');
+        router.push('/');
       }
       
     } catch (error: any) {
@@ -201,7 +201,7 @@ export default function LoginForm() {
       className="w-full max-w-md mx-auto"
     >
       <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
-        <div className="relative px-8 pt-8 pb-6" style={{ background: '#ff6600' }}>
+        <div className="relative px-8 pt-8 pb-6" style={{ background: '#9B0F06' }}>
           <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-white opacity-10 rounded-full blur-2xl"></div>
           <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-40 h-40 bg-white opacity-10 rounded-full blur-2xl"></div>
           
@@ -247,7 +247,7 @@ export default function LoginForm() {
                 <motion.div
                   animate={{ 
                     scale: focusedField === 'phoneNumber' ? 1.02 : 1,
-                    borderColor: focusedField === 'phoneNumber' ? '#ff6600' : errors.phoneNumber ? '#f87171' : '#e5e7eb'
+                    borderColor: focusedField === 'phoneNumber' ? '#9B0F06' : errors.phoneNumber ? '#f87171' : '#e5e7eb'
                   }}
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
                   className={`relative rounded-xl border-2 ${
@@ -256,7 +256,7 @@ export default function LoginForm() {
                 >
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <svg className={`w-5 h-5 transition-colors duration-300 ${
-                      focusedField === 'phoneNumber' ? 'text-[#ff6600]' : 'text-gray-400 group-hover:text-gray-500'
+                      focusedField === 'phoneNumber' ? 'text-[#9B0F06]' : 'text-gray-400 group-hover:text-gray-500'
                     }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                     </svg>
@@ -302,7 +302,7 @@ export default function LoginForm() {
               whileHover={{ scale: isLoadingState ? 1 : 1.02 }}
               whileTap={{ scale: isLoadingState ? 1 : 0.98 }}
               className="w-full py-4 px-4 text-white font-semibold rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed"
-              style={{ background: '#ff6600' }}
+              style={{ background: '#9B0F06' }}
             >
               {isSendingOtp ? (
                 <div className="flex items-center justify-center gap-3">
@@ -341,7 +341,7 @@ export default function LoginForm() {
                 <motion.div
                   animate={{ 
                     scale: focusedField === 'otpCode' ? 1.02 : 1,
-                    borderColor: focusedField === 'otpCode' ? '#ff6600' : errors.otpCode ? '#f87171' : '#e5e7eb'
+                    borderColor: focusedField === 'otpCode' ? '#9B0F06' : errors.otpCode ? '#f87171' : '#e5e7eb'
                   }}
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
                   className={`relative rounded-xl border-2 ${
@@ -350,7 +350,7 @@ export default function LoginForm() {
                 >
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <svg className={`w-5 h-5 transition-colors duration-300 ${
-                      focusedField === 'otpCode' ? 'text-[#ff6600]' : 'text-gray-400 group-hover:text-gray-500'
+                      focusedField === 'otpCode' ? 'text-[#9B0F06]' : 'text-gray-400 group-hover:text-gray-500'
                     }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
@@ -404,7 +404,7 @@ export default function LoginForm() {
                   className={`font-semibold transition-all ${
                     resendTimer > 0 || isSendingOtp
                       ? 'text-gray-400 cursor-not-allowed'
-                      : 'text-[#ff6600] hover:underline'
+                      : 'text-[#9B0F06] hover:underline'
                   }`}
                 >
                   {resendTimer > 0 ? `Resend in ${resendTimer}s` : 'Resend OTP'}
@@ -418,7 +418,7 @@ export default function LoginForm() {
               whileHover={{ scale: isVerifyingOtp ? 1 : 1.02 }}
               whileTap={{ scale: isVerifyingOtp ? 1 : 0.98 }}
               className="w-full py-4 px-4 text-white font-semibold rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed"
-              style={{ background: '#ff6600' }}
+              style={{ background: '#9B0F06' }}
             >
               {isVerifyingOtp ? (
                 <div className="flex items-center justify-center gap-3">

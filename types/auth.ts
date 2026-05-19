@@ -1,3 +1,5 @@
+// types/auth.ts
+
 // ========== OTP AUTH TYPES ==========
 
 export interface SendOtpRequest {
@@ -26,9 +28,12 @@ export interface VerifyOtpResponse {
 export interface OtpUser {
   id: string;
   phoneNumber: string;
+  email?: string;  // ✅ ADD THIS - optional since OTP users may not have email
+  name?: string;   // ✅ ADD THIS - optional name field
   createdAt: string;
   lastLogin: string;
   isActive?: boolean;
+  role?: 'user' | 'admin';  // ✅ ADD THIS for admin check
 }
 
 export interface OtpAuthResponse {

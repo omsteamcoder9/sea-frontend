@@ -26,6 +26,17 @@ export default function CartPage() {
     return null;
   };
 
+  // Helper function to get weight display
+  const getWeightDisplay = (item: any): string | null => {
+    const weight = item.weight || item.selectedVariant?.weight;
+    const weightUnit = item.weightUnit || item.selectedVariant?.weightUnit || 'gram';
+    
+    if (weight && weight > 0) {
+      return `${weight} ${weightUnit}`;
+    }
+    return null;
+  };
+
   // Helper function to get product name
   const getProductName = (item: any): string => {
     if (typeof item.product === 'object' && item.product !== null) {
@@ -50,29 +61,23 @@ export default function CartPage() {
       if (!imagePath) return '';
       if (imagePath.startsWith('http')) return imagePath;
       
-      // Clean the image path to avoid double slashes or duplicate /uploads
       let cleanPath = imagePath;
-      // Remove leading /uploads/ if present (since baseUrl already includes it)
       if (cleanPath.startsWith('/uploads/')) {
         cleanPath = cleanPath.replace('/uploads/', '');
       }
-      // Remove leading slash if present
       cleanPath = cleanPath.replace(/^\//, '');
       
       return `${baseUrl}/${cleanPath}`;
     };
     
-    // Check productImage from cart item
     if (item.productImage) {
       return formatImageUrl(item.productImage);
     }
     
-    // Check product images
     if (typeof item.product === 'object' && item.product?.images?.[0]?.image) {
       return formatImageUrl(item.product.images[0].image);
     }
     
-    // Check ogImage
     if (typeof item.product === 'object' && item.product?.ogImage) {
       return formatImageUrl(item.product.ogImage);
     }
@@ -140,6 +145,7 @@ export default function CartPage() {
                 {cart.items.map((item) => {
                   const productName = getProductName(item);
                   const variantName = getVariantName(item);
+                  const weightDisplay = getWeightDisplay(item);
                   const productStock = getProductStock(item);
                   const imageUrl = getProductImageUrl(item);
                   
@@ -169,7 +175,11 @@ export default function CartPage() {
                             {productName}
                           </h3>
                           {variantName && (
-                            <p className="text-xs font-medium" style={{ color: '#D53E0F' }}>📦 Variant: {variantName}</p>
+                            <p className="text-xs font-medium" style={{ color: '#D53E0F' }}>📦 {variantName}</p>
+                          )}
+                          {/* ✅ ADD WEIGHT DISPLAY */}
+                          {weightDisplay && (
+                            <p className="text-xs text-gray-500">⚖️ {weightDisplay}</p>
                           )}
                           <p className="text-gray-600 text-xs">₹{item.price || 0}</p>
                           {productStock && productStock < 10 && (
@@ -186,7 +196,11 @@ export default function CartPage() {
                           {productName}
                         </h3>
                         {variantName && (
-                          <p className="text-sm font-medium" style={{ color: '#D53E0F' }}>📦 Variant: {variantName}</p>
+                          <p className="text-sm font-medium" style={{ color: '#D53E0F' }}>📦 {variantName}</p>
+                        )}
+                        {/* ✅ ADD WEIGHT DISPLAY */}
+                        {weightDisplay && (
+                          <p className="text-sm text-gray-500">⚖️ Weight: {weightDisplay}</p>
                         )}
                         <p className="text-gray-600 text-sm">₹{item.price || 0}</p>
                         {productStock && productStock < 10 && (
@@ -282,7 +296,8 @@ export default function CartPage() {
                   e.currentTarget.style.backgroundColor = '#9B0F06';
                 }}
               >
-Buy Now              </button>
+                Buy Now
+              </button>
 
               {isGuest && (
                 <div className="text-center mb-3 sm:mb-4 space-y-2">
