@@ -301,7 +301,7 @@ export default function HomeClient({ categories, featuredCategories }: HomeClien
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1, type: "spring", stiffness: 100, damping: 15 }}
                 whileHover={{ y: -5 }}
-                className="group p-5 sm:p-8 rounded-3xl transition-all duration-300 hover:shadow-[0_20px_40px_rgba(155,15,6,0.12)] flex flex-col items-center text-center bg-white border border-gray-100"
+                className="group p-5 sm:p-7 rounded-3xl transition-all duration-300 hover:shadow-[0_20px_40px_rgba(155,15,6,0.12)] flex flex-col items-center text-center bg-white border border-gray-100"
               >
                 <motion.div 
                   whileHover={{ scale: 1.1, rotate: 5 }}
