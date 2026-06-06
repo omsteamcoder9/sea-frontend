@@ -57,7 +57,7 @@ export async function getCart(): Promise<Cart> {
   const response = await fetch(url, {
     method: 'GET',
     headers,
-    credentials: 'include',
+    // credentials: 'include',
   });
 
   await handleApiError(response, 'Failed to fetch cart');
@@ -87,7 +87,7 @@ export async function addToCart(cartData: AddToCartData): Promise<Cart> {
     method: 'POST',
     headers,
     body: JSON.stringify(requestBody),
-    credentials: 'include',
+    // credentials: 'include',
   });
 
   await handleApiError(response, 'Failed to add item to cart');
@@ -123,7 +123,7 @@ export async function updateCartItem(itemId: string, updateData: UpdateCartItemD
     method: 'PUT',
     headers,
     body: JSON.stringify(requestBody),
-    credentials: 'include',
+    // credentials: 'include',
   });
 
   await handleApiError(response, 'Failed to update cart item');
@@ -151,7 +151,7 @@ export async function removeFromCart(itemId: string): Promise<Cart> {
     method: 'DELETE',
     headers,
     body: JSON.stringify(requestBody),
-    credentials: 'include',
+    // credentials: 'include',
   });
 
   await handleApiError(response, 'Failed to remove item from cart');
@@ -159,6 +159,7 @@ export async function removeFromCart(itemId: string): Promise<Cart> {
   return result.data;
 }
 
+// Clear Cart
 // Clear Cart
 export async function clearCart(): Promise<Cart> {
   const token = getToken();
@@ -172,21 +173,23 @@ export async function clearCart(): Promise<Cart> {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  // Add guestId to request body if not authenticated
+  // Use different endpoint for guests
+  const url = token 
+    ? `${API_BASE_URL}/api/cart`
+    : `${API_BASE_URL}/api/cart/guest`;
+
   const requestBody = token ? {} : { guestId };
 
-  const response = await fetch(`${API_BASE_URL}/api/cart`, {
+  const response = await fetch(url, {
     method: 'DELETE',
     headers,
     body: JSON.stringify(requestBody),
-    credentials: 'include',
   });
 
   await handleApiError(response, 'Failed to clear cart');
   const result: CartResponse = await response.json();
   return result.data;
 }
-
 // Merge guest cart with user cart after login
 export async function mergeCart(): Promise<Cart> {
   const token = getToken();
@@ -210,7 +213,7 @@ export async function mergeCart(): Promise<Cart> {
     method: 'POST',
     headers,
     body: JSON.stringify({ guestId }),
-    credentials: 'include',
+    // credentials: 'include',
   });
 
   await handleApiError(response, 'Failed to merge cart');

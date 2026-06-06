@@ -7,7 +7,7 @@ import { useState, useEffect, useRef } from 'react';
 import { quickSearchProducts } from '@/lib/productService';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { ShoppingCart, Menu, X, User, Search, Instagram, Twitter, Facebook, Youtube, Linkedin, Phone, Mail } from 'lucide-react';
+import { ShoppingCart, Menu, X, User, Search, Instagram, Twitter, Facebook, Youtube, Linkedin, Phone, Mail, ChevronDown } from 'lucide-react';
 import { Category } from '@/types/category';
 import CartDrawer from '@/components/CartDrawer';
 import { settingsAPI } from '@/lib/settings-api';
@@ -38,6 +38,7 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchProduct[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [isShopDropdownOpen, setIsShopDropdownOpen] = useState(false);
   
   // Site settings state
   const [siteName, setSiteName] = useState('Sea Food');
@@ -54,9 +55,15 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const profileDropdownRef = useRef<HTMLDivElement>(null);
+  const shopDropdownRef = useRef<HTMLDivElement>(null);
   
   const categoryNames = categories.map(cat => cat.name);
   const cartCount = cart?.totalItems || 0;
+
+  // Get first 3 categories to show directly
+  const displayedCategories = categories.slice(0, 3);
+  // Get remaining categories for dropdown
+  const dropdownCategories = categories.slice(3);
 
   // Fetch settings on component mount
   useEffect(() => {
@@ -148,6 +155,7 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
     const categorySlug = typeof category === 'string' ? category : (category.slug || category._id);
     router.push(`/products?category=${encodeURIComponent(categorySlug)}`);
     setIsMenuOpen(false);
+    setIsShopDropdownOpen(false);
   };
 
   useEffect(() => {
@@ -254,6 +262,23 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
     };
   }, [isDropdownOpen]);
 
+  // Close shop dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (shopDropdownRef.current && !shopDropdownRef.current.contains(event.target as Node)) {
+        setIsShopDropdownOpen(false);
+      }
+    };
+
+    if (isShopDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isShopDropdownOpen]);
+
   const getImageUrl = (imagePath: string | null) => {
     if (!imagePath) return null;
     const filename = imagePath.split('/').pop();
@@ -338,7 +363,8 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                 >
                   HOME
                 </Link>
-                {categories.map((cat) => (
+                {/* Show only first 3 categories */}
+                {displayedCategories.map((cat) => (
                   <button
                     key={cat._id}
                     onClick={() => handleCategoryClick(cat)}
@@ -347,6 +373,32 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                     {cat.name.toUpperCase()}
                   </button>
                 ))}
+                {/* Shop Dropdown Button - Only show if there are remaining categories */}
+                {dropdownCategories.length > 0 && (
+                  <div ref={shopDropdownRef} className="relative">
+                    <button
+                      onClick={() => setIsShopDropdownOpen(!isShopDropdownOpen)}
+                      className="text-[12px] font-extrabold tracking-[1px] text-[#EED9B9]/80 hover:text-[#D53E0F] transition-all duration-300 cursor-pointer flex items-center gap-1"
+                    >
+                      SHOP
+                      <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isShopDropdownOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    
+                    {isShopDropdownOpen && (
+                      <div className="absolute top-full left-0 mt-2 min-w-[200px] bg-[#5E0006] rounded-lg shadow-2xl py-2 z-20 border border-[#D53E0F]/30 backdrop-blur-sm">
+                        {dropdownCategories.map((cat) => (
+                          <button
+                            key={cat._id}
+                            onClick={() => handleCategoryClick(cat)}
+                            className="block w-full text-left px-4 py-2.5 text-[13px] font-medium text-[#EED9B9]/90 hover:text-[#D53E0F] hover:bg-white/5 transition-all duration-200"
+                          >
+                            {cat.name}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
                 <Link
                   href="/about"
                   className="text-[12px] font-extrabold tracking-[1px] text-[#EED9B9]/80 hover:text-[#D53E0F] transition-all duration-300"
@@ -571,6 +623,7 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                   >
                     HOME
                   </Link>
+                  {/* Show all categories in mobile menu */}
                   {categories.map((cat) => (
                     <button
                       key={cat._id}
