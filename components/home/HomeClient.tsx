@@ -1,15 +1,13 @@
 // components/home/HomeClient.tsx
 'use client';
 
-import { Truck, Shield, Minus, Plus, Clock, Calendar, AlarmClock } from 'lucide-react';
+import { Truck, Shield, Minus, Plus, Calendar, AlarmClock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useRef, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Category } from '@/types/category';
 import ProductGrid from '@/components/products/ProductGrid';
-import Image from "next/image";
 import { getAllProducts } from '@/lib/productService';
-import Link from 'next/link';
 import TestimonialsSection from '@/components/Testimonial';
 import HomeHeroBanner from '@/components/HomeHeroBanner';
 import CategoryCarousel from '@/components/home/Carousal';
@@ -40,8 +38,8 @@ export default function HomeClient({ categories, featuredCategories }: HomeClien
         setCheckingProducts(true);
         const categoriesWithProductsList: string[] = [];
         
-        for (const category of featuredCategories) {
-          const response = await getAllProducts({ category: category._id });
+        for (const category of categories) {
+          const response = await getAllProducts({ category: category.slug });
           if (response.data && response.data.length > 0) {
             categoriesWithProductsList.push(category._id);
           }
@@ -55,10 +53,10 @@ export default function HomeClient({ categories, featuredCategories }: HomeClien
       }
     };
 
-    if (featuredCategories.length > 0) {
+    if (categories.length > 0) {
       checkCategoriesForProducts();
     }
-  }, [featuredCategories]);
+  }, [categories]);
 
   const faqItems = [
     {
@@ -95,7 +93,7 @@ export default function HomeClient({ categories, featuredCategories }: HomeClien
     setOpenFaqIndex(openFaqIndex === index ? null : index);
   };
 
-  const visibleCategories = featuredCategories.filter(
+  const visibleCategories = categories.filter(
     category => categoriesWithProducts.includes(category._id)
   );
 
@@ -114,7 +112,6 @@ export default function HomeClient({ categories, featuredCategories }: HomeClien
       >
         <div className="container mx-auto">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-center">
-            {/* Countdown Timer or Delivery Promise */}
             <div className="flex items-center gap-2">
               <Calendar className="w-5 h-5 animate-pulse" />
               <span className="font-semibold text-sm sm:text-base">
@@ -130,14 +127,9 @@ export default function HomeClient({ categories, featuredCategories }: HomeClien
                 Cutoff: 8:00 PM for next-day delivery
               </span>
             </div>
-            
-            <div className="hidden sm:block w-px h-6 bg-white/30"></div>
-            
-          
           </div>
         </div>
         
-        {/* Animated background effect */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute -inset-10 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-[shimmer_2s_infinite] transform -skew-x-12"></div>
         </div>
@@ -208,7 +200,7 @@ export default function HomeClient({ categories, featuredCategories }: HomeClien
                       <div className="h-1 rounded-full" style={{ backgroundColor: '#9B0F06', width: '80px' }}></div>
                     </motion.div>
                   </div>
-                  <ProductGrid category={category._id} limit={8} hideFilters={true} />
+                  <ProductGrid category={category.slug} limit={8} hideFilters={true} />
                 </motion.div>
               ))}
             </div>
@@ -237,17 +229,6 @@ export default function HomeClient({ categories, featuredCategories }: HomeClien
         className="container mx-auto px-4 py-6 md:py-8"
       >
         <HomeHeroBanner />
-      </motion.div>
-
-      {/* Next Day Delivery Promise Card */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        whileInView={{ opacity: 1, scale: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
-        className="container mx-auto px-4 -mt-4 mb-8"
-      >
-     
       </motion.div>
 
       {/* Why Choose Us Section */}

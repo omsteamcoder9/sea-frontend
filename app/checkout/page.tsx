@@ -64,7 +64,6 @@ interface RazorpayErrorResponse {
   };
 }
 
-// ✅ ADDED email to FormData
 interface FormData {
   email: string;
   phone: string;
@@ -88,13 +87,11 @@ interface PopupState {
   message: string;
 }
 
-// Helper to get product name safely
 const getProductName = (product: any): string => {
   if (typeof product === 'string') return product;
   return product?.name || 'Product';
 };
 
-// Helper to get product price safely
 const getProductPrice = (item: any): number => {
   return item.price || 0;
 };
@@ -104,7 +101,6 @@ export default function CheckoutPage() {
   const { user, token } = useAuth();
   const router = useRouter();
 
-  // ✅ ADDED email to initial state
   const [formData, setFormData] = useState<FormData>({
     email: '',
     phone: '',
@@ -130,13 +126,15 @@ export default function CheckoutPage() {
     cashOnDeliveryEnabled: true
   });
   const [settingsLoading, setSettingsLoading] = useState(true);
+  
+  // Buy Now state
+  const [buyNowItem, setBuyNowItem] = useState<any>(null);
+  const [isBuyNowMode, setIsBuyNowMode] = useState(false);
 
-  // Close popup
   const closePopup = () => {
     setPopup({ ...popup, isOpen: false });
   };
 
-  // Show error popup
   const showErrorPopup = (message: string) => {
     setPopup({
       isOpen: true,
@@ -146,7 +144,6 @@ export default function CheckoutPage() {
     });
   };
 
-  // Show success popup
   const showSuccessPopup = (message: string) => {
     setPopup({
       isOpen: true,
@@ -156,7 +153,6 @@ export default function CheckoutPage() {
     });
   };
 
-  // Auto-fill phone and email if user is logged in
   useEffect(() => {
     if (user) {
       if (user.phoneNumber && !formData.phone) {
@@ -168,14 +164,29 @@ export default function CheckoutPage() {
     }
   }, [user, formData.phone, formData.email]);
 
-  // Redirect if cart is empty
+  // Check for Buy Now item
   useEffect(() => {
-    if (cart.items.length === 0 && !settingsLoading) {
+    const searchParams = new URLSearchParams(window.location.search);
+    const isBuyNow = searchParams.get('buyNow');
+    
+    if (isBuyNow === 'true') {
+      const storedItem = sessionStorage.getItem('buyNowItem');
+      if (storedItem) {
+        const item = JSON.parse(storedItem);
+        setBuyNowItem(item);
+        setIsBuyNowMode(true);
+        // Don't remove here - remove only after successful order
+      }
+    }
+  }, []);
+
+  // Redirect if cart is empty AND not in buy now mode
+  useEffect(() => {
+    if (!isBuyNowMode && cart.items.length === 0 && !settingsLoading) {
       router.push('/cart');
     }
-  }, [cart.items.length, router, settingsLoading]);
+  }, [cart.items.length, router, settingsLoading, isBuyNowMode]);
 
-  // Check authentication status
   useEffect(() => {
     if (user && !token) {
       setAuthError('Authentication token is missing. Please log in again.');
@@ -184,7 +195,6 @@ export default function CheckoutPage() {
     }
   }, [user, token]);
 
-  // Fetch public settings
   useEffect(() => {
     fetchPaymentSettings();
   }, []);
@@ -237,7 +247,28 @@ export default function CheckoutPage() {
     });
   };
 
-  // Cash on Delivery handler - ✅ ADDED email validation
+  // Get display items based on buy now mode
+  const getDisplayItems = () => {
+    if (isBuyNowMode && buyNowItem) {
+      return [{
+        _id: 'buynow',
+        product: buyNowItem.product,
+        quantity: buyNowItem.quantity,
+        selectedVariant: buyNowItem.selectedVariant,
+        price: buyNowItem.price
+      }];
+    }
+    return cart.items;
+  };
+
+  // Get subtotal based on buy now mode
+  const getSubtotal = () => {
+    if (isBuyNowMode && buyNowItem) {
+      return buyNowItem.price * buyNowItem.quantity;
+    }
+    return cart.totalPrice || 0;
+  };
+
   const handleCashOnDelivery = async (): Promise<void> => {
     try {
       setLoading(true);
@@ -250,15 +281,16 @@ export default function CheckoutPage() {
         return;
       }
 
-      if (!cart.items || cart.items.length === 0) {
-        showErrorPopup('Your cart is empty. Please add items to cart first.');
+      const displayItems = getDisplayItems();
+      
+      if (!displayItems || displayItems.length === 0) {
+        showErrorPopup('No items to checkout. Please add items to cart first.');
         router.push('/cart');
         setLoading(false);
         return;
       }
 
-      // ✅ ADDED email to shippingAddress
-      const orderData: CreateOrderRequest = {
+      const orderData: any = {
         shippingAddress: {
           email: formData.email,
           street: formData.street,
@@ -271,9 +303,30 @@ export default function CheckoutPage() {
         paymentMethod: 'cod'
       };
 
+      // Add flag to prevent cart clearing on backend for Buy Now mode
+      if (isBuyNowMode) {
+        orderData.skipCartClear = true;
+        // Also add products for Buy Now mode
+        orderData.products = displayItems.map((item: any) => ({
+          product: item.product._id,
+          variantId: item.selectedVariant?._id,
+          variantName: item.selectedVariant?.variantName,
+          price: item.price,
+          quantity: item.quantity
+        }));
+      }
+
       const result = await createOrder(orderData);
       
-      clearCart();
+      // CRITICAL FIX: Only clear cart for normal checkout, NOT for Buy Now
+      if (isBuyNowMode) {
+        // Buy Now mode: Only remove the session storage item, keep cart intact
+        sessionStorage.removeItem('buyNowItem');
+        // DO NOT call clearCart() - Preserve existing cart items
+      } else {
+        // Normal checkout: Clear the cart
+        clearCart();
+      }
 
       showSuccessPopup(`Order placed successfully! Order ID: ${result.order.orderId}`);
       setTimeout(() => {
@@ -284,7 +337,7 @@ export default function CheckoutPage() {
       let errorMessage = 'Unable to place your order. Please try again.';
       
       if (error.code === 'STREET_NOT_FOUND') {
-        errorMessage = 'We could not verify your street address. Please enter a valid street name in Karaikudi.';
+        errorMessage = 'We could not verify your street address. Please enter a valid street name.';
       } 
       else if (error.code === 'DELIVERY_AREA_NOT_AVAILABLE') {
         errorMessage = 'Sorry, we currently deliver only to Karaikudi and surrounding areas. Please check your city.';
@@ -311,7 +364,6 @@ export default function CheckoutPage() {
     }
   };
 
-  // Razorpay handler - ✅ ADDED email validation
   const handleRazorpayPayment = async (): Promise<void> => {
     try {
       setPaymentLoading(true);
@@ -337,8 +389,23 @@ export default function CheckoutPage() {
         return;
       }
 
-      // Step 1: Create order in database - ✅ ADDED email
-      const orderData: CreateOrderRequest = {
+      const displayItems = getDisplayItems();
+      
+      if (!displayItems || displayItems.length === 0) {
+        showErrorPopup('No items to checkout. Please add items to cart first.');
+        router.push('/cart');
+        setPaymentLoading(false);
+        return;
+      }
+
+      const scriptLoaded = await loadRazorpayScript();
+      if (!scriptLoaded) {
+        showErrorPopup('Razorpay SDK failed to load. Please check your internet connection.');
+        setPaymentLoading(false);
+        return;
+      }
+
+      const orderData: any = {
         shippingAddress: {
           email: formData.email,
           street: formData.street,
@@ -351,6 +418,19 @@ export default function CheckoutPage() {
         paymentMethod: 'razorpay'
       };
 
+      // Add flag to prevent cart clearing on backend for Buy Now mode
+      if (isBuyNowMode) {
+        orderData.skipCartClear = true;
+        // Also add products for Buy Now mode
+        orderData.products = displayItems.map((item: any) => ({
+          product: item.product._id,
+          variantId: item.selectedVariant?._id,
+          variantName: item.selectedVariant?.variantName,
+          price: item.price,
+          quantity: item.quantity
+        }));
+      }
+
       console.log('Creating order for Razorpay:', orderData);
       const orderResult = await createOrder(orderData);
       const orderId = orderResult.order.orderId;
@@ -358,20 +438,10 @@ export default function CheckoutPage() {
 
       console.log('Order created:', orderId, 'Amount:', finalAmount);
 
-      // Step 2: Load Razorpay script
-      const scriptLoaded = await loadRazorpayScript();
-      if (!scriptLoaded) {
-        showErrorPopup('Razorpay SDK failed to load. Please check your internet connection.');
-        setPaymentLoading(false);
-        return;
-      }
-
-      // Step 3: Create Razorpay order using the API
       const razorpayOrder = await createRazorpayOrder(orderId);
       
       console.log('Razorpay order created:', razorpayOrder);
 
-      // Step 4: Open Razorpay checkout - ✅ Use actual email from form
       const options: RazorpayOptions = {
         key: razorpayOrder.key || paymentSettings.razorpayKeyId,
         amount: razorpayOrder.amount,
@@ -382,7 +452,6 @@ export default function CheckoutPage() {
         order_id: razorpayOrder.id,
         handler: async (response: RazorpayResponse) => {
           try {
-            // Step 5: Verify payment
             const verifyResult = await verifyPayment({
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
@@ -390,7 +459,15 @@ export default function CheckoutPage() {
             });
 
             if (verifyResult.success) {
-              clearCart();
+              // CRITICAL FIX: Only clear cart for normal checkout, NOT for Buy Now
+              if (isBuyNowMode) {
+                // Buy Now mode: Only remove the session storage item, keep cart intact
+                sessionStorage.removeItem('buyNowItem');
+                // DO NOT call clearCart() - Preserve existing cart items
+              } else {
+                // Normal checkout: Clear the cart
+                clearCart();
+              }
               showSuccessPopup(`Payment successful! Order ID: ${orderId}`);
               setTimeout(() => {
                 window.location.href = `/order-success?orderId=${orderId}`;
@@ -406,7 +483,7 @@ export default function CheckoutPage() {
         },
         prefill: {
           name: user?.name || 'Customer',
-          email: formData.email,  // ✅ Use actual email from form
+          email: formData.email,
           contact: formData.phone,
         },
         notes: {
@@ -440,7 +517,7 @@ export default function CheckoutPage() {
       let errorMessage = 'Payment initialization failed. Please try again or use Cash on Delivery.';
       
       if (error.code === 'STREET_NOT_FOUND') {
-        errorMessage = 'We could not verify your street address. Please enter a valid street name in Karaikudi.';
+        errorMessage = 'We could not verify your street address. Please enter a valid street name.';
       } 
       else if (error.code === 'DELIVERY_AREA_NOT_AVAILABLE') {
         errorMessage = 'Sorry, we currently deliver only to Karaikudi and surrounding areas. Please check your city.';
@@ -454,11 +531,13 @@ export default function CheckoutPage() {
     }
   };
 
-  const tax = (cart.totalPrice || 0) * 0.05;
+  const displayItems = getDisplayItems();
+  const subtotal = getSubtotal();
+  const tax = subtotal * 0.05;
   const shippingFee = 0;
-  const total = (cart.totalPrice || 0) + tax + shippingFee;
+  const total = subtotal + tax + shippingFee;
 
-  if (cart.items.length === 0 || settingsLoading) {
+  if ((!isBuyNowMode && cart.items.length === 0) || settingsLoading) {
     return (
       <div className="min-h-screen bg-[#f2f2f2] flex items-center justify-center">
         <div className="text-center">
@@ -548,7 +627,7 @@ export default function CheckoutPage() {
         <div className="container mx-auto px-4 sm:px-6">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 sm:mb-8">
             <h1 className="text-2xl sm:text-3xl font-bold text-[#5E0006]">Checkout</h1>
-            {!user && (
+            {!user && !isBuyNowMode && (
               <div className="border px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm" style={{ backgroundColor: '#9B0F06/10', borderColor: '#9B0F06/20', color: '#9B0F06' }}>
                 <p>
                   🛒 Shopping as Guest •{' '}
@@ -556,6 +635,11 @@ export default function CheckoutPage() {
                     Create account for faster checkout
                   </Link>
                 </p>
+              </div>
+            )}
+            {isBuyNowMode && (
+              <div className="border px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm" style={{ backgroundColor: '#9B0F06/10', borderColor: '#9B0F06/20', color: '#9B0F06' }}>
+                <p>⚡ Buy Now Mode • Checking out this item only</p>
               </div>
             )}
           </div>
@@ -584,7 +668,6 @@ export default function CheckoutPage() {
               </h2>
               
               <div className="space-y-3 sm:space-y-4">
-                {/* ✅ ADDED EMAIL FIELD */}
                 <div>
                   <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Email Address *</label>
                   <input
@@ -688,7 +771,7 @@ export default function CheckoutPage() {
                 <h2 className="text-lg sm:text-xl font-semibold text-[#5E0006] mb-4">Order Summary</h2>
                 
                 <div className="space-y-3 mb-4">
-                  {cart.items.map((item) => (
+                  {displayItems.map((item: any) => (
                     <div key={item._id} className="flex justify-between items-center border-b border-gray-200 pb-3">
                       <div className="flex-1">
                         <p className="font-medium text-sm">{getProductName(item.product)}</p>
@@ -705,7 +788,7 @@ export default function CheckoutPage() {
                 <div className="border-t pt-3 space-y-2">
                   <div className="flex justify-between text-sm sm:text-base">
                     <span>Subtotal</span>
-                    <span>₹{(cart.totalPrice || 0).toFixed(2)}</span>
+                    <span>₹{subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm sm:text-base">
                     <span>Shipping</span>

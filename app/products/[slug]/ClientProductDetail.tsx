@@ -79,12 +79,22 @@ const MobileFloatingButton = ({
     }
   };
   
+  // FIXED: Mobile Buy Now - Store in sessionStorage
   const handleBuyClick = async () => {
     if (isOutOfStock || !product) return;
     
     try {
       setAddingToBuy(true);
-      router.push('/checkout');
+      const buyNowData = {
+        product: product,
+        quantity: quantity,
+        selectedVariant: selectedVariant,
+        price: selectedVariant ? selectedVariant.price : product.basePrice,
+        productName: product.name,
+        variantName: selectedVariant?.variantName || selectedVariant?.name || null
+      };
+      sessionStorage.setItem('buyNowItem', JSON.stringify(buyNowData));
+      router.push('/checkout?buyNow=true');
     } catch (error) {
       console.error('Error:', error);
     } finally {
@@ -386,6 +396,7 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
     }
   };
 
+  // FIXED: Desktop Buy Now - Store in sessionStorage, don't add to cart
   const handleBuyNow = async () => {
     if (!product) {
       alert('Product not found');
@@ -393,24 +404,16 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
     }
     
     try {
-      const existingCartItem = cart?.items?.find(item => {
-        const productId = typeof item.product === 'string' ? item.product : item.product?._id;
-        if (productId !== product._id) return false;
-        
-        if (selectedVariant) {
-          const itemVariantId = item.selectedVariant?._id || item.variantId;
-          const selectedVariantId = selectedVariant._id || selectedVariant.variantName;
-          return itemVariantId === selectedVariantId;
-        } else {
-          return !item.selectedVariant;
-        }
-      });
-      
-      if (!existingCartItem) {
-        await addToCart(product, quantity, selectedVariant || undefined);
-      }
-      
-      router.push('/checkout');
+      const buyNowData = {
+        product: product,
+        quantity: quantity,
+        selectedVariant: selectedVariant,
+        price: selectedVariant ? selectedVariant.price : product.basePrice,
+        productName: product.name,
+        variantName: selectedVariant?.variantName || selectedVariant?.name || null
+      };
+      sessionStorage.setItem('buyNowItem', JSON.stringify(buyNowData));
+      router.push('/checkout?buyNow=true');
     } catch (error) {
       console.error('❌ Error in Buy Now:', error);
       alert('Failed to process Buy Now. Please try again.');
