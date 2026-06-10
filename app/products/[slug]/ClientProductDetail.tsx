@@ -7,6 +7,7 @@ import { Product, ProductVariant } from '@/types/product';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useCallback } from 'react';
 import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/context/AuthContext';
 import Footer from '@/components/Footer';
 
 interface ClientProductDetailProps {
@@ -53,6 +54,7 @@ const MobileFloatingButton = ({
   onAddToCart 
 }: MobileFloatingButtonProps) => {
   const router = useRouter();
+  const { user } = useAuth();
   const [addingToCart, setAddingToCart] = useState(false);
   const [addingToBuy, setAddingToBuy] = useState(false);
   const [showAddedMessage, setShowAddedMessage] = useState(false);
@@ -79,7 +81,6 @@ const MobileFloatingButton = ({
     }
   };
   
-  // FIXED: Mobile Buy Now - Store in sessionStorage
   const handleBuyClick = async () => {
     if (isOutOfStock || !product) return;
     
@@ -94,7 +95,13 @@ const MobileFloatingButton = ({
         variantName: selectedVariant?.variantName || selectedVariant?.name || null
       };
       sessionStorage.setItem('buyNowItem', JSON.stringify(buyNowData));
-      router.push('/checkout?buyNow=true');
+      
+      if (!user) {
+        sessionStorage.setItem('redirectAfterLogin', '/checkout?buyNow=true');
+        router.push('/signup?returnTo=/checkout&buyNow=true');
+      } else {
+        router.push('/checkout?buyNow=true');
+      }
     } catch (error) {
       console.error('Error:', error);
     } finally {
@@ -332,6 +339,7 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
   const [currentImages, setCurrentImages] = useState(product?.images || []);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const { addToCart, cart } = useCart();
+  const { user } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -396,7 +404,6 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
     }
   };
 
-  // FIXED: Desktop Buy Now - Store in sessionStorage, don't add to cart
   const handleBuyNow = async () => {
     if (!product) {
       alert('Product not found');
@@ -413,7 +420,13 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
         variantName: selectedVariant?.variantName || selectedVariant?.name || null
       };
       sessionStorage.setItem('buyNowItem', JSON.stringify(buyNowData));
-      router.push('/checkout?buyNow=true');
+      
+      if (!user) {
+        sessionStorage.setItem('redirectAfterLogin', '/checkout?buyNow=true');
+        router.push('/signup?returnTo=/checkout&buyNow=true');
+      } else {
+        router.push('/checkout?buyNow=true');
+      }
     } catch (error) {
       console.error('❌ Error in Buy Now:', error);
       alert('Failed to process Buy Now. Please try again.');

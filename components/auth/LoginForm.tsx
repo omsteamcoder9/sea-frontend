@@ -166,31 +166,36 @@ export default function LoginForm() {
     }
   };
 
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validateOtp() || !sessionId) return;
+const handleVerifyOtp = async (e: React.FormEvent) => {
+  e.preventDefault();
+  
+  if (!validateOtp() || !sessionId) return;
 
-    setIsVerifyingOtp(true);
-    setErrors({});
+  setIsVerifyingOtp(true);
+  setErrors({});
+  
+  try {
+    const user = await verifyOtp(sessionId, otpCode);
     
-    try {
-      const user = await verifyOtp(sessionId, otpCode);
-      
-      if (returnTo) {
-        router.push(returnTo);
-      } else {
-        router.push('/');
-      }
-      
-    } catch (error: any) {
-      console.error('Verify OTP error:', error);
-      setErrors({ otpCode: error.message || 'Invalid OTP code. Please try again.' });
-    } finally {
-      setIsVerifyingOtp(false);
+    // ✅ FIX: Check sessionStorage for redirect URL first
+    const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
+    
+    if (redirectUrl) {
+      sessionStorage.removeItem('redirectAfterLogin');
+      router.push(redirectUrl);
+    } else if (returnTo) {
+      router.push(returnTo);
+    } else {
+      router.push('/');
     }
-  };
-
+    
+  } catch (error: any) {
+    console.error('Verify OTP error:', error);
+    setErrors({ otpCode: error.message || 'Invalid OTP code. Please try again.' });
+  } finally {
+    setIsVerifyingOtp(false);
+  }
+};
   const isLoadingState = isSendingOtp || isVerifyingOtp || isLoading;
 
   return (

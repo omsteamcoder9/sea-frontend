@@ -43,12 +43,34 @@ interface CartProviderProps {
   children: ReactNode;
 }
 
+// Helper to get or create guest ID (sync with cart.ts)
+const getOrCreateGuestId = (): string => {
+  let guestId = localStorage.getItem('guestId');
+  if (!guestId) {
+    guestId = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    localStorage.setItem('guestId', guestId);
+  }
+  return guestId;
+};
+
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [cart, setCart] = useState<Cart>(initialCart);
   const [loading, setLoading] = useState(false);
   const [addingProductId, setAddingProductId] = useState<string | null>(null);
   const { user, isLoading: authLoading } = useAuth();
   const isGuest = !user;
+
+  // Save guest cart to localStorage (sync with guestId)
+  const saveGuestCart = useCallback((guestCart: Cart) => {
+    try {
+      // Ensure guestId exists (sync with cart.ts)
+      getOrCreateGuestId();
+      localStorage.setItem('guestCart', JSON.stringify(guestCart));
+      console.log('🛒 Saved guest cart to localStorage');
+    } catch (error) {
+      console.error('Error saving guest cart:', error);
+    }
+  }, []);
 
   // Refresh cart from backend or localStorage
   const refreshCart = useCallback(async () => {
@@ -61,7 +83,27 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
     try {
       if (!isGuest && user) {
-        // Authenticated user - fetch from API
+        // Check if there's a guest cart to merge
+        const guestId = localStorage.getItem('guestId');
+        const guestCartRaw = localStorage.getItem('guestCart');
+        const hasGuestItems = guestCartRaw && JSON.parse(guestCartRaw).items?.length > 0;
+        
+        if (hasGuestItems && guestId) {
+          console.log('🔄 Merging guest cart with user account...', { guestId });
+          try {
+            const mergedCart = await cartAPI.mergeCart();
+            console.log('🔄 Guest cart merged successfully', mergedCart);
+            // Clear guest data after successful merge
+            localStorage.removeItem('guestCart');
+            localStorage.removeItem('guestId');
+            setCart(mergedCart);
+            return; // Exit early since mergeCart already returns the merged cart
+          } catch (mergeError) {
+            console.error('Error merging guest cart:', mergeError);
+          }
+        }
+        
+        // Fetch user cart
         console.log('🔄 Fetching user cart from API');
         const cartData = await cartAPI.getCart();
         console.log('🔄 Cart data received:', cartData);
@@ -89,16 +131,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     }
   }, [isGuest, authLoading, user]);
 
-  // Save guest cart to localStorage
-  const saveGuestCart = useCallback((guestCart: Cart) => {
-    try {
-      localStorage.setItem('guestCart', JSON.stringify(guestCart));
-      console.log('🛒 Saved guest cart to localStorage');
-    } catch (error) {
-      console.error('Error saving guest cart:', error);
-    }
-  }, []);
-
   // Load guest cart on mount
   useEffect(() => {
     if (isGuest && !authLoading) {
@@ -115,14 +147,16 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const addToCart = async (product: Product, quantity: number, selectedVariant?: ProductVariant) => {
     console.log('🛒 addToCart called, isGuest:', isGuest);
     console.log('🛒 Product:', product.name, 'Quantity:', quantity, 'Variant:', selectedVariant?.variantName || selectedVariant?.name);
-    console.log('🛒 Variant weight:', selectedVariant?.weight, selectedVariant?.weightUnit);
     
     try {
       setAddingProductId(product._id);
       setLoading(true);
       
       if (isGuest) {
-        // Guest cart logic
+        // Ensure guestId exists before adding
+        const guestId = getOrCreateGuestId();
+        
+        // Guest cart logic - also sync with backend via API
         const guestCart = { ...cart };
         
         const existingItemIndex = guestCart.items.findIndex(item => {
@@ -136,7 +170,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         if (existingItemIndex > -1) {
           guestCart.items[existingItemIndex].quantity += quantity;
         } else {
-          // Get variant image
           let variantImage = '';
           if (selectedVariant?.images && selectedVariant.images.length > 0) {
             variantImage = selectedVariant.images[0].image;
@@ -154,7 +187,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
             variantName: selectedVariant?.variantName || selectedVariant?.name,
             productName: product.name,
             productImage: variantImage,
-            // ✅ ADD WEIGHT FIELDS
             weight: selectedVariant?.weight || 0,
             weightUnit: selectedVariant?.weightUnit || 'gram',
             selectedVariant: selectedVariant,
@@ -170,6 +202,19 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         
         setCart(guestCart);
         saveGuestCart(guestCart);
+        
+        // Also try to sync with backend (optional - creates backend guest cart)
+        try {
+          await cartAPI.addToCart({
+            productId: product._id,
+            quantity,
+            variantId: selectedVariant?._id,
+            guestId // Pass guestId to backend
+          });
+          console.log('🛒 Synced guest cart with backend');
+        } catch (backendError) {
+          console.log('🛒 Backend sync failed, keeping local guest cart only');
+        }
       } else {
         // For authenticated user
         console.log('🛒 Adding to cart for authenticated user');
@@ -180,11 +225,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
           variantId: selectedVariant?._id
         });
         
-        // Fetch the complete updated cart
         const updatedCart = await cartAPI.getCart();
         console.log('🛒 Updated cart after adding:', updatedCart);
-        console.log('🛒 Cart items count:', updatedCart.items?.length);
-        
         setCart(updatedCart);
       }
     } catch (error) {

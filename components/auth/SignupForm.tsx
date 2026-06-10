@@ -341,7 +341,21 @@ export default function SignupForm() {
               </div>
             </div>
 
-            <p className="text-xs text-center text-gray-500">
+            {/* Sign In Button Added Here */}
+            <div className="text-center">
+              <p className="text-sm text-gray-600">
+                Already have an account?{' '}
+                <button
+                  type="button"
+                  onClick={() => router.push('/login')}
+                  className="font-semibold text-[#9B0F06] hover:underline transition-colors"
+                >
+                  Sign In
+                </button>
+              </p>
+            </div>
+
+            <p className="text-xs text-center text-gray-500 mt-4">
               By signing up, you agree to our{' '}
               <Link href="/terms" className="text-[#9B0F06] hover:underline">
                 Terms of Service

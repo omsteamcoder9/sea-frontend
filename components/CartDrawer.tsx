@@ -98,7 +98,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
       onClose();
       sessionStorage.setItem('redirectAfterLogin', '/checkout');
       sessionStorage.setItem('pendingCheckout', 'true');
-      router.push('/login');
+      router.push('/signup');
     }
   };
 
