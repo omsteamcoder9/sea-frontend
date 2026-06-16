@@ -265,7 +265,7 @@ await addToCart(productWithImage, 1, defaultVariant);
 <button
   onClick={handleAddToCart}
   disabled={isOutOfStock || isAddingToCart}
-  className="flex items-center justify-center gap-1 sm:gap-2 px-1.5 sm:px-4 py-1.5 sm:py-2 rounded-xl transition-all duration-300 active:scale-95 shadow-sm disabled:opacity-50 cursor-pointer min-w-[90px] sm:min-w-0"
+  className="flex items-center justify-center gap-1 sm:gap-2 px-1.5 sm:px-4 py-1.5 sm:py-2 rounded-xl transition-all duration-300 active:scale-95 shadow-sm disabled:opacity-50 cursor-pointer min-w-[90px] sm:min-w-0 -mr-3"
   style={{ 
     backgroundColor: '#9B0F06',
     color: 'white'
