@@ -76,20 +76,15 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
       if (response.success && response.data) {
         const data = response.data;
         
-        // Update site name
         if (data.siteName) {
           setSiteName(data.siteName);
         }
-        
-        // Update contact info
         if (data.contactEmail) {
           setContactEmail(data.contactEmail);
         }
         if (data.contactNumber) {
           setContactNumber(data.contactNumber);
         }
-        
-        // Update social media
         if (data.socialMedia) {
           setSocialMedia({
             facebook: data.socialMedia.facebook || '',
@@ -99,8 +94,6 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
             linkedin: data.socialMedia.linkedin || ''
           });
         }
-        
-        // Also handle frontend format if needed
         if (data.facebookUrl) {
           setSocialMedia(prev => ({ ...prev, facebook: data.facebookUrl || '' }));
         }
@@ -119,7 +112,6 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
       }
     } catch (error) {
       console.error('Error fetching settings:', error);
-      // Keep default values if fetch fails
     }
   };
 
@@ -150,7 +142,6 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
     return displayName;
   };
 
-  // Handle category click with proper navigation
   const handleCategoryClick = (category: Category | string) => {
     const categorySlug = typeof category === 'string' ? category : (category.slug || category._id);
     router.push(`/products?category=${encodeURIComponent(categorySlug)}`);
@@ -216,7 +207,6 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
     }
   };
 
-  // Close search when clicking outside (only for desktop)
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (window.innerWidth >= 1024) {
@@ -245,7 +235,6 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
     };
   }, [showSearch]);
 
-  // Close profile dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target as Node)) {
@@ -262,7 +251,6 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
     };
   }, [isDropdownOpen]);
 
-  // Close shop dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (shopDropdownRef.current && !shopDropdownRef.current.contains(event.target as Node)) {
@@ -285,13 +273,34 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
     return `${process.env.NEXT_PUBLIC_IMG_URL}/${filename}`;
   };
 
+  // Split site name for logo display
+  const getLogoLines = () => {
+    if (!siteName || siteName.trim() === '') {
+      return { first: '', second: '' };
+    }
+    
+    const nameParts = siteName.trim().split(' ');
+    if (nameParts.length > 1) {
+      return { 
+        first: nameParts[0], 
+        second: nameParts.slice(1).join(' ') 
+      };
+    }
+    
+    return { 
+      first: nameParts[0], 
+      second: '' 
+    };
+  };
+
+  const { first: logoFirstLine, second: logoSecondLine } = getLogoLines();
+
   return (
     <>
       {/* ================= TOP HEADER ================= */}
       <div className="hidden lg:block w-full bg-[#9B0F06]">
         <div className="max-w-[1350px] mx-auto">
           <div className="flex items-center justify-between h-[40px] px-6">
-            {/* LEFT SIDE - Email and Phone from DB */}
             <div className="flex items-center gap-8 text-[#EED9B9] text-[12px] font-semibold">
               <div className="flex items-center gap-2">
                 <Mail className="w-[12px] h-[12px]" />
@@ -303,7 +312,6 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
               </div>
             </div>
 
-            {/* RIGHT SIDE - Contact Link and Social Icons from DB */}
             <div className="flex items-center gap-4 text-[#EED9B9] text-[12px] font-semibold">
               <a href="/contact" className="hover:text-white transition-all duration-300">
                 Contact
@@ -340,22 +348,41 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
         </div>
       </div>
 
-      {/* ================= MAIN NAVBAR with STICKY ================= */}
+      {/* ================= MAIN NAVBAR ================= */}
       <header className="sticky top-0 z-50 w-full bg-[#5E0006] border-b border-[#D53E0F]/30">
         <div className="w-full lg:max-w-[1350px] lg:mx-auto">
-          <div className="flex items-center justify-between lg:grid lg:grid-cols-[220px_1fr_320px] h-[60px] lg:h-[72px] px-0 lg:px-0">
-            {/* LEFT LOGO - Dynamic Site Name from DB */}
-            <div className="flex items-center px-3 lg:px-6 bg-transparent">
-              <Link href="/" className="relative">
-                <div className="absolute -top-3 left-0 w-8 lg:w-11 h-[3px] lg:h-[4px] bg-[#D53E0F]"></div>
-                <h1 className="text-[20px] lg:text-[28px] font-black tracking-[3px] lg:tracking-[5px] text-[#EED9B9] leading-none">
-                  {siteName}
-                </h1>
+          <div className="flex items-center justify-between lg:grid lg:grid-cols-[220px_1fr_320px] h-[60px] lg:h-[72px] px-3 lg:px-0 md:mr-1">
+            
+            {/* LEFT LOGO */}
+            <div className="flex items-center bg-transparent ">
+              <Link href="/" className="flex items-center gap-2">
+                {/* Logo Image */}
+<div className="relative w-15 h-15 lg:w-20 lg:h-20  flex-shrink-0 mt-2 lg:mt-0 lg:ml-10">
+                    <Image
+                    src="/images/logo.png"
+                    alt={siteName}
+                    fill
+                    priority
+                    className="object-contain"
+                  />
+                </div>
+                
+                {/* Logo Text */}
+                <div className="flex flex-col justify-center">
+                  <span className="text-[16px] sm:text-[18px] lg:text-[22px] font-black tracking-[2px] lg:tracking-[3px] text-[#EED9B9] leading-none">
+                    {logoFirstLine}
+                  </span>
+                  {logoSecondLine && (
+                    <span className="text-[10px]mr-20 sm:text-[11px] lg:text-[13px] font-bold tracking-[1px] text-[#D53E0F] leading-none md:ml-5">
+                      {logoSecondLine}
+                    </span>
+                  )}
+                </div>
               </Link>
             </div>
 
             {/* CENTER MENU - Desktop only */}
-            <div className="hidden lg:flex items-center justify-center bg-transparent">
+            <div className="hidden lg:flex items-center justify-center bg-transparent md:ml-40">
               <nav className="hidden xl:flex items-center gap-8">
                 <Link
                   href="/"
@@ -363,7 +390,6 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                 >
                   HOME
                 </Link>
-                {/* Show only first 3 categories */}
                 {displayedCategories.map((cat) => (
                   <button
                     key={cat._id}
@@ -373,7 +399,6 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                     {cat.name.toUpperCase()}
                   </button>
                 ))}
-                {/* Shop Dropdown Button - Only show if there are remaining categories */}
                 {dropdownCategories.length > 0 && (
                   <div ref={shopDropdownRef} className="relative">
                     <button
@@ -415,11 +440,9 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
             </div>
 
             {/* RIGHT AREA */}
-            <div className="bg-transparent flex items-center justify-end px-3 lg:px-8 gap-3 lg:gap-6 h-full">
-              {/* When search is NOT active - Show Search Icon, Cart, and Profile */}
+            <div className="bg-transparent flex items-center justify-end gap-3 lg:gap-6 h-full">
               {!showSearch ? (
                 <div className="flex items-center gap-3 lg:gap-6">
-                  {/* Search Icon */}
                   <button 
                     onClick={handleSearchClick}
                     className="text-[#EED9B9]/80 hover:text-[#D53E0F] transition-all duration-300"
@@ -427,7 +450,6 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                     <Search className="w-[18px] h-[18px]" />
                   </button>
 
-                  {/* Cart */}
                   <button 
                     onClick={openCartDrawer}
                     className="text-[#EED9B9]/80 hover:text-[#D53E0F] transition-all duration-300 relative"
@@ -440,7 +462,6 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                     )}
                   </button>
 
-                  {/* Profile / Login Button */}
                   {!isAuthenticated ? (
                     <Link href="/login" className="hidden lg:block">
                       <button className="border border-[#D53E0F]/50 bg-white/10 backdrop-blur-sm h-[40px] px-6 text-[#EED9B9] text-[11px] font-black tracking-[1.5px] uppercase hover:bg-[#D53E0F] hover:text-white transition-all duration-300 rounded-full">
@@ -466,23 +487,22 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                           >
                             My Orders
                           </Link>
-                    <button
-  onClick={() => {
-    setIsDropdownOpen(false);
-    logout();
-    router.push('/');  // ← Add this line to redirect to home
-  }}
-  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
->
-  Logout
-</button>
+                          <button
+                            onClick={() => {
+                              setIsDropdownOpen(false);
+                              logout();
+                              router.push('/');
+                            }}
+                            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          >
+                            Logout
+                          </button>
                         </div>
                       )}
                     </div>
                   )}
                 </div>
               ) : (
-                /* When search is active - Show Search Input in place (Desktop only) */
                 <div className="hidden lg:block">
                   <div ref={searchContainerRef} className="relative">
                     <div className="bg-white rounded-lg shadow-xl border border-gray-200 w-64">
@@ -529,7 +549,6 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                       </form>
                     </div>
                     
-                    {/* Search Results Dropdown */}
                     {(searchResults.length > 0 || isSearching) && (
                       <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-xl border border-gray-200 max-h-96 overflow-y-auto z-50">
                         {isSearching ? (
@@ -585,7 +604,6 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                 </div>
               )}
 
-              {/* Mobile Menu Button */}
               <button 
                 className="lg:hidden text-[#EED9B9]/80 hover:text-[#D53E0F] transition-all duration-300"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -607,8 +625,21 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
           <div className="absolute top-0 left-0 h-full w-64 bg-[#5E0006] shadow-2xl">
             <div className="flex flex-col h-full">
               <div className="flex items-center justify-between p-4 border-b border-[#D53E0F]/30">
-                <Link href="/" onClick={() => setIsMenuOpen(false)}>
-                  <h1 className="text-xl font-black tracking-[3px] text-[#EED9B9]">{siteName}</h1>
+                <Link href="/" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2">
+                  <div className="relative w-15 h-15">
+                    <Image
+                      src="/images/logo.png"
+                      alt={siteName}
+                      fill
+                      className="object-contain"
+                    />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-lg font-black tracking-[2px] text-[#EED9B9] leading-none">{logoFirstLine}</span>
+                    {logoSecondLine && (
+                      <span className="text-[10px] font-bold tracking-[1px] text-[#D53E0F] leading-none">{logoSecondLine}</span>
+                    )}
+                  </div>
                 </Link>
                 <button onClick={() => setIsMenuOpen(false)} className="text-[#EED9B9]/80 hover:text-[#D53E0F]">
                   <X className="w-5 h-5" />
@@ -623,7 +654,6 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                   >
                     HOME
                   </Link>
-                  {/* Show all categories in mobile menu */}
                   {categories.map((cat) => (
                     <button
                       key={cat._id}

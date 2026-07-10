@@ -9,6 +9,7 @@ import {
   Linkedin
 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { settingsAPI } from '@/lib/settings-api';
 
@@ -27,6 +28,28 @@ export default function Footer() {
   });
   const [loading, setLoading] = useState(true);
 
+  // Split site name for logo display
+  const getLogoLines = () => {
+    if (!siteName || siteName.trim() === '') {
+      return { first: '', second: '' };
+    }
+    
+    const nameParts = siteName.trim().split(' ');
+    if (nameParts.length > 1) {
+      return { 
+        first: nameParts[0], 
+        second: nameParts.slice(1).join(' ') 
+      };
+    }
+    
+    return { 
+      first: nameParts[0], 
+      second: '' 
+    };
+  };
+
+  const { first: logoFirstLine, second: logoSecondLine } = getLogoLines();
+
   useEffect(() => {
     fetchSettings();
   }, []);
@@ -37,12 +60,9 @@ export default function Footer() {
       if (response.success && response.data) {
         const data = response.data;
         
-        // Update site name
         if (data.siteName) {
           setSiteName(data.siteName);
         }
-        
-        // Update contact info
         if (data.contactEmail) {
           setContactEmail(data.contactEmail);
         }
@@ -52,13 +72,9 @@ export default function Footer() {
         if (data.companyAddress) {
           setCompanyAddress(data.companyAddress);
         }
-        
-        // Update footer text
         if (data.footerText) {
           setFooterText(data.footerText);
         }
-        
-        // Update social media from socialMedia object
         if (data.socialMedia) {
           setSocialMedia({
             facebook: data.socialMedia.facebook || '',
@@ -68,8 +84,6 @@ export default function Footer() {
             linkedin: data.socialMedia.linkedin || ''
           });
         }
-        
-        // Also handle frontend format if needed (fallback)
         if (data.facebookUrl && !data.socialMedia?.facebook) {
           setSocialMedia(prev => ({ ...prev, facebook: data.facebookUrl || '' }));
         }
@@ -88,13 +102,11 @@ export default function Footer() {
       }
     } catch (error) {
       console.error('Error fetching footer settings:', error);
-      // Keep default values if fetch fails
     } finally {
       setLoading(false);
     }
   };
 
-  // Define social icons and their configurations based on fetched data
   const socialConfigs = [
     { key: 'facebook', icon: Facebook, url: socialMedia.facebook, label: 'Facebook' },
     { key: 'twitter', icon: Twitter, url: socialMedia.twitter, label: 'Twitter' },
@@ -103,10 +115,8 @@ export default function Footer() {
     { key: 'linkedin', icon: Linkedin, url: socialMedia.linkedin, label: 'LinkedIn' },
   ];
 
-  // Filter only social links that have URLs
   const activeSocialLinks = socialConfigs.filter(social => social.url && social.url.trim() !== '');
 
-  // Navigation links
   const navLinks = [
     { title: 'Home', href: '/' },
     { title: 'About', href: '/about' },
@@ -118,7 +128,6 @@ export default function Footer() {
     { title: 'Privacy Policy', href: '/privacy' },
   ];
 
-  // Get copyright text - use footerText from DB or default
   const copyrightText = footerText || `© ${new Date().getFullYear()} ${siteName}. All rights reserved.`;
 
   if (loading) {
@@ -137,19 +146,39 @@ export default function Footer() {
     <footer className="pt-12 pb-8" style={{ backgroundColor: '#5E0006', color: '#EED9B9' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-          {/* About Section */}
+          {/* About Section with Logo */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
           >
-            <h3 className="font-bold text-lg mb-4" style={{ color: '#D53E0F' }}>{siteName}</h3>
+            <div className="flex items-center gap-3 mb-4">
+              {/* Logo Image */}
+              <div className="relative w-16 h-16 lg:w-20 lg:h-20 flex-shrink-0">
+                <Image
+                  src="/images/logo.png"
+                  alt={siteName}
+                  fill
+                  className="object-contain"
+                />
+              </div>
+              {/* Logo Text */}
+              <div className="flex flex-col justify-center">
+                <span className="text-[18px] sm:text-[20px] lg:text-[24px] font-black tracking-[2px] lg:tracking-[3px] text-[#EED9B9] leading-none">
+                  {logoFirstLine}
+                </span>
+                {logoSecondLine && (
+                  <span className="text-[10px] sm:text-[11px] lg:text-[13px] font-bold tracking-[1px] text-[#D53E0F] leading-none ml-2 sm:ml-3 lg:ml-4">
+                    {logoSecondLine}
+                  </span>
+                )}
+              </div>
+            </div>
             <p className="text-sm leading-relaxed" style={{ color: '#EED9B9' }}>
               India's fastest growing seafood platform. Get the freshest catches delivered instantly at minimal cost.
             </p>
             
-            {/* Social Links - Only show if URLs exist */}
             {activeSocialLinks.length > 0 && (
               <div className="flex gap-3 mt-4">
                 {activeSocialLinks.map((social) => {

@@ -3,7 +3,7 @@
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/context/AuthContext';
-import { CartProvider } from '@/context/CartContext'; // ✅ ADD THIS
+import { CartProvider } from '@/context/CartContext';
 import HeaderWrapper from '@/components/ui/HeaderWrapper';
 import Footer from '@/components/Footer';
 
@@ -16,9 +16,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/images/logo.png" type="image/png" />
+      </head>
       <body className={inter.className}>
         <AuthProvider>
-          <CartProvider> {/* ✅ WRAP WITH CartProvider */}
+          <CartProvider>
             <HeaderWrapper />
             {children}
             <Footer />
