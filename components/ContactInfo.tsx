@@ -12,8 +12,8 @@ interface ContactInfo {
 export default function ContactInfo() {
   const [contactInfo, setContactInfo] = useState<ContactInfo>({
     contactNumber: '+91 7200074221',
-    contactEmail: 'support@seafood.com',
-    companyAddress: '123 Seafood Street, Mumbai, India'
+    contactEmail: 'support@MeenavanFresh.com',
+    companyAddress: '123 MeenavanFresh Street, Mumbai, India'
   });
   
   const [loading, setLoading] = useState(true);
@@ -28,8 +28,8 @@ export default function ContactInfo() {
           const data = response.data;
           setContactInfo({
             contactNumber: data.contactNumber || '+91 7200074221',
-            contactEmail: data.contactEmail || 'support@seafood.com',
-            companyAddress: data.companyAddress || '123 Seafood Street, Mumbai, India'
+            contactEmail: data.contactEmail || 'support@MeenavanFresh.com',
+            companyAddress: data.companyAddress || '123 MeenavanFresh Street, Mumbai, India'
           });
         }
         setError(null);

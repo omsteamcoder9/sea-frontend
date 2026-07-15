@@ -81,7 +81,7 @@ export default function HomeClient({ categories, featuredCategories }: HomeClien
     },
     {
       question: "Do you offer bulk orders for restaurants?",
-      answer: "Yes, we provide bulk ordering options for restaurants, hotels, and seafood businesses. Contact us for wholesale pricing."
+      answer: "Yes, we provide bulk ordering options for restaurants, hotels, and MeenavanFresh businesses. Contact us for wholesale pricing."
     },
     {
       question: "What is your delivery policy?",
@@ -156,7 +156,7 @@ export default function HomeClient({ categories, featuredCategories }: HomeClien
               className="text-center mb-8"
             >
               <h2 className="text-4xl font-bold mb-3 animate-gradient-text" style={{ background: 'linear-gradient(135deg, #5E0006 0%, #9B0F06 50%, #D53E0F 100%)', backgroundSize: '200% auto', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-                Explore Our Fresh Seafood Collection
+                Explore Our Fresh MeenavanFresh Collection
               </h2>
               <motion.p 
                 initial={{ opacity: 0 }}
@@ -216,7 +216,7 @@ export default function HomeClient({ categories, featuredCategories }: HomeClien
           className="py-8"
         >
           <div className="container mx-auto px-1 text-center">
-            <p className="text-[#5E0006]/60">No seafood available at the moment. Please check back later.</p>
+            <p className="text-[#5E0006]/60">No MeenavanFresh available at the moment. Please check back later.</p>
           </div>
         </motion.section>
       )}
@@ -248,7 +248,7 @@ export default function HomeClient({ categories, featuredCategories }: HomeClien
             className="text-center mb-8 sm:mb-12"
           >
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 tracking-tight animate-gradient-text" style={{ background: 'linear-gradient(135deg, #5E0006 0%, #9B0F06 50%, #D53E0F 100%)', backgroundSize: '200% auto', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-              Why Choose Our Fresh Seafood
+              Why Choose Our MeenavanFresh
             </h2>
             <motion.div 
               initial={{ width: 0 }}
@@ -265,15 +265,15 @@ export default function HomeClient({ categories, featuredCategories }: HomeClien
               transition={{ delay: 0.4 }}
               className="max-w-2xl mx-auto text-sm sm:text-base md:text-lg text-[#5E0006]/70 px-2 sm:px-0"
             >
-              Trusted quality seafood sourced directly from local fishermen
+              Trusted quality MeenavanFresh sourced directly from local fishermen
             </motion.p>
           </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto">
             {[
-              { icon: Calendar, title: 'Next-Day Delivery', desc: 'Order today, get fresh seafood delivered tomorrow. Guaranteed same-day dispatch.', highlight: 'Tomorrow Delivery' },
+              { icon: Calendar, title: 'Next-Day Delivery', desc: 'Order today, get fresh MeenavanFresh delivered tomorrow. Guaranteed same-day dispatch.', highlight: 'Tomorrow Delivery' },
               { icon: Truck, title: 'Fast & Safe Delivery', desc: 'Quick and safe delivery with ice packing to your doorstep.', highlight: 'Ice Packed' },
-              { icon: Shield, title: 'Premium Quality', desc: '100% Fresh seafood sourced directly from harbour daily.', highlight: 'Certified Fresh' },
+              { icon: Shield, title: 'Premium Quality', desc: '100% Fresh MeenavanFresh sourced directly from harbour daily.', highlight: 'Certified Fresh' },
             ].map((feature, idx) => (
               <motion.div 
                 key={idx}
@@ -344,7 +344,7 @@ export default function HomeClient({ categories, featuredCategories }: HomeClien
               transition={{ delay: 0.3 }}
               className="max-w-2xl mx-auto text-[#5E0006]/70"
             >
-              Find answers to common questions about our fresh seafood
+              Find answers to common questions about our fresh MeenavanFresh
             </motion.p>
           </motion.div>
 

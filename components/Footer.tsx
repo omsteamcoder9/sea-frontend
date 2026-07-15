@@ -15,7 +15,7 @@ import { settingsAPI } from '@/lib/settings-api';
 
 export default function Footer() {
   const [siteName, setSiteName] = useState('Sea Food');
-  const [contactEmail, setContactEmail] = useState('support@seafood.com');
+  const [contactEmail, setContactEmail] = useState('support@MeenavanFresh.com');
   const [contactNumber, setContactNumber] = useState('+91 98765 43210');
   const [companyAddress, setCompanyAddress] = useState('Mumbai, India');
   const [footerText, setFooterText] = useState('');
@@ -176,7 +176,7 @@ export default function Footer() {
               </div>
             </div>
             <p className="text-sm leading-relaxed" style={{ color: '#EED9B9' }}>
-              India's fastest growing seafood platform. Get the freshest catches delivered instantly at minimal cost.
+              India's fastest growing MeenavanFresh platform. Get the freshest catches delivered instantly at minimal cost.
             </p>
             
             {activeSocialLinks.length > 0 && (

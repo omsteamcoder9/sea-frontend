@@ -181,11 +181,11 @@ className="object-contain bg-gradient-to-t from-[#5E0006] via-[#9B0F06] to-[#5E0
               </h2>
               
               <h1 className={`text-[#EED9B9] text-2xl sm:text-3xl md:text-4xl font-serif italic tracking-wide -mt-1 md:-mt-2 mb-2 ${getAnimationClass('delay-200')}`}>
-                SEAFOOD
+                MeenavanFresh
               </h1>
               
               <p className={`text-[#EED9B9]/70 text-xs sm:text-sm md:text-base max-w-md mb-4 leading-relaxed mx-auto md:mx-0 ${getAnimationClass('delay-300')}`}>
-                Enjoy premium ocean-fresh seafood with{' '}
+                Enjoy premium ocean-fresh MeenavanFresh with{' '}
                 <span className="font-bold text-[#D53E0F]">healthy delicious</span>{' '}
                 {currentProduct.productName.toLowerCase()} from{' '}
                 <span className="font-semibold text-[#EED9B9]">{currentProduct.price}</span>.

@@ -1,4 +1,4 @@
-// types/order.ts - COMPLETE UPDATED VERSION WITH WEIGHT
+// types/order.ts - COMPLETE UPDATED VERSION WITH WARD TYPES
 
 export interface OrderItem {
   product: string | {
@@ -16,7 +16,6 @@ export interface OrderItem {
   name?: string;
   image?: string;
   _id?: string;
-  // ✅ ADD WEIGHT FIELDS
   weight?: number;
   weightUnit?: string;
 }
@@ -26,7 +25,6 @@ export interface Order {
   orderId: string;
   sNo: number;
   
-  // User
   user: string | {
     _id: string;
     name: string;
@@ -34,10 +32,8 @@ export interface Order {
     phone?: string;
   };
   
-  // Products
   products: OrderItem[];
   
-  // Shipping - WITH EMAIL
   shippingAddress: {
     street: string;
     city: string;
@@ -48,36 +44,30 @@ export interface Order {
     email: string;
   };
   
-  // Ward Info
   wardId?: number | null;
   wardName?: string | null;
   deliveryZone?: string;
   
-  // Payment
   paymentMethod: 'cod' | 'razorpay' | 'card';
   paymentId?: string;
   paymentStatus: 'pending' | 'completed' | 'failed' | 'refunded';
   paidAt?: string;
   
-  // Refund Info
   refundStatus?: 'pending' | 'completed' | 'failed' | 'not_applicable';
   refundMessage?: string;
   refundedAt?: string | null;
   
-  // Amounts
   totalAmount: number;
   shippingFee: number;
   taxAmount: number;
   discountAmount: number;
   finalAmount: number;
   
-  // Status
   orderStatus: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   cancelledAt?: string;
   cancellationReason?: string;
   deliveredAt?: string;
   
-  // Timestamps
   createdAt: string;
   updatedAt: string;
 }
@@ -94,6 +84,8 @@ export interface CreateOrderRequest {
   };
   paymentMethod: 'cod' | 'razorpay' | 'card';
   paymentId?: string;
+  skipCartClear?: boolean;
+  products?: any[];
 }
 
 export interface OrdersResponse {
@@ -114,7 +106,25 @@ export interface OrderResponse {
   requiresPayment?: boolean;
 }
 
-// Admin Types
+// ✅ NEW: Ward Types
+export interface Ward {
+  wardId: number;
+  wardName: string;
+  streets: string[];
+  centroid?: {
+    lat: number;
+    lon: number;
+  };
+}
+
+export interface WardData {
+  municipality: string;
+  state: string;
+  country: string;
+  totalWards: number;
+  wards: Ward[];
+}
+
 export interface OrderStats {
   totalOrders: number;
   totalRevenue: number;

@@ -42,7 +42,7 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
   
   // Site settings state
   const [siteName, setSiteName] = useState('Sea Food');
-  const [contactEmail, setContactEmail] = useState('contact@seafood.com');
+  const [contactEmail, setContactEmail] = useState('contact@MeenavanFresh.com');
   const [contactNumber, setContactNumber] = useState('+91 98765 43210');
   const [socialMedia, setSocialMedia] = useState({
     facebook: '',
@@ -503,105 +503,105 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                   )}
                 </div>
               ) : (
-                <div className="hidden lg:block">
-                  <div ref={searchContainerRef} className="relative">
-                    <div className="bg-white rounded-lg shadow-xl border border-gray-200 w-64">
-                      <form onSubmit={handleSearchSubmit} className="p-2">
-                        <div className="flex items-center gap-1">
-                          <div className="flex-1 flex items-center border border-gray-200 rounded-md px-2 py-1">
-                            <Search className="w-3.5 h-3.5 text-gray-400 mr-1.5" />
-                            <input
-                              ref={searchInputRef}
-                              type="text"
-                              value={searchQuery}
-                              onChange={(e) => setSearchQuery(e.target.value)}
-                              placeholder="Search..."
-                              className="flex-1 text-xs focus:outline-none"
-                            />
-                            {searchQuery && (
-                              <button
-                                type="button"
-                                onClick={() => setSearchQuery('')}
-                                className="text-gray-400 hover:text-gray-600 ml-1"
-                              >
-                                <X className="w-3 h-3" />
-                              </button>
-                            )}
-                          </div>
-                          <button
-                            type="submit"
-                            className="px-2.5 py-1 bg-[#D53E0F] text-white rounded-md text-[10px] font-medium hover:opacity-80 transition-all whitespace-nowrap"
-                          >
-                            Go
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setShowSearch(false);
-                              setSearchQuery('');
-                              setSearchResults([]);
-                            }}
-                            className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-all"
-                          >
-                            <X className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </form>
-                    </div>
-                    
-                    {(searchResults.length > 0 || isSearching) && (
-                      <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-xl border border-gray-200 max-h-96 overflow-y-auto z-50">
-                        {isSearching ? (
-                          <div className="p-4 text-center text-gray-500">
-                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#D53E0F] mx-auto"></div>
-                            <p className="mt-2 text-xs">Searching...</p>
-                          </div>
-                        ) : (
-                          <>
-                            <div className="p-2">
-                              {searchResults.map((product) => (
-                                <div
-                                  key={product._id}
-                                  className="flex items-center p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
-                                  onClick={() => handleProductClick(product)}
-                                >
-                                  <div className="w-10 h-10 bg-gray-100 rounded-md flex-shrink-0 overflow-hidden relative">
-                                    {product.image ? (
-                                      <Image
-                                        src={getImageUrl(product.image) || ''}
-                                        className="w-full h-full object-cover"
-                                        alt={product.name}
-                                        fill
-                                        sizes="40px"
-                                      />
-                                    ) : (
-                                      <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                                        <ShoppingCart className="w-5 h-5 text-gray-400" />
-                                      </div>
-                                    )}
-                                  </div>
-                                  <div className="ml-3 flex-1 min-w-0">
-                                    <p className="text-sm font-medium text-gray-800 truncate">{product.name}</p>
-                                    <p className="text-xs text-gray-500">{product.category}</p>
-                                  </div>
-                                  <p className="text-[#D53E0F] font-medium text-sm">₹{product.basePrice}</p>
-                                </div>
-                              ))}
-                            </div>
-                            <div
-                              className="border-t border-gray-100 p-3 bg-gray-50 hover:bg-gray-100 cursor-pointer text-center rounded-b-lg"
-                              onClick={handleViewAllResults}
-                            >
-                              <p className="text-sm font-medium text-[#D53E0F]">
-                                View all results for &quot;{searchQuery}&quot;
-                              </p>
-                            </div>
-                          </>
-                        )}
+              <div className="hidden lg:block">
+  <div ref={searchContainerRef} className="relative">
+    <div className="bg-white rounded-lg shadow-xl border border-gray-200 w-64">
+      <form onSubmit={handleSearchSubmit} className="p-2">
+        <div className="flex items-center gap-1">
+          <div className="flex-1 flex items-center border border-gray-200 rounded-md px-2 py-1 min-w-0">
+            <Search className="w-3.5 h-3.5 text-gray-400 mr-1.5 flex-shrink-0" />
+            <input
+              ref={searchInputRef}
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search..."
+              className="flex-1 text-xs focus:outline-none min-w-0"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="text-gray-400 hover:text-gray-600 ml-1 flex-shrink-0"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            )}
+          </div>
+          <button
+            type="submit"
+            className="px-2.5 py-1 bg-[#D53E0F] text-white rounded-md text-[10px] font-medium hover:opacity-80 transition-all whitespace-nowrap flex-shrink-0"
+          >
+            Go
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setShowSearch(false);
+              setSearchQuery('');
+              setSearchResults([]);
+            }}
+            className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-all flex-shrink-0"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </form>
+    </div>
+    
+    {(searchResults.length > 0 || isSearching) && (
+      <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-xl border border-gray-200 max-h-96 overflow-y-auto z-50">
+        {isSearching ? (
+          <div className="p-4 text-center text-gray-500">
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#D53E0F] mx-auto"></div>
+            <p className="mt-2 text-xs">Searching...</p>
+          </div>
+        ) : (
+          <>
+            <div className="p-2">
+              {searchResults.map((product) => (
+                <div
+                  key={product._id}
+                  className="flex items-center p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
+                  onClick={() => handleProductClick(product)}
+                >
+                  <div className="w-10 h-10 bg-gray-100 rounded-md flex-shrink-0 overflow-hidden relative">
+                    {product.image ? (
+                      <Image
+                        src={getImageUrl(product.image) || ''}
+                        className="w-full h-full object-cover"
+                        alt={product.name}
+                        fill
+                        sizes="40px"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                        <ShoppingCart className="w-5 h-5 text-gray-400" />
                       </div>
                     )}
                   </div>
+                  <div className="ml-3 flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-800 truncate">{product.name}</p>
+                    <p className="text-xs text-gray-500">{product.category}</p>
+                  </div>
+                  <p className="text-[#D53E0F] font-medium text-sm flex-shrink-0 ml-2">₹{product.basePrice}</p>
                 </div>
+              ))}
+            </div>
+            <div
+              className="border-t border-gray-100 p-3 bg-gray-50 hover:bg-gray-100 cursor-pointer text-center rounded-b-lg"
+              onClick={handleViewAllResults}
+            >
+              <p className="text-sm font-medium text-[#D53E0F]">
+                View all results for &quot;{searchQuery}&quot;
+              </p>
+            </div>
+          </>
+        )}
+      </div>
+    )}
+  </div>
+</div>
               )}
 
               <button 

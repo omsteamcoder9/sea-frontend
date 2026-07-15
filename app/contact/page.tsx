@@ -15,7 +15,7 @@ export default function ContactPage() {
             Contact Us
           </h1>
           <p className="text-xl text-gray-700 max-w-2xl mx-auto">
-            Have questions about our premium seafood including fresh fish, prawns, crabs, and daily catches? We&apos;d love to hear from you. Send us a message and we&apos;ll respond as soon as possible.
+            Have questions about our premium MeenavanFresh including fresh fish, prawns, crabs, and daily catches? We&apos;d love to hear from you. Send us a message and we&apos;ll respond as soon as possible.
           </p>
         </div>
 
@@ -46,7 +46,7 @@ export default function ContactPage() {
                   </svg>
                 </div>
                 <h4 className="font-semibold" style={{ color: '#EED9B9' }}>Premium Quality</h4>
-                <p className="text-sm" style={{ color: '#EED9B9' }}>Fresh seafood sourced daily from local fishermen for exceptional quality and taste</p>
+                <p className="text-sm" style={{ color: '#EED9B9' }}>Fresh MeenavanFresh sourced daily from local fishermen for exceptional quality and taste</p>
               </div>
               <div className="space-y-3">
                 <div className="w-12 h-12 mx-auto rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(213, 62, 15, 0.2)' }}>

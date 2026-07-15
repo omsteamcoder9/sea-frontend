@@ -5,9 +5,9 @@ import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { createOrder } from '@/lib/order-api';
+import { createOrder, getWards, getStreetsByWard } from '@/lib/order-api';
 import { createRazorpayOrder, verifyPayment } from '@/lib/payment-api';
-import { CreateOrderRequest } from '@/types/order';
+import { CreateOrderRequest, Ward } from '@/types/order';
 
 declare global {
   interface Window {
@@ -72,6 +72,8 @@ interface FormData {
   state: string;
   postalCode: string;
   country: string;
+  selectedWardId: number | null;
+  selectedStreet: string;
 }
 
 interface PublicSettings {
@@ -105,12 +107,17 @@ export default function CheckoutPage() {
     email: '',
     phone: '',
     street: '',
-    city: '',
-    state: '',
+    city: 'Karaikudi',
+    state: 'Tamil Nadu',
     postalCode: '',
     country: 'India',
+    selectedWardId: null,
+    selectedStreet: '',
   });
 
+  const [wards, setWards] = useState<Ward[]>([]);
+  const [streetsForSelectedWard, setStreetsForSelectedWard] = useState<string[]>([]);
+  const [loadingWards, setLoadingWards] = useState(true);
   const [loading, setLoading] = useState(false);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [authError, setAuthError] = useState('');
@@ -153,6 +160,42 @@ export default function CheckoutPage() {
     });
   };
 
+  // Load wards on mount
+  useEffect(() => {
+    loadWards();
+  }, []);
+
+  const loadWards = async () => {
+    try {
+      setLoadingWards(true);
+      const wardData = await getWards();
+      setWards(wardData);
+      console.log('✅ Loaded wards:', wardData.length);
+    } catch (error) {
+      console.error('❌ Error loading wards:', error);
+      showErrorPopup('Failed to load ward data. Please refresh the page.');
+    } finally {
+      setLoadingWards(false);
+    }
+  };
+
+  // Update streets when ward changes
+  useEffect(() => {
+    if (formData.selectedWardId) {
+      const streets = getStreetsForWard(formData.selectedWardId);
+      setStreetsForSelectedWard(streets);
+      // Reset street when ward changes
+      setFormData(prev => ({ ...prev, street: '', selectedStreet: '' }));
+    } else {
+      setStreetsForSelectedWard([]);
+    }
+  }, [formData.selectedWardId]);
+
+  const getStreetsForWard = (wardId: number): string[] => {
+    const ward = wards.find(w => w.wardId === wardId);
+    return ward?.streets || [];
+  };
+
   useEffect(() => {
     if (user) {
       if (user.phoneNumber && !formData.phone) {
@@ -175,7 +218,6 @@ export default function CheckoutPage() {
         const item = JSON.parse(storedItem);
         setBuyNowItem(item);
         setIsBuyNowMode(true);
-        // Don't remove here - remove only after successful order
       }
     }
   }, []);
@@ -230,6 +272,48 @@ export default function CheckoutPage() {
       ...prev,
       [name]: value
     }));
+
+    // If street is manually entered, try to find matching ward
+    if (name === 'street' && value.length > 2) {
+      const matchedWard = findWardByStreet(value);
+      if (matchedWard) {
+        setFormData(prev => ({
+          ...prev,
+          selectedWardId: matchedWard.wardId
+        }));
+      }
+    }
+  };
+
+  const findWardByStreet = (streetName: string): Ward | null => {
+    const searchTerm = streetName.toLowerCase().trim();
+    for (const ward of wards) {
+      for (const street of ward.streets) {
+        if (street.toLowerCase().includes(searchTerm)) {
+          return ward;
+        }
+      }
+    }
+    return null;
+  };
+
+  const handleStreetSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const street = e.target.value;
+    setFormData(prev => ({
+      ...prev,
+      street: street,
+      selectedStreet: street
+    }));
+
+    // Auto-fill city, state, country
+    if (street) {
+      setFormData(prev => ({
+        ...prev,
+        city: 'Karaikudi',
+        state: 'Tamil Nadu',
+        country: 'India'
+      }));
+    }
   };
 
   const loadRazorpayScript = (): Promise<boolean> => {
@@ -269,6 +353,12 @@ export default function CheckoutPage() {
     return cart.totalPrice || 0;
   };
 
+  // ✅ Get selected ward name
+  const getSelectedWardName = (): string => {
+    const ward = wards.find(w => w.wardId === formData.selectedWardId);
+    return ward ? `Ward ${ward.wardId} - ${ward.wardName}` : '';
+  };
+
   const handleCashOnDelivery = async (): Promise<void> => {
     try {
       setLoading(true);
@@ -277,6 +367,12 @@ export default function CheckoutPage() {
       if (!formData.email || !formData.phone || !formData.street || !formData.city || 
           !formData.state || !formData.postalCode) {
         showErrorPopup('Please fill all the required fields before placing order.');
+        setLoading(false);
+        return;
+      }
+
+      if (!formData.selectedWardId) {
+        showErrorPopup('Please select a ward from the dropdown.');
         setLoading(false);
         return;
       }
@@ -303,10 +399,8 @@ export default function CheckoutPage() {
         paymentMethod: 'cod'
       };
 
-      // Add flag to prevent cart clearing on backend for Buy Now mode
       if (isBuyNowMode) {
         orderData.skipCartClear = true;
-        // Also add products for Buy Now mode
         orderData.products = displayItems.map((item: any) => ({
           product: item.product._id,
           variantId: item.selectedVariant?._id,
@@ -318,13 +412,9 @@ export default function CheckoutPage() {
 
       const result = await createOrder(orderData);
       
-      // CRITICAL FIX: Only clear cart for normal checkout, NOT for Buy Now
       if (isBuyNowMode) {
-        // Buy Now mode: Only remove the session storage item, keep cart intact
         sessionStorage.removeItem('buyNowItem');
-        // DO NOT call clearCart() - Preserve existing cart items
       } else {
-        // Normal checkout: Clear the cart
         clearCart();
       }
 
@@ -337,7 +427,7 @@ export default function CheckoutPage() {
       let errorMessage = 'Unable to place your order. Please try again.';
       
       if (error.code === 'STREET_NOT_FOUND') {
-        errorMessage = 'We could not verify your street address. Please enter a valid street name.';
+        errorMessage = 'We could not verify your street address. Please select a valid street from the dropdown.';
       } 
       else if (error.code === 'DELIVERY_AREA_NOT_AVAILABLE') {
         errorMessage = 'Sorry, we currently deliver only to Karaikudi and surrounding areas. Please check your city.';
@@ -382,6 +472,12 @@ export default function CheckoutPage() {
         return;
       }
 
+      if (!formData.selectedWardId) {
+        showErrorPopup('Please select a ward from the dropdown.');
+        setPaymentLoading(false);
+        return;
+      }
+
       if (user && !token) {
         setAuthError('Your session has expired. Please log in again.');
         showErrorPopup('Your session has expired. Please log in again.');
@@ -418,10 +514,8 @@ export default function CheckoutPage() {
         paymentMethod: 'razorpay'
       };
 
-      // Add flag to prevent cart clearing on backend for Buy Now mode
       if (isBuyNowMode) {
         orderData.skipCartClear = true;
-        // Also add products for Buy Now mode
         orderData.products = displayItems.map((item: any) => ({
           product: item.product._id,
           variantId: item.selectedVariant?._id,
@@ -459,13 +553,9 @@ export default function CheckoutPage() {
             });
 
             if (verifyResult.success) {
-              // CRITICAL FIX: Only clear cart for normal checkout, NOT for Buy Now
               if (isBuyNowMode) {
-                // Buy Now mode: Only remove the session storage item, keep cart intact
                 sessionStorage.removeItem('buyNowItem');
-                // DO NOT call clearCart() - Preserve existing cart items
               } else {
-                // Normal checkout: Clear the cart
                 clearCart();
               }
               showSuccessPopup(`Payment successful! Order ID: ${orderId}`);
@@ -517,7 +607,7 @@ export default function CheckoutPage() {
       let errorMessage = 'Payment initialization failed. Please try again or use Cash on Delivery.';
       
       if (error.code === 'STREET_NOT_FOUND') {
-        errorMessage = 'We could not verify your street address. Please enter a valid street name.';
+        errorMessage = 'We could not verify your street address. Please select a valid street from the dropdown.';
       } 
       else if (error.code === 'DELIVERY_AREA_NOT_AVAILABLE') {
         errorMessage = 'Sorry, we currently deliver only to Karaikudi and surrounding areas. Please check your city.';
@@ -537,12 +627,12 @@ export default function CheckoutPage() {
   const shippingFee = 0;
   const total = subtotal + tax + shippingFee;
 
-  if ((!isBuyNowMode && cart.items.length === 0) || settingsLoading) {
+  if ((!isBuyNowMode && cart.items.length === 0) || settingsLoading || loadingWards) {
     return (
       <div className="min-h-screen bg-[#f2f2f2] flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#9B0F06] mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading payment methods...</p>
+          <p className="text-gray-600">{loadingWards ? 'Loading ward data...' : 'Loading payment methods...'}</p>
         </div>
       </div>
     );
@@ -575,7 +665,7 @@ export default function CheckoutPage() {
 
   return (
     <>
-      {/* Attractive Custom Popup Modal */}
+      {/* Custom Popup Modal */}
       {popup.isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div 
@@ -694,32 +784,83 @@ export default function CheckoutPage() {
                   />
                 </div>
 
+                {/* ✅ NEW: Ward Dropdown */}
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Street Address *</label>
-                  <textarea
-                    name="street"
-                    required
-                    value={formData.street}
-                    onChange={handleInputChange}
-                    rows={3}
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                    Select Ward *
+                  </label>
+                  <select
+                    name="selectedWardId"
+                    value={formData.selectedWardId || ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setFormData(prev => ({
+                        ...prev,
+                        selectedWardId: value ? parseInt(value) : null,
+                        street: '',
+                        selectedStreet: '',
+                      }));
+                    }}
                     className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#9B0F06] focus:border-[#9B0F06] transition-all duration-200"
-                    placeholder="Enter your complete address"
-                  />
+                  >
+                    <option value="">-- Select Ward --</option>
+                    {wards.map((ward) => (
+                      <option key={ward.wardId} value={ward.wardId}>
+                        Ward {ward.wardId} - {ward.wardName}
+                      </option>
+                    ))}
+                  </select>
+                  {formData.selectedWardId && (
+                    <p className="text-xs text-green-600 mt-1">
+                      ✓ Selected: {getSelectedWardName()} ({streetsForSelectedWard.length} streets)
+                    </p>
+                  )}
                 </div>
 
+                {/* ✅ NEW: Street Dropdown (filtered by ward) */}
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                    Street Address *
+                  </label>
+                  <select
+                    name="selectedStreet"
+                    value={formData.selectedStreet}
+                    onChange={handleStreetSelect}
+                    disabled={!formData.selectedWardId}
+                    className={`w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#9B0F06] focus:border-[#9B0F06] transition-all duration-200 ${
+                      !formData.selectedWardId ? 'bg-gray-100 cursor-not-allowed' : ''
+                    }`}
+                  >
+                    <option value="">
+                      {formData.selectedWardId ? '-- Select Street --' : 'Please select a ward first'}
+                    </option>
+                    {streetsForSelectedWard.map((street, index) => (
+                      <option key={index} value={street}>
+                        {street}
+                      </option>
+                    ))}
+                  </select>
+                  {formData.selectedWardId && streetsForSelectedWard.length === 0 && (
+                    <p className="text-xs text-yellow-600 mt-1">
+                      ⚠️ No streets found for this ward
+                    </p>
+                  )}
+                </div>
+
+           
+
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                  <div>
-                    <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">City *</label>
-                    <input
-                      type="text"
-                      name="city"
-                      required
-                      value={formData.city}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#9B0F06] focus:border-[#9B0F06] transition-all duration-200"
-                      placeholder="City"
-                    />
-                  </div>
+                 <div>
+  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">City *</label>
+  <input
+    type="text"
+    name="city"
+    required
+    value="Karaikudi"
+    readOnly
+    className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed focus:outline-none"
+  />
+</div>
                   <div>
                     <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">State *</label>
                     <input
@@ -812,7 +953,7 @@ export default function CheckoutPage() {
                   {paymentSettings.razorpayEnabled && (
                     <button
                       onClick={handleRazorpayPayment}
-                      disabled={paymentLoading || loading || !!authError || !paymentSettings.razorpayKeyId}
+                      disabled={paymentLoading || loading || !!authError || !paymentSettings.razorpayKeyId || !formData.selectedWardId}
                       className="w-full text-white py-3 rounded-lg transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg text-sm sm:text-base cursor-pointer"
                       style={{ backgroundColor: '#9B0F06' }}
                       onMouseEnter={(e) => {
@@ -829,6 +970,8 @@ export default function CheckoutPage() {
                         </div>
                       ) : !paymentSettings.razorpayKeyId ? (
                         'Razorpay Configuration Required'
+                      ) : !formData.selectedWardId ? (
+                        'Select Ward First'
                       ) : (
                         `Pay ₹${total.toFixed(2)}`
                       )}
@@ -838,7 +981,7 @@ export default function CheckoutPage() {
                   {paymentSettings.cashOnDeliveryEnabled && (
                     <button
                       onClick={handleCashOnDelivery}
-                      disabled={loading || paymentLoading || !!authError}
+                      disabled={loading || paymentLoading || !!authError || !formData.selectedWardId}
                       className="w-full py-3 rounded-lg transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-sm sm:text-base cursor-pointer"
                       style={{ border: '1px solid #9B0F06', color: '#9B0F06' }}
                       onMouseEnter={(e) => {
@@ -855,12 +998,39 @@ export default function CheckoutPage() {
                           <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-[#9B0F06] mr-2"></div>
                           Processing...
                         </div>
+                      ) : !formData.selectedWardId ? (
+                        'Select Ward First'
                       ) : (
                         'Cash On Delivery'
                       )}
                     </button>
                   )}
                 </div>
+
+                {/* Ward info display */}
+                {formData.selectedWardId && (
+                  <div className="mt-4 p-3 rounded-lg" style={{ backgroundColor: '#9B0F06/10', border: '1px solid #9B0F06/20' }}>
+                    <div className="flex items-center space-x-2" style={{ color: '#9B0F06' }}>
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      <span className="text-xs sm:text-sm font-medium">
+                        Ward {formData.selectedWardId}: {getSelectedWardName()}
+                      </span>
+                    </div>
+                    {formData.street && (
+                      <div className="flex items-center space-x-2 mt-1" style={{ color: '#9B0F06' }}>
+                        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1m-2 0h2" />
+                        </svg>
+                        <span className="text-xs sm:text-sm">
+                          Street: {formData.street}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <div className="mt-4 p-3 rounded-lg" style={{ backgroundColor: '#9B0F06/10', border: '1px solid #9B0F06/20' }}>
                   {user ? (

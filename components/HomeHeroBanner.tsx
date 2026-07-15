@@ -9,7 +9,7 @@ export default function HomeHeroBanner() {
   const banner = {
     title: "Sea Food",
     subtitle: "Fresh Catch Daily",
-    description: "Explore the Freshest Seafood Delivered to Your Doorstep",
+    description: "Explore the Freshest MeenavanFresh Delivered to Your Doorstep",
     leftImage: "/images/d1.jpg",
     rightImage: "/images/d2.jpg",
     leftLink: "/products",

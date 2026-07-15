@@ -13,7 +13,7 @@ export default function TestimonialsSection() {
       name: "Rajesh Kumar",
       location: "Chennai",
       rating: 5,
-      text: "Sea Food has been my go-to for fresh seafood. The quality is exceptional and delivery is always on time. Their prawns and fish are incredibly fresh!",
+      text: "Sea Food has been my go-to for fresh MeenavanFresh. The quality is exceptional and delivery is always on time. Their prawns and fish are incredibly fresh!",
       project: "Fresh Fish Delivery",
       satisfaction: "100%",
       satisfactionLabel: "FRESHNESS RATING",
@@ -22,8 +22,8 @@ export default function TestimonialsSection() {
       name: "Priya Sharma",
       location: "Mumbai",
       rating: 5,
-      text: "Excellent quality seafood delivered right to my doorstep. The packaging is perfect and the fish stays fresh. Highly recommend their premium seafood selection.",
-      project: "Premium Seafood Order",
+      text: "Excellent quality MeenavanFresh delivered right to my doorstep. The packaging is perfect and the fish stays fresh. Highly recommend their premium MeenavanFresh selection.",
+      project: "Premium MeenavanFresh Order",
       satisfaction: "98%",
       satisfactionLabel: "QUALITY ASSURANCE",
     },
@@ -40,8 +40,8 @@ export default function TestimonialsSection() {
       name: "Lakshmi Devi",
       location: "Bangalore",
       rating: 5,
-      text: "Finally found a reliable seafood supplier! The freshness is unmatched and the prices are reasonable. Their frozen section is also great.",
-      project: "Regular Seafood Delivery",
+      text: "Finally found a reliable MeenavanFresh supplier! The freshness is unmatched and the prices are reasonable. Their frozen section is also great.",
+      project: "Regular MeenavanFresh Delivery",
       satisfaction: "100%",
       satisfactionLabel: "CUSTOMER SATISFACTION",
     },
@@ -49,8 +49,8 @@ export default function TestimonialsSection() {
       name: "Karthik Raman",
       location: "Hyderabad",
       rating: 5,
-      text: "Professional service with excellent seafood quality. Their selection of fish varieties is impressive. Will definitely order again!",
-      project: "Family Seafood Order",
+      text: "Professional service with excellent MeenavanFresh quality. Their selection of fish varieties is impressive. Will definitely order again!",
+      project: "Family MeenavanFresh Order",
       satisfaction: "97%",
       satisfactionLabel: "PRODUCT VARIETY",
     },
@@ -137,7 +137,7 @@ export default function TestimonialsSection() {
             className="text-sm sm:text-lg text-[#5E0006]/80 max-w-3xl mx-auto leading-relaxed px-4"
           >
             Don't just take our word for it. Here's what our satisfied customers have to say about their experience
-            getting fresh, premium quality seafood delivered by Sea Food.
+            getting fresh, premium quality MeenavanFresh delivered by Sea Food.
           </motion.p>
         </motion.div>
 
@@ -253,7 +253,7 @@ export default function TestimonialsSection() {
             >
               <Image
                 src="/images/h1.jpg"
-                alt="Happy customers with fresh seafood from Sea Food"
+                alt="Happy customers with fresh MeenavanFresh from Sea Food"
                 width={600}
                 height={500}
                 className="w-full h-64 sm:h-[500px] object-cover transform hover:scale-105 transition-transform duration-700"

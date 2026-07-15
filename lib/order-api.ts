@@ -1,4 +1,4 @@
-// lib/order-api.ts - UPDATED WITH ADMIN FUNCTIONS
+// lib/order-api.ts - UPDATED WITH WARD FUNCTIONS
 
 import { 
   Order, 
@@ -6,7 +6,9 @@ import {
   OrderResponse, 
   CreateOrderRequest,
   OrderStats,
-  UpdateOrderStatusRequest
+  UpdateOrderStatusRequest,
+  WardData,
+  Ward
 } from '@/types/order';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -27,6 +29,64 @@ const getHeaders = (): HeadersInit => {
     'Content-Type': 'application/json',
   };
 };
+
+// ========== WARD DATA ==========
+
+// ✅ NEW: Get Ward Data from backend
+export async function getWardData(): Promise<WardData> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/wards`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch ward data');
+    }
+
+    const data = await response.json();
+    return data.data || data;
+  } catch (error) {
+    console.error('❌ Error fetching ward data:', error);
+    // Fallback: Try to load from local JSON
+    try {
+      const response = await fetch('/data/Karaikudi_Wards.json');
+      const data = await response.json();
+      return data;
+    } catch (fallbackError) {
+      console.error('❌ Fallback ward data load failed:', fallbackError);
+      throw new Error('Could not load ward data');
+    }
+  }
+}
+
+// ✅ NEW: Get wards list only
+export async function getWards(): Promise<Ward[]> {
+  const data = await getWardData();
+  return data.wards || [];
+}
+
+// ✅ NEW: Get streets by ward ID
+export async function getStreetsByWard(wardId: number): Promise<string[]> {
+  const wards = await getWards();
+  const ward = wards.find(w => w.wardId === wardId);
+  return ward?.streets || [];
+}
+
+// ✅ NEW: Get ward by street name
+export async function getWardByStreet(streetName: string): Promise<Ward | null> {
+  const wards = await getWards();
+  for (const ward of wards) {
+    for (const street of ward.streets) {
+      if (street.toLowerCase().includes(streetName.toLowerCase())) {
+        return ward;
+      }
+    }
+  }
+  return null;
+}
 
 // ========== USER ROUTES ==========
 
