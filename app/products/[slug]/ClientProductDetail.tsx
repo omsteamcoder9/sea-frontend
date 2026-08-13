@@ -526,67 +526,80 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
                   </div>
 
                   {/* Image Thumbnail Gallery */}
-                  {currentImages && currentImages.length > 1 && (
-                    <div className="mt-4">
-                      <div className="flex justify-center items-center gap-2">
-                        <div className="flex items-center gap-2">
-                          {(() => {
-                            let startIndex = selectedImageIndex - 2;
-                            if (startIndex < 0) startIndex = 0;
-                            if (startIndex > currentImages.length - 5) startIndex = Math.max(0, currentImages.length - 5);
-                            
-                            const visibleThumbnails = currentImages.slice(startIndex, startIndex + 5);
-                            
-                            return visibleThumbnails.map((img, localIndex) => {
-                              const actualIndex = startIndex + localIndex;
-                              
-                              return (
-                                <button
-                                  key={actualIndex}
-                                  onClick={() => handleImageThumbnailClick(actualIndex)}
-                                  className={`
-                                    flex-shrink-0 w-16 h-16 md:w-20 md:h-20 relative rounded-md overflow-hidden transition-all cursor-pointer
-                                    ${selectedImageIndex === actualIndex 
-                                      ? 'border-2 border-[#9B0F06] ring-2 ring-[#9B0F06]/10 scale-105' 
-                                      : 'border border-gray-200 hover:border-[#9B0F06]/60'
-                                    }
-                                  `}
-                                >
-                                  {img.image ? (
-                                    <Image
-                                      src={getImageUrl(img.image)}
-                                      alt={`${product.name} - View ${actualIndex + 1}`}
-                                      fill
-                                      className="object-cover"
-                                      sizes="80px"
-                                      onError={(e) => {
-                                        const target = e.target as HTMLImageElement;
-                                        target.src = '/placeholder-image.jpg';
-                                      }}
-                                    />
-                                  ) : (
-                                    <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                                      <span className="text-gray-400 text-xs">Image {actualIndex + 1}</span>
-                                    </div>
-                                  )}
-                                  
-                                  {selectedImageIndex === actualIndex && (
-                                    <div className="absolute inset-0 bg-gradient-to-r from-[#9B0F06]/10 via-[#9B0F06]/10 to-[#9B0F06]/10 flex items-center justify-center">
-                                      <div className="w-6 h-6 rounded-full bg-[#9B0F06] flex items-center justify-center">
-                                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                        </svg>
-                                      </div>
-                                    </div>
-                                  )}
-                                </button>
-                              );
-                            });
-                          })()}
-                        </div>
-                      </div>
+ {currentImages && currentImages.length > 1 && (
+  <div className="mt-3 sm:mt-4">
+    <div className="flex justify-center items-center gap-1.5 sm:gap-2">
+      <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto px-1 sm:px-2 py-1 max-w-full scrollbar-hide">
+        {(() => {
+          // Calculate visible thumbnails based on screen size
+          let visibleCount = 5;
+          if (typeof window !== 'undefined') {
+            const width = window.innerWidth;
+            if (width < 400) visibleCount = 3;
+            else if (width < 640) visibleCount = 4;
+            else if (width < 768) visibleCount = 5;
+            else visibleCount = 5;
+          }
+          
+          let startIndex = selectedImageIndex - Math.floor(visibleCount / 2);
+          if (startIndex < 0) startIndex = 0;
+          if (startIndex > currentImages.length - visibleCount) {
+            startIndex = Math.max(0, currentImages.length - visibleCount);
+          }
+          
+          const visibleThumbnails = currentImages.slice(startIndex, startIndex + visibleCount);
+          
+          return visibleThumbnails.map((img, localIndex) => {
+            const actualIndex = startIndex + localIndex;
+            
+            return (
+              <button
+                key={actualIndex}
+                onClick={() => handleImageThumbnailClick(actualIndex)}
+                className={`
+                  flex-shrink-0 relative rounded-md overflow-hidden transition-all cursor-pointer
+                  w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24
+                  ${selectedImageIndex === actualIndex 
+                    ? 'border-2 border-[#9B0F06] ring-2 ring-[#9B0F06]/20 scale-105 shadow-lg' 
+                    : 'border border-gray-200 hover:border-[#9B0F06]/60 hover:scale-102'
+                  }
+                `}
+              >
+                {img.image ? (
+                  <Image
+                    src={getImageUrl(img.image)}
+                    alt={`${product.name} - View ${actualIndex + 1}`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 480px) 48px, (max-width: 640px) 56px, (max-width: 768px) 64px, (max-width: 1024px) 80px, 96px"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = '/placeholder-image.jpg';
+                    }}
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                    <span className="text-gray-400 text-[6px] xs:text-[8px] sm:text-xs">Image {actualIndex + 1}</span>
+                  </div>
+                )}
+                
+                {selectedImageIndex === actualIndex && (
+                  <div className="absolute inset-0 bg-[#9B0F06]/10 flex items-center justify-center">
+                    <div className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 rounded-full bg-[#9B0F06] flex items-center justify-center">
+                      <svg className="w-2 h-2 xs:w-2.5 xs:h-2.5 sm:w-3 sm:h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
                     </div>
-                  )}
+                  </div>
+                )}
+              </button>
+            );
+          });
+        })()}
+      </div>
+    </div>
+  </div>
+)}
                 </div>
               </div>
 
@@ -684,88 +697,81 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
                   </div>
                 </div>
 
-                {/* Add to Cart Section */}
-                <div className="pt-2">
-                  {/* Desktop: Two buttons side by side */}
-                  <div className="hidden lg:block">
-                    <div className="flex gap-3 items-start">
-                      <div className="w-auto">
-                        <AddToCartButton 
-                          product={product} 
-                          selectedVariant={selectedVariant || undefined}
-                          quantity={quantity}
-                          onQuantityChange={setQuantity}
-                        />
-                      </div>
-                      <div className="w-auto">
-                        <button
-                          onClick={handleBuyNow}
-                          disabled={currentStock <= 0}
-                          className={`
-                            py-2 px-6 rounded-lg font-medium flex items-center justify-center gap-2 mt-10
-                            transition-all duration-300 shadow cursor-pointer text-sm whitespace-nowrap active:scale-95
-                            ${currentStock <= 0 
-                              ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
-                              : ''
-                            }
-                          `}
-                          style={currentStock > 0 ? { backgroundColor: '#000000', color: 'white' } : {}}
-                          onMouseEnter={(e) => {
-                            if (currentStock > 0) {
-                              e.currentTarget.style.backgroundColor = '#1a1a1a';
-                            }
-                          }}
-                          onMouseLeave={(e) => {
-                            if (currentStock > 0) {
-                              e.currentTarget.style.backgroundColor = '#000000';
-                            }
-                          }}
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                          </svg>
-                          Buy Now
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Mobile: Stacked buttons */}
-                  <div className="lg:hidden space-y-2">
-                    <AddToCartButton 
-                      product={product} 
-                      selectedVariant={selectedVariant || undefined}
-                    />
-                    <button
-                      onClick={handleBuyNow}
-                      disabled={currentStock <= 0}
-                      className={`
-                        w-full py-3 rounded-lg font-semibold text-sm
-                        transition-colors duration-200 flex items-center justify-center gap-1.5 cursor-pointer active:scale-95
-                        ${currentStock <= 0 
-                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                          : ''
-                        }
-                      `}
-                      style={currentStock > 0 ? { backgroundColor: '#000000', color: 'white' } : {}}
-                      onMouseEnter={(e) => {
-                        if (currentStock > 0) {
-                          e.currentTarget.style.backgroundColor = '#1a1a1a';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (currentStock > 0) {
-                          e.currentTarget.style.backgroundColor = '#000000';
-                        }
-                      }}
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                      </svg>
-                      Buy Now
-                    </button>
-                  </div>
-                </div>
+<div className="pt-2">
+  <div className="max-w-sm">
+    {/* Desktop Add to Cart Button - Two buttons side by side */}
+    <div className="hidden lg:block">
+      <div className="flex gap-3">
+        {/* Add to Cart Button */}
+        <div className="flex-1">
+          <AddToCartButton 
+            product={product} 
+            selectedVariant={selectedVariant || undefined}
+            quantity={quantity}
+            onQuantityChange={setQuantity}
+          />
+        </div>
+        
+        {/* Buy Now Button - Exact same size as AddToCart */}
+        <div className="flex-1">
+          <button
+            onClick={handleBuyNow}
+            disabled={currentStock <= 0}
+            className={`
+              w-full py-2 px-4 rounded-lg font-medium flex items-center justify-center gap-2 mt-10
+              transition-all duration-300 shadow cursor-pointer text-sm
+              ${currentStock <= 0 
+                ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
+                : 'bg-black text-white '
+              }
+            `}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
+            Buy Now
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    {/* Mobile Add to Cart & Buy Now - Single Row - Same Size */}
+    <div className="lg:hidden">
+      <div className="flex gap-2">
+        {/* Add to Cart Button - 50% width */}
+        <div className="flex-1">
+          <AddToCartButton 
+            product={product} 
+            selectedVariant={selectedVariant || undefined}
+            quantity={quantity}
+            onQuantityChange={setQuantity}
+          />
+        </div>
+        
+        {/* Buy Now Button - 50% width - Same size as AddToCart */}
+        <div className="flex-1">
+          <button
+            onClick={handleBuyNow}
+            disabled={currentStock <= 0}
+            className={`
+              w-full min-h-[38px] py-2 px-3 rounded-lg font-semibold text-sm
+              transition-colors duration-200 flex items-center justify-center gap-1.5 mt-10.5
+              ${currentStock <= 0 
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                : 'bg-black text-white hover:bg-gray-800 active:bg-gray-900'
+              }
+            `}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
+            Buy Now
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
                 {/* Product Details */}
                 <div className="space-y-3 pt-2">
