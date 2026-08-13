@@ -165,11 +165,11 @@ export default function Footer() {
               </div>
               {/* Logo Text */}
               <div className="flex flex-col justify-center">
-                <span className="text-[18px] sm:text-[20px] lg:text-[24px] font-black tracking-[2px] lg:tracking-[3px] text-[#EED9B9] leading-none">
+                <span className="text-[25px] sm:text-[25px] lg:text-[28px] font-black tracking-[2px] lg:tracking-[3px] text-[#EED9B9] leading-none ">
                   {logoFirstLine}
                 </span>
                 {logoSecondLine && (
-                  <span className="text-[10px] sm:text-[11px] lg:text-[13px] font-bold tracking-[1px] text-[#D53E0F] leading-none ml-2 sm:ml-3 lg:ml-4">
+                  <span className="text-[18px] sm:text-[18px] lg:text-[16px] font-bold tracking-[1px] text-[#D53E0F] leading-none ml-4 sm:ml-3 lg:ml-5">
                     {logoSecondLine}
                   </span>
                 )}
@@ -298,9 +298,12 @@ export default function Footer() {
           className="pt-8 mt-8"
           style={{ borderTop: '1px solid rgba(213, 62, 15, 0.2)' }}
         >
-          <p className="text-sm text-center" style={{ color: '#EED9B9' }}>
-            {copyrightText}
-          </p>
+     <p 
+  className="text-[10px] xs:text-[11px] sm:text-xs md:text-sm lg:text-base text-center px-2" 
+  style={{ color: '#EED9B9' }}
+>
+  {copyrightText}
+</p>
         </motion.div>
       </div>
     </footer>

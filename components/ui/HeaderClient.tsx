@@ -369,11 +369,11 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                 
                 {/* Logo Text */}
                 <div className="flex flex-col justify-center">
-                  <span className="text-[16px] sm:text-[18px] lg:text-[22px] font-black tracking-[2px] lg:tracking-[3px] text-[#EED9B9] leading-none">
+                  <span className="text-[16px] sm:text-[18px] lg:text-[26px] font-black tracking-[2px] lg:tracking-[3px] text-[#EED9B9] leading-none">
                     {logoFirstLine}
                   </span>
                   {logoSecondLine && (
-                    <span className="text-[10px]mr-20 sm:text-[11px] lg:text-[13px] font-bold tracking-[1px] text-[#D53E0F] leading-none md:ml-5">
+                    <span className="text-[10px]mr-20 sm:text-[11px] lg:text-[16px] font-bold tracking-[1px] text-[#D53E0F] leading-none md:ml-5">
                       {logoSecondLine}
                     </span>
                   )}
@@ -616,73 +616,141 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
       </header>
 
       {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="lg:hidden fixed inset-0 z-50">
-          <div 
-            className="absolute inset-0 bg-black/50"
-            onClick={() => setIsMenuOpen(false)}
-          />
-          <div className="absolute top-0 left-0 h-full w-64 bg-[#5E0006] shadow-2xl">
-            <div className="flex flex-col h-full">
-              <div className="flex items-center justify-between p-4 border-b border-[#D53E0F]/30">
-                <Link href="/" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2">
-                  <div className="relative w-15 h-15">
-                    <Image
-                      src="/images/logo.png"
-                      alt={siteName}
-                      fill
-                      className="object-contain"
-                    />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-lg font-black tracking-[2px] text-[#EED9B9] leading-none">{logoFirstLine}</span>
-                    {logoSecondLine && (
-                      <span className="text-[10px] font-bold tracking-[1px] text-[#D53E0F] leading-none">{logoSecondLine}</span>
-                    )}
-                  </div>
+{/* Mobile Menu */}
+{isMenuOpen && (
+  <div className="lg:hidden fixed inset-0 z-50">
+    <div 
+      className="absolute inset-0 bg-black/50"
+      onClick={() => setIsMenuOpen(false)}
+    />
+    <div className="absolute top-0 left-0 h-full w-64 bg-[#5E0006] shadow-2xl">
+      <div className="flex flex-col h-full">
+        <div className="flex items-center justify-between p-4 border-b border-[#D53E0F]/30">
+          <Link href="/" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2">
+            <div className="relative w-15 h-15">
+              <Image
+                src="/images/logo.png"
+                alt={siteName}
+                fill
+                className="object-contain"
+              />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[20px] font-black tracking-[2px] text-[#EED9B9] leading-none">{logoFirstLine}</span>
+              {logoSecondLine && (
+                <span className="text-[18px] font-bold tracking-[1px] text-[#D53E0F] leading-none ml-4">{logoSecondLine}</span>
+              )}
+            </div>
+          </Link>
+          <button onClick={() => setIsMenuOpen(false)} className="text-[#EED9B9]/80 hover:text-[#D53E0F]">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <nav className="flex-1 p-4 overflow-y-auto">
+          <div className="space-y-1">
+            {/* HOME */}
+            <Link
+              href="/"
+              className="flex items-center gap-3 py-2.5 text-[12px] font-extrabold tracking-[1px] text-[#EED9B9]/80 hover:text-[#D53E0F] transition-all"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+              HOME
+            </Link>
+
+            {/* SHOP BY CATEGORY - Heading */}
+            <div className="pt-2 pb-1">
+              <p className="text-[10px] font-bold tracking-[2px] text-[#EED9B9]/50 uppercase flex items-center gap-2">
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+                Shop by Category
+              </p>
+            </div>
+
+            {/* CATEGORIES - Indented */}
+            <div className="pl-4 space-y-0.5">
+              {categories.map((cat) => (
+                <button
+                  key={cat._id}
+                  onClick={() => handleCategoryClick(cat)}
+                  className="flex items-center gap-2.5 w-full text-left py-2 px-2 text-[11px] font-semibold tracking-[0.5px] text-[#EED9B9]/70 hover:text-[#D53E0F] hover:bg-white/5 rounded-md transition-all cursor-pointer"
+                >
+                  <svg className="w-2.5 h-2.5 flex-shrink-0 text-[#D53E0F]/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                  {cat.name.toUpperCase()}
+                </button>
+              ))}
+            </div>
+
+            {/* ABOUT */}
+            <Link
+              href="/about"
+              className="flex items-center gap-3 py-2.5 text-[12px] font-extrabold tracking-[1px] text-[#EED9B9]/80 hover:text-[#D53E0F] transition-all mt-1"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              ABOUT
+            </Link>
+
+            {/* CONTACT */}
+            <Link
+              href="/contact"
+              className="flex items-center gap-3 py-2.5 text-[12px] font-extrabold tracking-[1px] text-[#EED9B9]/80 hover:text-[#D53E0F] transition-all"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              CONTACT
+            </Link>
+
+            {/* LOGIN/ACCOUNT - Mobile Only */}
+            {!isAuthenticated ? (
+              <Link
+                href="/login"
+                className="flex items-center gap-3 py-2.5 text-[12px] font-extrabold tracking-[1px] text-[#EED9B9]/80 hover:text-[#D53E0F] transition-all border-t border-[#D53E0F]/10 mt-2"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <User className="w-4 h-4 flex-shrink-0" />
+                LOGIN
+              </Link>
+            ) : (
+              <div className="border-t border-[#D53E0F]/10 mt-2 pt-2">
+                <Link
+                  href="/profile"
+                  className="flex items-center gap-3 py-2.5 text-[12px] font-extrabold tracking-[1px] text-[#EED9B9]/80 hover:text-[#D53E0F] transition-all"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <User className="w-4 h-4 flex-shrink-0" />
+                  MY ACCOUNT
                 </Link>
-                <button onClick={() => setIsMenuOpen(false)} className="text-[#EED9B9]/80 hover:text-[#D53E0F]">
-                  <X className="w-5 h-5" />
+                <button
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    logout();
+                    router.push('/');
+                  }}
+                  className="flex items-center gap-3 w-full text-left py-2.5 text-[12px] font-extrabold tracking-[1px] text-[#EED9B9]/80 hover:text-[#D53E0F] transition-all cursor-pointer"
+                >
+                  <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  LOGOUT
                 </button>
               </div>
-              <nav className="flex-1 p-4 overflow-y-auto">
-                <div className="space-y-2">
-                  <Link
-                    href="/"
-                    className="block py-2 text-[12px] font-extrabold tracking-[1px] text-[#EED9B9]/80 hover:text-[#D53E0F] transition-all"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    HOME
-                  </Link>
-                  {categories.map((cat) => (
-                    <button
-                      key={cat._id}
-                      onClick={() => handleCategoryClick(cat)}
-                      className="block w-full text-left py-2 text-[12px] font-extrabold tracking-[1px] text-[#EED9B9]/80 hover:text-[#D53E0F] transition-all cursor-pointer"
-                    >
-                      {cat.name.toUpperCase()}
-                    </button>
-                  ))}
-                  <Link
-                    href="/about"
-                    className="block py-2 text-[12px] font-extrabold tracking-[1px] text-[#EED9B9]/80 hover:text-[#D53E0F] transition-all"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    ABOUT
-                  </Link>
-                  <Link
-                    href="/contact"
-                    className="block py-2 text-[12px] font-extrabold tracking-[1px] text-[#EED9B9]/80 hover:text-[#D53E0F] transition-all"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    CONTACT
-                  </Link>
-                </div>
-              </nav>
-            </div>
+            )}
           </div>
-        </div>
-      )}
+        </nav>
+      </div>
+    </div>
+  </div>
+)}
 
       {/* Mobile Fullscreen Search Overlay */}
       {showSearch && (
