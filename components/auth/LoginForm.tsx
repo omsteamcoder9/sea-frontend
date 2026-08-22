@@ -92,18 +92,29 @@ export default function LoginForm() {
     try {
       const result = await sendOtp(phoneNumber);
       
-      // CRITICAL: If user doesn't exist, redirect to signup
-      if (result.isNewUser) {
-        setResendMessage('No account found with this number. Redirecting to signup...');
+      // ✅ If user doesn't exist, redirect to signup (NO OTP sent)
+      if (!result.exists) {
+        setResendMessage('No account found. Redirecting to signup...');
         setTimeout(() => {
           router.push(`/signup?phone=${phoneNumber}`);
         }, 1500);
         return;
       }
       
-      // User exists - proceed with OTP verification
-      setSessionId(result.sessionId);
+      // ✅ User exists - proceed with OTP verification
+      // ✅ FIX: Only set sessionId if it exists, otherwise use null
+      if (result.sessionId) {
+        setSessionId(result.sessionId);
+      } else {
+        setErrors({ phoneNumber: 'Failed to get OTP session' });
+        setIsSendingOtp(false);
+        return;
+      }
+      
       setResendTimer(60);
+      setResendMessage('OTP sent successfully!');
+      
+      setTimeout(() => setResendMessage(null), 3000);
       
       const timer = setInterval(() => {
         setResendTimer(prev => {
@@ -132,8 +143,7 @@ export default function LoginForm() {
     try {
       const result = await sendOtp(phoneNumber);
       
-      // Check again if user exists (in case account was deleted)
-      if (result.isNewUser) {
+      if (!result.exists) {
         setResendMessage('No account found. Redirecting to signup...');
         setTimeout(() => {
           router.push(`/signup?phone=${phoneNumber}`);
@@ -141,7 +151,15 @@ export default function LoginForm() {
         return;
       }
       
-      setSessionId(result.sessionId);
+      // ✅ FIX: Only set sessionId if it exists
+      if (result.sessionId) {
+        setSessionId(result.sessionId);
+      } else {
+        setResendMessage('Failed to get OTP session. Please try again.');
+        setIsSendingOtp(false);
+        return;
+      }
+      
       setResendTimer(60);
       setResendMessage('OTP resent successfully!');
       
@@ -166,36 +184,36 @@ export default function LoginForm() {
     }
   };
 
-const handleVerifyOtp = async (e: React.FormEvent) => {
-  e.preventDefault();
-  
-  if (!validateOtp() || !sessionId) return;
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateOtp() || !sessionId) return;
 
-  setIsVerifyingOtp(true);
-  setErrors({});
-  
-  try {
-    const user = await verifyOtp(sessionId, otpCode);
+    setIsVerifyingOtp(true);
+    setErrors({});
     
-    // ✅ FIX: Check sessionStorage for redirect URL first
-    const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
-    
-    if (redirectUrl) {
-      sessionStorage.removeItem('redirectAfterLogin');
-      router.push(redirectUrl);
-    } else if (returnTo) {
-      router.push(returnTo);
-    } else {
-      router.push('/');
+    try {
+      const user = await verifyOtp(sessionId, otpCode);
+      
+      const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
+      
+      if (redirectUrl) {
+        sessionStorage.removeItem('redirectAfterLogin');
+        router.push(redirectUrl);
+      } else if (returnTo) {
+        router.push(returnTo);
+      } else {
+        router.push('/');
+      }
+      
+    } catch (error: any) {
+      console.error('Verify OTP error:', error);
+      setErrors({ otpCode: error.message || 'Invalid OTP code. Please try again.' });
+    } finally {
+      setIsVerifyingOtp(false);
     }
-    
-  } catch (error: any) {
-    console.error('Verify OTP error:', error);
-    setErrors({ otpCode: error.message || 'Invalid OTP code. Please try again.' });
-  } finally {
-    setIsVerifyingOtp(false);
-  }
-};
+  };
+
   const isLoadingState = isSendingOtp || isVerifyingOtp || isLoading;
 
   return (
@@ -334,6 +352,19 @@ const handleVerifyOtp = async (e: React.FormEvent) => {
               <div className="relative flex justify-center text-sm">
                 <span className="px-4 bg-white text-gray-400">Secure login with OTP</span>
               </div>
+            </div>
+
+            <div className="text-center">
+              <p className="text-sm text-gray-600">
+                Don't have an account?{' '}
+                <button
+                  type="button"
+                  onClick={() => router.push('/signup')}
+                  className="font-semibold text-[#9B0F06] hover:underline transition-colors"
+                >
+                  Sign Up
+                </button>
+              </p>
             </div>
           </form>
         ) : (

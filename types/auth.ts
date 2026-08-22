@@ -1,21 +1,24 @@
 // types/auth.ts
 
-// ========== OTP AUTH TYPES ==========
-
-export interface SendOtpRequest {
+export interface OtpUser {
+  id: string;
   phoneNumber: string;
+  email?: string | null;
+  role: 'user' | 'admin';
+  name?: string | null;
+  isActive: boolean;
+  createdAt: string;
+  lastLogin?: string | null;
 }
 
 export interface SendOtpResponse {
   success: boolean;
+  exists?: boolean;        // ✅ For login - check if user exists
+  isActive?: boolean;      // ✅ For signup - check if user is active
+  isNewUser?: boolean;     // ✅ For signup - check if new user
+  hasInactiveUser?: boolean; // ✅ For signup - check if inactive user exists
   message: string;
   otpSessionId?: string;
-  isNewUser?: boolean;
-}
-
-export interface VerifyOtpRequest {
-  otpSessionId: string;
-  otpCode: string;
 }
 
 export interface VerifyOtpResponse {
@@ -25,54 +28,8 @@ export interface VerifyOtpResponse {
   user?: OtpUser;
 }
 
-export interface OtpUser {
-  id: string;
-  phoneNumber: string;
-  email?: string;  // ✅ ADD THIS - optional since OTP users may not have email
-  name?: string;   // ✅ ADD THIS - optional name field
-  createdAt: string;
-  lastLogin: string;
-  isActive?: boolean;
-  role?: 'user' | 'admin';  // ✅ ADD THIS for admin check
-}
-
-export interface OtpAuthResponse {
-  token: string;
-  user: OtpUser;
-}
-
 export interface ApiError {
-  success: boolean;
+  success: false;
   message: string;
-  statusCode?: number;
-}
-
-// Session management
-export interface OtpSession {
-  sessionId: string;
-  phoneNumber: string;
-  expiresAt: number;
-}
-
-// Component Props
-export interface PhoneInputProps {
-  onSubmit: (phoneNumber: string) => Promise<void>;
-  isLoading: boolean;
-  error?: string;
-}
-
-export interface OtpInputProps {
-  sessionId: string;
-  phoneNumber: string;
-  onVerify: (sessionId: string, otpCode: string) => Promise<void>;
-  onResendOtp: () => Promise<void>;
-  isLoading: boolean;
-  error?: string;
-}
-
-export interface UserState {
-  user: OtpUser | null;
-  token: string | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
+  statusCode: number;
 }

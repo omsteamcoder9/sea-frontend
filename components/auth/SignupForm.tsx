@@ -13,7 +13,7 @@ export default function SignupForm() {
   const [otpCode, setOtpCode] = useState('');
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const { sendOtp, verifyOtp, isLoading } = useAuth();
+  const { sendSignupOtp, verifyOtp, isLoading } = useAuth();
   const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
@@ -97,10 +97,10 @@ export default function SignupForm() {
     setResendMessage(null);
     
     try {
-      const result = await sendOtp(phoneNumber);
+      const result = await sendSignupOtp(phoneNumber);
       
-      // CRITICAL: If user already exists, redirect to login
-      if (!result.isNewUser) {
+      // ✅ If user already exists and is active, redirect to login
+      if (result.exists && result.isActive) {
         setResendMessage('Account already exists. Redirecting to login...');
         setTimeout(() => {
           router.push(`/login?phone=${phoneNumber}`);
@@ -108,10 +108,18 @@ export default function SignupForm() {
         return;
       }
       
-      // New user - proceed with OTP verification
-      setSessionId(result.sessionId);
+      // ✅ New user or inactive user - proceed with OTP verification
+      // ✅ FIX: Only set sessionId if it exists, otherwise show error
+      if (result.sessionId) {
+        setSessionId(result.sessionId);
+      } else {
+        setErrors({ phoneNumber: 'Failed to get OTP session' });
+        setIsSendingOtp(false);
+        return;
+      }
+      
       setResendTimer(60);
-      setResendMessage('Welcome! Please enter the OTP sent to your phone.');
+      setResendMessage('OTP sent successfully!');
       
       setTimeout(() => setResendMessage(null), 3000);
       
@@ -140,9 +148,9 @@ export default function SignupForm() {
     setResendMessage(null);
     
     try {
-      const result = await sendOtp(phoneNumber);
+      const result = await sendSignupOtp(phoneNumber);
       
-      if (!result.isNewUser) {
+      if (result.exists && result.isActive) {
         setResendMessage('Account already exists. Redirecting to login...');
         setTimeout(() => {
           router.push(`/login?phone=${phoneNumber}`);
@@ -150,7 +158,15 @@ export default function SignupForm() {
         return;
       }
       
-      setSessionId(result.sessionId);
+      // ✅ FIX: Only set sessionId if it exists
+      if (result.sessionId) {
+        setSessionId(result.sessionId);
+      } else {
+        setResendMessage('Failed to get OTP session. Please try again.');
+        setIsSendingOtp(false);
+        return;
+      }
+      
       setResendTimer(60);
       setResendMessage('OTP resent successfully!');
       
@@ -341,7 +357,6 @@ export default function SignupForm() {
               </div>
             </div>
 
-            {/* Sign In Button Added Here */}
             <div className="text-center">
               <p className="text-sm text-gray-600">
                 Already have an account?{' '}
