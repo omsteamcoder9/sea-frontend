@@ -115,20 +115,20 @@ const MobileFloatingButton = ({
       transform transition-transform duration-300 ease-in-out
       ${isVisible ? 'translate-y-0' : 'translate-y-full'}
     `}>
-      <div className="border-t border-gray-300" style={{ backgroundColor: '#5E0006', color: '#EED9B9' }}>
+      <div className="border-t border-[#176B8C]" style={{ backgroundColor: '#064B6A', color: '#EAF8FC' }}>
         {/* QUANTITY ROW - COMPACT */}
-        <div className="flex items-center justify-between px-3 py-1.5 border-b border-gray-300" style={{ backgroundColor: '#5E0006', color: '#EED9B9' }}>
-          <span className="text-xs font-medium" style={{ color: '#EED9B9' }}>Quantity:</span>
+        <div className="flex items-center justify-between px-3 py-1.5 border-b border-[#176B8C]" style={{ backgroundColor: '#064B6A', color: '#EAF8FC' }}>
+          <span className="text-xs font-medium" style={{ color: '#EAF8FC' }}>Quantity:</span>
           <div className="flex items-center gap-1">
             <button
               onClick={() => setQuantity(prev => Math.max(1, prev - 1))}
               disabled={quantity <= 1}
               className="w-6 h-6 flex items-center justify-center border rounded-md disabled:opacity-40 hover:bg-opacity-20 cursor-pointer"
-              style={{ backgroundColor: '#5E0006', borderColor: '#D53E0F', color: '#EED9B9' }}
+              style={{ backgroundColor: '#064B6A', borderColor: '#00A9E0', color: '#EAF8FC' }}
             >
               -
             </button>
-            <span className="text-sm font-medium w-6 text-center" style={{ color: '#EED9B9' }}>{quantity}</span>
+            <span className="text-sm font-medium w-6 text-center" style={{ color: '#EAF8FC' }}>{quantity}</span>
             <button
               onClick={() => {
                 const maxStock = currentStock || 99;
@@ -136,7 +136,7 @@ const MobileFloatingButton = ({
               }}
               disabled={isOutOfStock || quantity >= (currentStock || 99)}
               className="w-6 h-6 flex items-center justify-center border rounded-md disabled:opacity-40 hover:bg-opacity-20 cursor-pointer"
-              style={{ backgroundColor: '#5E0006', borderColor: '#D53E0F', color: '#EED9B9' }}
+              style={{ backgroundColor: '#064B6A', borderColor: '#00A9E0', color: '#EAF8FC' }}
             >
               +
             </button>
@@ -155,15 +155,15 @@ const MobileFloatingButton = ({
                 : 'hover:shadow-md'
               }
             `}
-            style={!isOutOfStock && !addingToCart ? { backgroundColor: '#9B0F06', color: 'white' } : {}}
+            style={!isOutOfStock && !addingToCart ? { backgroundColor: '#008FB8', color: 'white' } : {}}
             onMouseEnter={(e) => {
               if (!isOutOfStock && !addingToCart) {
-                e.currentTarget.style.backgroundColor = '#6B0A04';
+                e.currentTarget.style.backgroundColor = '#00A9E0';
               }
             }}
             onMouseLeave={(e) => {
               if (!isOutOfStock && !addingToCart) {
-                e.currentTarget.style.backgroundColor = '#9B0F06';
+                e.currentTarget.style.backgroundColor = '#008FB8';
               }
             }}
           >
@@ -191,15 +191,15 @@ const MobileFloatingButton = ({
                 : ''
               }
             `}
-            style={!isOutOfStock && !addingToBuy ? { backgroundColor: '#000000', color: 'white' } : {}}
+            style={!isOutOfStock && !addingToBuy ? { backgroundColor: '#063B5C', color: 'white' } : {}}
             onMouseEnter={(e) => {
               if (!isOutOfStock && !addingToBuy) {
-                e.currentTarget.style.backgroundColor = '#1a1a1a';
+                e.currentTarget.style.backgroundColor = '#064B6A';
               }
             }}
             onMouseLeave={(e) => {
               if (!isOutOfStock && !addingToBuy) {
-                e.currentTarget.style.backgroundColor = '#000000';
+                e.currentTarget.style.backgroundColor = '#063B5C';
               }
             }}
           >
@@ -456,10 +456,10 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-[#f2f2f2] flex items-center justify-center">
+      <div className="min-h-screen bg-[#F8FCFD] flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-xl font-bold text-gray-800">Product not found</h1>
-          <p className="text-gray-600 mt-2">The product you are looking for does not exist.</p>
+          <h1 className="text-xl font-bold text-[#063B5C]">Product not found</h1>
+          <p className="text-[#315A6E] mt-2">The product you are looking for does not exist.</p>
         </div>
       </div>
     );
@@ -483,10 +483,10 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
                           <button
                             onClick={() => handleImageThumbnailClick(Math.max(0, selectedImageIndex - 1))}
                             disabled={selectedImageIndex === 0}
-                            className="absolute top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-white/80 hover:bg-white shadow-lg border border-gray-300 disabled:opacity-30 disabled:cursor-not-allowed transition-all left-4"
+                            className="absolute top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-white/80 hover:bg-white shadow-lg border border-[#B8DCE7] disabled:opacity-30 disabled:cursor-not-allowed transition-all left-4"
                             aria-label="Previous image"
                           >
-                            <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-6 h-6 text-[#063B5C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                             </svg>
                           </button>
@@ -510,17 +510,17 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
                           <button
                             onClick={() => handleImageThumbnailClick(Math.min(currentImages.length - 1, selectedImageIndex + 1))}
                             disabled={selectedImageIndex === currentImages.length - 1}
-                            className="absolute top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-white/80 hover:bg-white shadow-lg border border-gray-300 disabled:opacity-30 disabled:cursor-not-allowed transition-all right-4"
+                            className="absolute top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-white/80 hover:bg-white shadow-lg border border-[#B8DCE7] disabled:opacity-30 disabled:cursor-not-allowed transition-all right-4"
                           >
-                            <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-6 h-6 text-[#063B5C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                             </svg>
                           </button>
                         )}
                       </>
                     ) : (
-                      <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                        <span className="text-gray-400 text-sm">No image</span>
+                      <div className="w-full h-full bg-[#EAF8FC] flex items-center justify-center">
+                        <span className="text-[#315A6E]/60 text-sm">No image</span>
                       </div>
                     )}
                   </div>
@@ -560,8 +560,8 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
                   flex-shrink-0 relative rounded-md overflow-hidden transition-all cursor-pointer
                   w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24
                   ${selectedImageIndex === actualIndex 
-                    ? 'border-2 border-[#9B0F06] ring-2 ring-[#9B0F06]/20 scale-105 shadow-lg' 
-                    : 'border border-gray-200 hover:border-[#9B0F06]/60 hover:scale-102'
+                    ? 'border-2 border-[#008FB8] ring-2 ring-[#008FB8]/20 scale-105 shadow-lg' 
+                    : 'border border-[#B8DCE7] hover:border-[#008FB8]/60 hover:scale-102'
                   }
                 `}
               >
@@ -578,14 +578,14 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
                     }}
                   />
                 ) : (
-                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                    <span className="text-gray-400 text-[6px] xs:text-[8px] sm:text-xs">Image {actualIndex + 1}</span>
+                  <div className="w-full h-full bg-[#EAF8FC] flex items-center justify-center">
+                    <span className="text-[#315A6E]/60 text-[6px] xs:text-[8px] sm:text-xs">Image {actualIndex + 1}</span>
                   </div>
                 )}
                 
                 {selectedImageIndex === actualIndex && (
-                  <div className="absolute inset-0 bg-[#9B0F06]/10 flex items-center justify-center">
-                    <div className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 rounded-full bg-[#9B0F06] flex items-center justify-center">
+                  <div className="absolute inset-0 bg-[#008FB8]/10 flex items-center justify-center">
+                    <div className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 rounded-full bg-[#008FB8] flex items-center justify-center">
                       <svg className="w-2 h-2 xs:w-2.5 xs:h-2.5 sm:w-3 sm:h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
@@ -606,10 +606,10 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
               {/* Product Details Section */}
               <div className="space-y-3 p-3 sm:p-4">
                 {/* Product Name */}
-                <h1 className="text-lg sm:text-xl font-bold text-gray-900">
+                <h1 className="text-lg sm:text-xl font-bold text-[#063B5C]">
                   {product.name}
                   {selectedVariant && (
-                    <span className="text-base font-normal text-gray-600 ml-2">
+                    <span className="text-base font-normal text-[#315A6E] ml-2">
                       - {selectedVariant.variantName || selectedVariant.name}
                     </span>
                   )}
@@ -618,7 +618,7 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
                 {/* Variant Selection - Optimized */}
                 {product.variants && product.variants.length > 0 && (
                   <div className="space-y-2">
-                    <h3 className="text-sm font-medium text-gray-900">Select Weight:</h3>
+                    <h3 className="text-sm font-medium text-[#063B5C]">Select Weight:</h3>
                     <div className="flex flex-wrap gap-2">
                       {product.variants.map((variant) => {
                         let weightDisplay = '';
@@ -656,8 +656,8 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
                             `}
                             style={
                               selectedVariant?.variantName === variant.variantName || selectedVariant?.name === variant.name
-                                ? { backgroundColor: '#9B0F06', borderColor: '#9B0F06' }
-                                : { backgroundColor: '#5E0006', color: '#EED9B9', borderColor: '#9B0F06' }
+                                ? { backgroundColor: '#008FB8', borderColor: '#008FB8' }
+                                : { backgroundColor: '#064B6A', color: '#EAF8FC', borderColor: '#008FB8' }
                             }
                           >
                             <span className="font-medium">
@@ -673,25 +673,25 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
                 {/* Price Section */}
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xl sm:text-2xl font-bold text-gray-800">
+                    <span className="text-xl sm:text-2xl font-bold text-[#063B5C]">
                       ₹{displayPrice.toLocaleString('en-IN')}
                     </span>
                     {originalPrice && originalPrice > displayPrice && (
                       <>
                         <span 
-                          className="text-lg text-gray-500 line-through"
+                          className="text-lg text-[#315A6E]/60 line-through"
                           style={{ textDecorationThickness: '2px' }}
                         >
                           ₹{originalPrice.toLocaleString('en-IN')}
                         </span>
-                        <span className="text-sm font-bold" style={{ color: '#9B0F06' }}>
+                        <span className="text-sm font-bold" style={{ color: '#008FB8' }}>
                           {discountPercentage}% OFF
                         </span>
                       </>
                     )}
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded-full text-xs" style={{ backgroundColor: 'rgba(155, 15, 6, 0.1)', color: '#9B0F06' }}>
+                    <span className="px-2 py-0.5 rounded-full text-xs" style={{ backgroundColor: 'rgba(0, 143, 184, 0.1)', color: '#008FB8' }}>
                       Tax included. Shipping calculated at checkout.
                     </span>
                   </div>
@@ -722,7 +722,7 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
               transition-all duration-300 shadow cursor-pointer text-sm
               ${currentStock <= 0 
                 ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
-                : 'bg-black text-white '
+                : 'bg-[#063B5C] text-white '
               }
             `}
           >
@@ -758,7 +758,7 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
               transition-colors duration-200 flex items-center justify-center gap-1.5 mt-10.5
               ${currentStock <= 0 
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
-                : 'bg-black text-white hover:bg-gray-800 active:bg-gray-900'
+                : 'bg-[#063B5C] text-white hover:bg-[#064B6A] active:bg-[#008FB8]'
               }
             `}
           >
@@ -778,12 +778,12 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
                   {/* Specifications */}
                   {specifications.length > 0 && (
                     <div className="space-y-3">
-                      <h3 className="text-sm font-medium text-gray-900">Specifications</h3>
+                      <h3 className="text-sm font-medium text-[#063B5C]">Specifications</h3>
                       <div className="space-y-1">
                         {specifications.map((spec: any, index: number) => (
                           <div key={index} className="flex text-sm">
-                            <span className="font-medium text-gray-700 w-2/5">{spec.key}:</span>
-                            <span className="text-gray-600 w-3/5">{spec.value}</span>
+                            <span className="font-medium text-[#315A6E] w-2/5">{spec.key}:</span>
+                            <span className="text-[#315A6E] w-3/5">{spec.value}</span>
                           </div>
                         ))}
                       </div>
@@ -793,21 +793,21 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
                   {/* Key Features */}
                   {(selectedVariant?.features && selectedVariant.features.length > 0) || keyFeatures.length > 0 ? (
                     <div className="space-y-2">
-                      <h3 className="text-sm font-medium text-gray-900">Key Features</h3>
+                      <h3 className="text-sm font-medium text-[#063B5C]">Key Features</h3>
                       <ul className="space-y-1">
                         {selectedVariant?.features && selectedVariant.features.length > 0 && (
                           selectedVariant.features.map((feature, index) => (
                             <li key={`variant-${index}`} className="flex items-start text-sm">
-                              <span className="mr-2 mt-0.5" style={{ color: '#9B0F06' }}>✓</span>
-                              <span className="text-gray-700">{feature}</span>
+                              <span className="mr-2 mt-0.5" style={{ color: '#008FB8' }}>✓</span>
+                              <span className="text-[#315A6E]">{feature}</span>
                             </li>
                           ))
                         )}
                         {keyFeatures.length > 0 && (
                           keyFeatures.map((feature: string, index: number) => (
                             <li key={`product-${index}`} className="flex items-start text-sm">
-                              <span className="mr-2 mt-0.5" style={{ color: '#9B0F06' }}>✓</span>
-                              <span className="text-gray-700">{feature}</span>
+                              <span className="mr-2 mt-0.5" style={{ color: '#008FB8' }}>✓</span>
+                              <span className="text-[#315A6E]">{feature}</span>
                             </li>
                           ))
                         )}
@@ -817,8 +817,8 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
 
                   {/* Description */}
                   <div>
-                    <h3 className="text-sm font-medium text-gray-900 mb-1">Description</h3>
-                    <p className="text-gray-700 text-sm leading-relaxed">
+                    <h3 className="text-sm font-medium text-[#063B5C] mb-1">Description</h3>
+                    <p className="text-[#315A6E] text-sm leading-relaxed">
                       {selectedVariant?.description || product.description}
                     </p>
                   </div>
@@ -829,8 +829,8 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
 
           {/* Related Products */}
           {randomProducts && randomProducts.length > 0 && (
-            <div className="p-3 sm:p-8 mt-5 border-t border-gray-300 bg-white">
-              <h2 className="text-base font-bold text-gray-800 mb-2 text-center">You may also like</h2>
+            <div className="p-3 sm:p-8 mt-5 border-t border-[#B8DCE7] bg-white">
+              <h2 className="text-base font-bold text-[#063B5C] mb-2 text-center">You may also like</h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                 {randomProducts.slice(0, 4).map((relatedProduct) => (
                   <div key={relatedProduct._id} className="scale-95">

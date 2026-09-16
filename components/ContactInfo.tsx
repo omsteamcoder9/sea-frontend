@@ -83,13 +83,13 @@ export default function ContactInfo() {
 
   if (loading) {
     return (
-      <div className="rounded-lg p-8 border" style={{ borderColor: '#9B0F06' }}>
+      <div className="rounded-2xl p-6 sm:p-8 bg-white shadow-lg">
         <div className="animate-pulse">
-          <div className="h-8 rounded w-48 mb-6" style={{ backgroundColor: 'rgba(155, 15, 6, 0.1)' }}></div>
+          <div className="h-8 rounded w-48 mb-6" style={{ backgroundColor: 'rgba(0, 143, 184, 0.1)' }}></div>
           <div className="space-y-6">
-            <div className="h-24 rounded" style={{ backgroundColor: 'rgba(155, 15, 6, 0.05)' }}></div>
-            <div className="h-24 rounded" style={{ backgroundColor: 'rgba(155, 15, 6, 0.05)' }}></div>
-            <div className="h-24 rounded" style={{ backgroundColor: 'rgba(155, 15, 6, 0.05)' }}></div>
+            <div className="h-24 rounded" style={{ backgroundColor: 'rgba(0, 143, 184, 0.05)' }}></div>
+            <div className="h-24 rounded" style={{ backgroundColor: 'rgba(0, 143, 184, 0.05)' }}></div>
+            <div className="h-24 rounded" style={{ backgroundColor: 'rgba(0, 143, 184, 0.05)' }}></div>
           </div>
         </div>
       </div>
@@ -97,32 +97,32 @@ export default function ContactInfo() {
   }
 
   return (
-    <div className="rounded-lg p-8 border" style={{ borderColor: '#9B0F06' }}>
-      <h3 className="text-2xl font-bold mb-6" style={{ color: '#5E0006' }}>Contact Information</h3>
+    <div className="rounded-2xl p-6 sm:p-8 bg-white shadow-lg">
+      <h3 className="text-xl sm:text-2xl font-bold mb-6" style={{ color: '#063B5C' }}>Contact Information</h3>
       
       {error && (
-        <div className="mb-4 p-3 rounded-lg text-sm" style={{ backgroundColor: 'rgba(155, 15, 6, 0.1)', border: '1px solid #9B0F06', color: '#5E0006' }}>
+        <div className="mb-4 p-3 rounded-lg text-sm" style={{ backgroundColor: 'rgba(0, 143, 184, 0.1)', border: '1px solid #008FB8', color: '#063B5C' }}>
           {error}
         </div>
       )}
       
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* Email Contact */}
         <a 
           href={contactMethods[0].action}
           className="block group cursor-pointer transition-all duration-200 hover:shadow-lg"
         >
           <div 
-            className="flex items-start space-x-4 p-4 rounded-lg border transition-all duration-200 hover:border-[#9B0F06]"
-            style={{ borderColor: 'rgba(155, 15, 6, 0.2)' }}
+            className="flex items-start space-x-4 p-4 rounded-lg border transition-all duration-200 hover:border-[#008FB8]"
+            style={{ borderColor: 'rgba(0, 143, 184, 0.2)' }}
           >
-            <div className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center transition-transform duration-200 group-hover:scale-110" style={{ backgroundColor: 'rgba(155, 15, 6, 0.1)', color: '#9B0F06' }}>
+            <div className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center transition-transform duration-200 group-hover:scale-110" style={{ backgroundColor: 'rgba(0, 143, 184, 0.1)', color: '#008FB8' }}>
               {contactMethods[0].icon}
             </div>
-            <div>
-              <h4 className="font-semibold" style={{ color: '#9B0F06' }}>{contactMethods[0].title}</h4>
-              <p className="font-medium text-gray-800">{contactMethods[0].details}</p>
-              <p className="text-sm text-gray-600">{contactMethods[0].description}</p>
+            <div className="min-w-0 flex-1">
+              <h4 className="font-semibold" style={{ color: '#008FB8' }}>{contactMethods[0].title}</h4>
+              <p className="font-medium text-[#063B5C] break-words">{contactMethods[0].details}</p>
+              <p className="text-sm text-[#315A6E]">{contactMethods[0].description}</p>
             </div>
           </div>
         </a>
@@ -133,16 +133,16 @@ export default function ContactInfo() {
           className="block group cursor-pointer transition-all duration-200 hover:shadow-lg"
         >
           <div 
-            className="flex items-start space-x-4 p-4 rounded-lg border transition-all duration-200 hover:border-[#9B0F06]"
-            style={{ borderColor: 'rgba(155, 15, 6, 0.2)' }}
+            className="flex items-start space-x-4 p-4 rounded-lg border transition-all duration-200 hover:border-[#008FB8]"
+            style={{ borderColor: 'rgba(0, 143, 184, 0.2)' }}
           >
-            <div className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center transition-transform duration-200 group-hover:scale-110" style={{ backgroundColor: 'rgba(155, 15, 6, 0.1)', color: '#9B0F06' }}>
+            <div className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center transition-transform duration-200 group-hover:scale-110" style={{ backgroundColor: 'rgba(0, 143, 184, 0.1)', color: '#008FB8' }}>
               {contactMethods[1].icon}
             </div>
-            <div>
-              <h4 className="font-semibold" style={{ color: '#9B0F06' }}>{contactMethods[1].title}</h4>
-              <p className="font-medium text-gray-800">{contactMethods[1].details}</p>
-              <p className="text-sm text-gray-600">{contactMethods[1].description}</p>
+            <div className="min-w-0 flex-1">
+              <h4 className="font-semibold" style={{ color: '#008FB8' }}>{contactMethods[1].title}</h4>
+              <p className="font-medium text-[#063B5C] break-words">{contactMethods[1].details}</p>
+              <p className="text-sm text-[#315A6E]">{contactMethods[1].description}</p>
             </div>
           </div>
         </a>
@@ -155,16 +155,16 @@ export default function ContactInfo() {
           rel="noopener noreferrer"
         >
           <div 
-            className="flex items-start space-x-4 p-4 rounded-lg border transition-all duration-200 hover:border-[#9B0F06]"
-            style={{ borderColor: 'rgba(155, 15, 6, 0.2)' }}
+            className="flex items-start space-x-4 p-4 rounded-lg border transition-all duration-200 hover:border-[#008FB8]"
+            style={{ borderColor: 'rgba(0, 143, 184, 0.2)' }}
           >
-            <div className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center transition-transform duration-200 group-hover:scale-110" style={{ backgroundColor: 'rgba(155, 15, 6, 0.1)', color: '#9B0F06' }}>
+            <div className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center transition-transform duration-200 group-hover:scale-110" style={{ backgroundColor: 'rgba(0, 143, 184, 0.1)', color: '#008FB8' }}>
               {contactMethods[2].icon}
             </div>
-            <div>
-              <h4 className="font-semibold" style={{ color: '#9B0F06' }}>{contactMethods[2].title}</h4>
-              <p className="font-medium text-gray-800">{contactMethods[2].details}</p>
-              <p className="text-sm text-gray-600">{contactMethods[2].description}</p>
+            <div className="min-w-0 flex-1">
+              <h4 className="font-semibold" style={{ color: '#008FB8' }}>{contactMethods[2].title}</h4>
+              <p className="font-medium text-[#063B5C] break-words">{contactMethods[2].details}</p>
+              <p className="text-sm text-[#315A6E]">{contactMethods[2].description}</p>
             </div>
           </div>
         </a>

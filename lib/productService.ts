@@ -2,6 +2,14 @@ import { Product, ProductsResponse } from '@/types/product';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
+export const SORT_OPTIONS = [
+  { value: 'createdAt-desc', label: 'Newest First' },
+  { value: 'createdAt-asc', label: 'Oldest First' },
+  { value: 'name-asc', label: 'Name: A to Z' },
+  { value: 'name-desc', label: 'Name: Z to A' },
+  { value: 'basePrice-asc', label: 'Price: Low to High' },
+  { value: 'basePrice-desc', label: 'Price: High to Low' },
+];
 export const PRICE_RANGES = [
   { value: '100-200', label: '₹100 - ₹200' },
   { value: '200-300', label: '₹200 - ₹300' },

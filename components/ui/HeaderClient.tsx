@@ -298,47 +298,47 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
   return (
     <>
       {/* ================= TOP HEADER ================= */}
-      <div className="hidden lg:block w-full bg-[#9B0F06]">
+      <div className="hidden lg:block w-full bg-[#064B6A]">
         <div className="max-w-[1350px] mx-auto">
           <div className="flex items-center justify-between h-[40px] px-6">
-            <div className="flex items-center gap-8 text-[#EED9B9] text-[12px] font-semibold">
+            <div className="flex items-center gap-8 text-[#EAF8FC] text-[12px] font-semibold">
               <div className="flex items-center gap-2">
-                <Mail className="w-[12px] h-[12px]" />
+                <Mail className="w-[12px] h-[12px] text-[#00A9E0]" />
                 <span>{contactEmail}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Phone className="w-[12px] h-[12px]" />
+                <Phone className="w-[12px] h-[12px] text-[#00A9E0]" />
                 <span>{contactNumber}</span>
               </div>
             </div>
 
-            <div className="flex items-center gap-4 text-[#EED9B9] text-[12px] font-semibold">
-              <a href="/contact" className="hover:text-white transition-all duration-300">
+            <div className="flex items-center gap-4 text-[#EAF8FC] text-[12px] font-semibold">
+              <a href="/contact" className="hover:text-[#00A9E0] transition-all duration-300">
                 Contact
               </a>
               <div className="flex items-center gap-3">
                 {socialMedia.facebook && (
-                  <a href={socialMedia.facebook} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-all duration-300">
+                  <a href={socialMedia.facebook} target="_blank" rel="noopener noreferrer" className="hover:text-[#00A9E0] transition-all duration-300">
                     <Facebook className="w-[12px] h-[12px] cursor-pointer" />
                   </a>
                 )}
                 {socialMedia.twitter && (
-                  <a href={socialMedia.twitter} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-all duration-300">
+                  <a href={socialMedia.twitter} target="_blank" rel="noopener noreferrer" className="hover:text-[#00A9E0] transition-all duration-300">
                     <Twitter className="w-[12px] h-[12px] cursor-pointer" />
                   </a>
                 )}
                 {socialMedia.instagram && (
-                  <a href={socialMedia.instagram} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-all duration-300">
+                  <a href={socialMedia.instagram} target="_blank" rel="noopener noreferrer" className="hover:text-[#00A9E0] transition-all duration-300">
                     <Instagram className="w-[12px] h-[12px] cursor-pointer" />
                   </a>
                 )}
                 {socialMedia.youtube && (
-                  <a href={socialMedia.youtube} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-all duration-300">
+                  <a href={socialMedia.youtube} target="_blank" rel="noopener noreferrer" className="hover:text-[#00A9E0] transition-all duration-300">
                     <Youtube className="w-[12px] h-[12px] cursor-pointer" />
                   </a>
                 )}
                 {socialMedia.linkedin && (
-                  <a href={socialMedia.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-all duration-300">
+                  <a href={socialMedia.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-[#00A9E0] transition-all duration-300">
                     <Linkedin className="w-[12px] h-[12px] cursor-pointer" />
                   </a>
                 )}
@@ -349,16 +349,16 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
       </div>
 
       {/* ================= MAIN NAVBAR ================= */}
-      <header className="sticky top-0 z-50 w-full bg-[#5E0006] border-b border-[#D53E0F]/30">
+      <header className="sticky top-0 z-50 w-full bg-[#F8FCFD] border-b border-[#B8DCE7] shadow-sm">
         <div className="w-full lg:max-w-[1350px] lg:mx-auto">
           <div className="flex items-center justify-between lg:grid lg:grid-cols-[220px_1fr_320px] h-[60px] lg:h-[72px] px-3 lg:px-0 md:mr-1">
             
             {/* LEFT LOGO */}
-            <div className="flex items-center bg-transparent ">
+            <div className="flex items-center bg-transparent">
               <Link href="/" className="flex items-center gap-2">
                 {/* Logo Image */}
-<div className="relative w-15 h-15 lg:w-20 lg:h-20  flex-shrink-0 mt-2 lg:mt-0 lg:ml-10">
-                    <Image
+                <div className="relative w-15 h-15 lg:w-20 lg:h-20 flex-shrink-0 mt-2 lg:mt-0 lg:ml-10">
+                  <Image
                     src="/images/logo.png"
                     alt={siteName}
                     fill
@@ -369,11 +369,11 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                 
                 {/* Logo Text */}
                 <div className="flex flex-col justify-center">
-                  <span className="text-[16px] sm:text-[18px] lg:text-[26px] font-black tracking-[2px] lg:tracking-[3px] text-[#EED9B9] leading-none">
+                  <span className="text-[16px] sm:text-[18px] lg:text-[26px] font-black tracking-[2px] lg:tracking-[3px] text-[#063B5C] leading-none">
                     {logoFirstLine}
                   </span>
                   {logoSecondLine && (
-                    <span className="text-[10px]mr-20 sm:text-[11px] lg:text-[16px] font-bold tracking-[1px] text-[#D53E0F] leading-none md:ml-5">
+                    <span className="text-[10px] mr-20 sm:text-[11px] lg:text-[16px] font-bold tracking-[1px] text-[#008FB8] leading-none md:ml-5">
                       {logoSecondLine}
                     </span>
                   )}
@@ -386,7 +386,7 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
               <nav className="hidden xl:flex items-center gap-8">
                 <Link
                   href="/"
-                  className="text-[12px] font-extrabold tracking-[1px] text-[#EED9B9]/80 hover:text-[#D53E0F] transition-all duration-300"
+                  className="text-[12px] font-extrabold tracking-[1px] text-[#063B5C] hover:text-[#008FB8] transition-all duration-300"
                 >
                   HOME
                 </Link>
@@ -394,7 +394,7 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                   <button
                     key={cat._id}
                     onClick={() => handleCategoryClick(cat)}
-                    className="text-[12px] font-extrabold tracking-[1px] text-[#EED9B9]/80 hover:text-[#D53E0F] transition-all duration-300 cursor-pointer"
+                    className="text-[12px] font-extrabold tracking-[1px] text-[#063B5C] hover:text-[#008FB8] transition-all duration-300 cursor-pointer"
                   >
                     {cat.name.toUpperCase()}
                   </button>
@@ -403,19 +403,19 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                   <div ref={shopDropdownRef} className="relative">
                     <button
                       onClick={() => setIsShopDropdownOpen(!isShopDropdownOpen)}
-                      className="text-[12px] font-extrabold tracking-[1px] text-[#EED9B9]/80 hover:text-[#D53E0F] transition-all duration-300 cursor-pointer flex items-center gap-1"
+                      className="text-[12px] font-extrabold tracking-[1px] text-[#063B5C] hover:text-[#008FB8] transition-all duration-300 cursor-pointer flex items-center gap-1"
                     >
                       SHOP
                       <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isShopDropdownOpen ? 'rotate-180' : ''}`} />
                     </button>
                     
                     {isShopDropdownOpen && (
-                      <div className="absolute top-full left-0 mt-2 min-w-[200px] bg-[#5E0006] rounded-lg shadow-2xl py-2 z-20 border border-[#D53E0F]/30 backdrop-blur-sm">
+                      <div className="absolute top-full left-0 mt-2 min-w-[200px] bg-white rounded-lg shadow-2xl py-2 z-20 border border-[#B8DCE7]">
                         {dropdownCategories.map((cat) => (
                           <button
                             key={cat._id}
                             onClick={() => handleCategoryClick(cat)}
-                            className="block w-full text-left px-4 py-2.5 text-[13px] font-medium text-[#EED9B9]/90 hover:text-[#D53E0F] hover:bg-white/5 transition-all duration-200"
+                            className="block w-full text-left px-4 py-2.5 text-[13px] font-medium text-[#315A6E] hover:text-[#008FB8] hover:bg-[#EAF8FC] transition-all duration-200"
                           >
                             {cat.name}
                           </button>
@@ -426,13 +426,13 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                 )}
                 <Link
                   href="/about"
-                  className="text-[12px] font-extrabold tracking-[1px] text-[#EED9B9]/80 hover:text-[#D53E0F] transition-all duration-300"
+                  className="text-[12px] font-extrabold tracking-[1px] text-[#063B5C] hover:text-[#008FB8] transition-all duration-300"
                 >
                   ABOUT
                 </Link>
                 <Link
                   href="/contact"
-                  className="text-[12px] font-extrabold tracking-[1px] text-[#EED9B9]/80 hover:text-[#D53E0F] transition-all duration-300"
+                  className="text-[12px] font-extrabold tracking-[1px] text-[#063B5C] hover:text-[#008FB8] transition-all duration-300"
                 >
                   CONTACT
                 </Link>
@@ -445,18 +445,18 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                 <div className="flex items-center gap-3 lg:gap-6">
                   <button 
                     onClick={handleSearchClick}
-                    className="text-[#EED9B9]/80 hover:text-[#D53E0F] transition-all duration-300"
+                    className="text-[#063B5C] hover:text-[#008FB8] transition-all duration-300"
                   >
-                    <Search className="w-[18px] h-[18px]" />
+                    <Search className="w-[18px] h-[18px] cursor-pointer" />
                   </button>
 
                   <button 
                     onClick={openCartDrawer}
-                    className="text-[#EED9B9]/80 hover:text-[#D53E0F] transition-all duration-300 relative"
+                    className="text-[#063B5C] hover:text-[#008FB8] transition-all duration-300 relative"
                   >
-                    <ShoppingCart className="w-[18px] h-[18px]" />
+                    <ShoppingCart className="w-[18px] h-[18px] cursor-pointer" />
                     {cartCount > 0 && (
-                      <span className="absolute -top-2 -right-2 bg-[#D53E0F] text-[#EED9B9] rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-bold">
+                      <span className="absolute -top-2 -right-2 bg-[#008FB8] text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-bold">
                         {cartCount > 9 ? '9+' : cartCount}
                       </span>
                     )}
@@ -464,25 +464,25 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
 
                   {!isAuthenticated ? (
                     <Link href="/login" className="hidden lg:block">
-                      <button className="border border-[#D53E0F]/50 bg-white/10 backdrop-blur-sm h-[40px] px-6 text-[#EED9B9] text-[11px] font-black tracking-[1.5px] uppercase hover:bg-[#D53E0F] hover:text-white transition-all duration-300 rounded-full">
+                      <button className="border  border-[#008FB8] bg-[#EAF8FC] h-[40px] px-6 text-[#063B5C] text-[11px] font-black tracking-[1.5px] uppercase hover:bg-[#008FB8] hover:text-white transition-all duration-300 rounded-full cursor-pointer">
                         LOGIN
                       </button>
                     </Link>
                   ) : (
-                    <div ref={profileDropdownRef} className="relative hidden lg:block">
+                    <div ref={profileDropdownRef} className="relative hidden lg:block cursor-pointer">
                       <button
                         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                        className="border border-[#D53E0F]/50 bg-white/10 backdrop-blur-sm h-[40px] px-6 text-[#EED9B9] text-[11px] font-black tracking-[1.5px] uppercase hover:bg-[#D53E0F] hover:text-white transition-all duration-300 rounded-full flex items-center gap-2"
+                        className="border border-[#008FB8] bg-[#EAF8FC] h-[40px] px-6 text-[#063B5C] text-[11px] font-black tracking-[1.5px] uppercase hover:bg-[#008FB8] hover:text-white transition-all duration-300 rounded-full flex items-center gap-2"
                       >
                         <User className="w-[14px] h-[14px]" />
                         {getUserShortName()}
                       </button>
                       
                       {isDropdownOpen && (
-                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-2 z-20 border border-gray-100">
+                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-2 z-20 border border-[#B8DCE7]">
                           <Link
                             href="/profile"
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                            className="block px-4 py-2 text-sm text-[#315A6E] hover:bg-[#EAF8FC]"
                             onClick={() => setIsDropdownOpen(false)}
                           >
                             My Orders
@@ -493,7 +493,7 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                               logout();
                               router.push('/');
                             }}
-                            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                            className="block w-full text-left px-4 py-2 text-sm text-[#315A6E] hover:bg-[#EAF8FC]"
                           >
                             Logout
                           </button>
@@ -504,108 +504,108 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                 </div>
               ) : (
               <div className="hidden lg:block">
-  <div ref={searchContainerRef} className="relative">
-    <div className="bg-white rounded-lg shadow-xl border border-gray-200 w-64">
-      <form onSubmit={handleSearchSubmit} className="p-2">
-        <div className="flex items-center gap-1">
-          <div className="flex-1 flex items-center border border-gray-200 rounded-md px-2 py-1 min-w-0">
-            <Search className="w-3.5 h-3.5 text-gray-400 mr-1.5 flex-shrink-0" />
-            <input
-              ref={searchInputRef}
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search..."
-              className="flex-1 text-xs focus:outline-none min-w-0"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery('')}
-                className="text-gray-400 hover:text-gray-600 ml-1 flex-shrink-0"
-              >
-                <X className="w-3 h-3" />
-              </button>
-            )}
-          </div>
-          <button
-            type="submit"
-            className="px-2.5 py-1 bg-[#D53E0F] text-white rounded-md text-[10px] font-medium hover:opacity-80 transition-all whitespace-nowrap flex-shrink-0"
-          >
-            Go
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setShowSearch(false);
-              setSearchQuery('');
-              setSearchResults([]);
-            }}
-            className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-all flex-shrink-0"
-          >
-            <X className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      </form>
-    </div>
-    
-    {(searchResults.length > 0 || isSearching) && (
-      <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-xl border border-gray-200 max-h-96 overflow-y-auto z-50">
-        {isSearching ? (
-          <div className="p-4 text-center text-gray-500">
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#D53E0F] mx-auto"></div>
-            <p className="mt-2 text-xs">Searching...</p>
-          </div>
-        ) : (
-          <>
-            <div className="p-2">
-              {searchResults.map((product) => (
-                <div
-                  key={product._id}
-                  className="flex items-center p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
-                  onClick={() => handleProductClick(product)}
-                >
-                  <div className="w-10 h-10 bg-gray-100 rounded-md flex-shrink-0 overflow-hidden relative">
-                    {product.image ? (
-                      <Image
-                        src={getImageUrl(product.image) || ''}
-                        className="w-full h-full object-cover"
-                        alt={product.name}
-                        fill
-                        sizes="40px"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                        <ShoppingCart className="w-5 h-5 text-gray-400" />
+                <div ref={searchContainerRef} className="relative">
+                  <div className="bg-white rounded-lg shadow-xl border border-[#B8DCE7] w-64">
+                    <form onSubmit={handleSearchSubmit} className="p-2">
+                      <div className="flex items-center gap-1">
+                        <div className="flex-1 flex items-center border border-[#B8DCE7] rounded-md px-2 py-1 min-w-0">
+                          <Search className="w-3.5 h-3.5 text-[#008FB8] mr-1.5 flex-shrink-0" />
+                          <input
+                            ref={searchInputRef}
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder="Search..."
+                            className="flex-1 text-xs focus:outline-none min-w-0 text-[#063B5C]"
+                          />
+                          {searchQuery && (
+                            <button
+                              type="button"
+                              onClick={() => setSearchQuery('')}
+                              className="text-[#315A6E] hover:text-[#063B5C] ml-1 flex-shrink-0"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          )}
+                        </div>
+                        <button
+                          type="submit"
+                          className="px-2.5 py-1 bg-[#008FB8] text-white rounded-md text-[10px] font-medium hover:bg-[#00A9E0] transition-all whitespace-nowrap flex-shrink-0"
+                        >
+                          Go
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowSearch(false);
+                            setSearchQuery('');
+                            setSearchResults([]);
+                          }}
+                          className="p-1 text-[#315A6E] hover:text-[#063B5C] hover:bg-[#EAF8FC] rounded-md transition-all flex-shrink-0"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
                       </div>
-                    )}
+                    </form>
                   </div>
-                  <div className="ml-3 flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-800 truncate">{product.name}</p>
-                    <p className="text-xs text-gray-500">{product.category}</p>
-                  </div>
-                  <p className="text-[#D53E0F] font-medium text-sm flex-shrink-0 ml-2">₹{product.basePrice}</p>
+                  
+                  {(searchResults.length > 0 || isSearching) && (
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-xl border border-[#B8DCE7] max-h-96 overflow-y-auto z-50">
+                      {isSearching ? (
+                        <div className="p-4 text-center text-[#315A6E]">
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#008FB8] mx-auto"></div>
+                          <p className="mt-2 text-xs">Searching...</p>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="p-2">
+                            {searchResults.map((product) => (
+                              <div
+                                key={product._id}
+                                className="flex items-center p-2 hover:bg-[#EAF8FC] rounded-lg cursor-pointer transition-colors"
+                                onClick={() => handleProductClick(product)}
+                              >
+                                <div className="w-10 h-10 bg-[#EAF8FC] rounded-md flex-shrink-0 overflow-hidden relative">
+                                  {product.image ? (
+                                    <Image
+                                      src={getImageUrl(product.image) || ''}
+                                      className="w-full h-full object-cover"
+                                      alt={product.name}
+                                      fill
+                                      sizes="40px"
+                                    />
+                                  ) : (
+                                    <div className="w-full h-full bg-[#EAF8FC] flex items-center justify-center">
+                                      <ShoppingCart className="w-5 h-5 text-[#008FB8]" />
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="ml-3 flex-1 min-w-0">
+                                  <p className="text-sm font-medium text-[#063B5C] truncate">{product.name}</p>
+                                  <p className="text-xs text-[#315A6E]">{product.category}</p>
+                                </div>
+                                <p className="text-[#008FB8] font-medium text-sm flex-shrink-0 ml-2">₹{product.basePrice}</p>
+                              </div>
+                            ))}
+                          </div>
+                          <div
+                            className="border-t border-[#B8DCE7] p-3 bg-[#F8FCFD] hover:bg-[#EAF8FC] cursor-pointer text-center rounded-b-lg"
+                            onClick={handleViewAllResults}
+                          >
+                            <p className="text-sm font-medium text-[#008FB8]">
+                              View all results for &quot;{searchQuery}&quot;
+                            </p>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  )}
                 </div>
-              ))}
-            </div>
-            <div
-              className="border-t border-gray-100 p-3 bg-gray-50 hover:bg-gray-100 cursor-pointer text-center rounded-b-lg"
-              onClick={handleViewAllResults}
-            >
-              <p className="text-sm font-medium text-[#D53E0F]">
-                View all results for &quot;{searchQuery}&quot;
-              </p>
-            </div>
-          </>
-        )}
-      </div>
-    )}
-  </div>
-</div>
+              </div>
               )}
 
               <button 
-                className="lg:hidden text-[#EED9B9]/80 hover:text-[#D53E0F] transition-all duration-300"
+                className="lg:hidden text-[#063B5C] hover:text-[#008FB8] transition-all duration-300"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
               >
                 {isMenuOpen ? <X className="w-[18px] h-[18px]" /> : <Menu className="w-[18px] h-[18px]" />}
@@ -616,163 +616,162 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
       </header>
 
       {/* Mobile Menu */}
-{/* Mobile Menu */}
-{isMenuOpen && (
-  <div className="lg:hidden fixed inset-0 z-50">
-    <div 
-      className="absolute inset-0 bg-black/50"
-      onClick={() => setIsMenuOpen(false)}
-    />
-    <div className="absolute top-0 left-0 h-full w-64 bg-[#5E0006] shadow-2xl">
-      <div className="flex flex-col h-full">
-        <div className="flex items-center justify-between p-4 border-b border-[#D53E0F]/30">
-          <Link href="/" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2">
-            <div className="relative w-15 h-15">
-              <Image
-                src="/images/logo.png"
-                alt={siteName}
-                fill
-                className="object-contain"
-              />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-[20px] font-black tracking-[2px] text-[#EED9B9] leading-none">{logoFirstLine}</span>
-              {logoSecondLine && (
-                <span className="text-[18px] font-bold tracking-[1px] text-[#D53E0F] leading-none ml-4">{logoSecondLine}</span>
-              )}
-            </div>
-          </Link>
-          <button onClick={() => setIsMenuOpen(false)} className="text-[#EED9B9]/80 hover:text-[#D53E0F]">
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-        <nav className="flex-1 p-4 overflow-y-auto">
-          <div className="space-y-1">
-            {/* HOME */}
-            <Link
-              href="/"
-              className="flex items-center gap-3 py-2.5 text-[12px] font-extrabold tracking-[1px] text-[#EED9B9]/80 hover:text-[#D53E0F] transition-all"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-              </svg>
-              HOME
-            </Link>
-
-            {/* SHOP BY CATEGORY - Heading */}
-            <div className="pt-2 pb-1">
-              <p className="text-[10px] font-bold tracking-[2px] text-[#EED9B9]/50 uppercase flex items-center gap-2">
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-                Shop by Category
-              </p>
-            </div>
-
-            {/* CATEGORIES - Indented */}
-            <div className="pl-4 space-y-0.5">
-              {categories.map((cat) => (
-                <button
-                  key={cat._id}
-                  onClick={() => handleCategoryClick(cat)}
-                  className="flex items-center gap-2.5 w-full text-left py-2 px-2 text-[11px] font-semibold tracking-[0.5px] text-[#EED9B9]/70 hover:text-[#D53E0F] hover:bg-white/5 rounded-md transition-all cursor-pointer"
-                >
-                  <svg className="w-2.5 h-2.5 flex-shrink-0 text-[#D53E0F]/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                  {cat.name.toUpperCase()}
-                </button>
-              ))}
-            </div>
-
-            {/* ABOUT */}
-            <Link
-              href="/about"
-              className="flex items-center gap-3 py-2.5 text-[12px] font-extrabold tracking-[1px] text-[#EED9B9]/80 hover:text-[#D53E0F] transition-all mt-1"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              ABOUT
-            </Link>
-
-            {/* CONTACT */}
-            <Link
-              href="/contact"
-              className="flex items-center gap-3 py-2.5 text-[12px] font-extrabold tracking-[1px] text-[#EED9B9]/80 hover:text-[#D53E0F] transition-all"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-              CONTACT
-            </Link>
-
-            {/* LOGIN/ACCOUNT - Mobile Only */}
-            {!isAuthenticated ? (
-              <Link
-                href="/login"
-                className="flex items-center gap-3 py-2.5 text-[12px] font-extrabold tracking-[1px] text-[#EED9B9]/80 hover:text-[#D53E0F] transition-all border-t border-[#D53E0F]/10 mt-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <User className="w-4 h-4 flex-shrink-0" />
-                LOGIN
-              </Link>
-            ) : (
-              <div className="border-t border-[#D53E0F]/10 mt-2 pt-2">
-                <Link
-                  href="/profile"
-                  className="flex items-center gap-3 py-2.5 text-[12px] font-extrabold tracking-[1px] text-[#EED9B9]/80 hover:text-[#D53E0F] transition-all"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <User className="w-4 h-4 flex-shrink-0" />
-                  MY ACCOUNT
+      {isMenuOpen && (
+        <div className="lg:hidden fixed inset-0 z-50">
+          <div 
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setIsMenuOpen(false)}
+          />
+          <div className="absolute top-0 left-0 h-full w-64 bg-white shadow-2xl">
+            <div className="flex flex-col h-full">
+              <div className="flex items-center justify-between p-4 border-b border-[#B8DCE7]">
+                <Link href="/" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2">
+                  <div className="relative w-15 h-15">
+                    <Image
+                      src="/images/logo.png"
+                      alt={siteName}
+                      fill
+                      className="object-contain"
+                    />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[20px] font-black tracking-[2px] text-[#063B5C] leading-none">{logoFirstLine}</span>
+                    {logoSecondLine && (
+                      <span className="text-[18px] font-bold tracking-[1px] text-[#008FB8] leading-none ml-4">{logoSecondLine}</span>
+                    )}
+                  </div>
                 </Link>
-                <button
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    logout();
-                    router.push('/');
-                  }}
-                  className="flex items-center gap-3 w-full text-left py-2.5 text-[12px] font-extrabold tracking-[1px] text-[#EED9B9]/80 hover:text-[#D53E0F] transition-all cursor-pointer"
-                >
-                  <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
-                  LOGOUT
+                <button onClick={() => setIsMenuOpen(false)} className="text-[#315A6E] hover:text-[#008FB8]">
+                  <X className="w-5 h-5" />
                 </button>
               </div>
-            )}
+              <nav className="flex-1 p-4 overflow-y-auto">
+                <div className="space-y-1">
+                  {/* HOME */}
+                  <Link
+                    href="/"
+                    className="flex items-center gap-3 py-2.5 text-[12px] font-extrabold tracking-[1px] text-[#063B5C] hover:text-[#008FB8] transition-all"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                    HOME
+                  </Link>
+
+                  {/* SHOP BY CATEGORY - Heading */}
+                  <div className="pt-2 pb-1">
+                    <p className="text-[10px] font-bold tracking-[2px] text-[#315A6E] uppercase flex items-center gap-2">
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                      </svg>
+                      Shop by Category
+                    </p>
+                  </div>
+
+                  {/* CATEGORIES - Indented */}
+                  <div className="pl-4 space-y-0.5">
+                    {categories.map((cat) => (
+                      <button
+                        key={cat._id}
+                        onClick={() => handleCategoryClick(cat)}
+                        className="flex items-center gap-2.5 w-full text-left py-2 px-2 text-[11px] font-semibold tracking-[0.5px] text-[#315A6E] hover:text-[#008FB8] hover:bg-[#EAF8FC] rounded-md transition-all cursor-pointer"
+                      >
+                        <svg className="w-2.5 h-2.5 flex-shrink-0 text-[#008FB8]/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                        {cat.name.toUpperCase()}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* ABOUT */}
+                  <Link
+                    href="/about"
+                    className="flex items-center gap-3 py-2.5 text-[12px] font-extrabold tracking-[1px] text-[#063B5C] hover:text-[#008FB8] transition-all mt-1"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    ABOUT
+                  </Link>
+
+                  {/* CONTACT */}
+                  <Link
+                    href="/contact"
+                    className="flex items-center gap-3 py-2.5 text-[12px] font-extrabold tracking-[1px] text-[#063B5C] hover:text-[#008FB8] transition-all"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    CONTACT
+                  </Link>
+
+                  {/* LOGIN/ACCOUNT - Mobile Only */}
+                  {!isAuthenticated ? (
+                    <Link
+                      href="/login"
+                      className="flex items-center gap-3 py-2.5 text-[12px] font-extrabold tracking-[1px] text-[#063B5C] hover:text-[#008FB8] transition-all border-t border-[#B8DCE7] mt-2"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <User className="w-4 h-4 flex-shrink-0" />
+                      LOGIN
+                    </Link>
+                  ) : (
+                    <div className="border-t border-[#B8DCE7] mt-2 pt-2">
+                      <Link
+                        href="/profile"
+                        className="flex items-center gap-3 py-2.5 text-[12px] font-extrabold tracking-[1px] text-[#063B5C] hover:text-[#008FB8] transition-all"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <User className="w-4 h-4 flex-shrink-0" />
+                        MY ACCOUNT
+                      </Link>
+                      <button
+                        onClick={() => {
+                          setIsMenuOpen(false);
+                          logout();
+                          router.push('/');
+                        }}
+                        className="flex items-center gap-3 w-full text-left py-2.5 text-[12px] font-extrabold tracking-[1px] text-[#063B5C] hover:text-[#008FB8] transition-all cursor-pointer"
+                      >
+                        <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        LOGOUT
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </nav>
+            </div>
           </div>
-        </nav>
-      </div>
-    </div>
-  </div>
-)}
+        </div>
+      )}
 
       {/* Mobile Fullscreen Search Overlay */}
       {showSearch && (
-        <div className="lg:hidden fixed inset-0 z-50 bg-[#5E0006] pt-20">
+        <div className="lg:hidden fixed inset-0 z-50 bg-[#F8FCFD] pt-20">
           <div className="w-full px-4">
             <div className="flex items-center gap-2 mb-4">
-              <div className="flex-1 flex items-center bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 border border-[#D53E0F]/30">
-                <Search className="w-5 h-5 text-[#D53E0F] mr-3 flex-shrink-0" />
+              <div className="flex-1 flex items-center bg-white rounded-lg px-4 py-2 border border-[#B8DCE7] shadow-sm">
+                <Search className="w-5 h-5 text-[#008FB8] mr-3 flex-shrink-0" />
                 <input
                   ref={searchInputRef}
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search products..."
-                  className="flex-1 bg-transparent text-[#EED9B9] focus:outline-none text-base placeholder-[#EED9B9]/60 w-full"
+                  className="flex-1 bg-transparent text-[#063B5C] focus:outline-none text-base placeholder-[#315A6E]/60 w-full"
                   autoFocus
                 />
                 {searchQuery && (
                   <button
                     type="button"
                     onClick={() => setSearchQuery('')}
-                    className="ml-2 p-1 text-[#EED9B9]/70 hover:text-[#EED9B9] rounded-full hover:bg-white/10"
+                    className="ml-2 p-1 text-[#315A6E] hover:text-[#063B5C] rounded-full hover:bg-[#EAF8FC]"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -782,7 +781,7 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
               <button
                 type="button"
                 onClick={handleSearchSubmit}
-                className="p-3 bg-white/10 backdrop-blur-sm hover:bg-[#D53E0F] text-[#EED9B9] rounded-lg transition-all duration-300 flex items-center justify-center border border-[#D53E0F]/30"
+                className="p-3 bg-[#008FB8] hover:bg-[#00A9E0] text-white rounded-lg transition-all duration-300 flex items-center justify-center"
               >
                 <Search className="w-5 h-5" />
               </button>
@@ -794,30 +793,30 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                   setSearchQuery('');
                   setSearchResults([]);
                 }}
-                className="p-3 text-[#EED9B9]/70 hover:text-[#EED9B9] hover:bg-white/10 rounded-lg transition-all duration-300 border border-[#D53E0F]/30"
+                className="p-3 text-[#315A6E] hover:text-[#063B5C] hover:bg-[#EAF8FC] rounded-lg transition-all duration-300 border border-[#B8DCE7]"
               >
                 <X className="w-6 h-6" />
               </button>
             </div>
 
             {(searchResults.length > 0 || isSearching) && (
-              <div className="bg-white/10 backdrop-blur-sm border border-[#D53E0F]/30 rounded-lg shadow-2xl max-h-[60vh] overflow-y-auto">
+              <div className="bg-white border border-[#B8DCE7] rounded-lg shadow-2xl max-h-[60vh] overflow-y-auto">
                 {isSearching ? (
-                  <div className="p-4 text-center text-[#EED9B9]">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#D53E0F] mx-auto"></div>
+                  <div className="p-4 text-center text-[#315A6E]">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#008FB8] mx-auto"></div>
                     <p className="mt-2 text-sm">Searching...</p>
                   </div>
                 ) : (
                   <>
                     <div className="p-2">
-                      <p className="text-xs text-[#D53E0F] font-medium px-2 py-1 border-b border-[#D53E0F]/30">Search Results</p>
+                      <p className="text-xs text-[#008FB8] font-medium px-2 py-1 border-b border-[#B8DCE7]">Search Results</p>
                       {searchResults.map((product) => (
                         <div
                           key={product._id}
-                          className="flex items-center p-2 hover:bg-white/10 rounded-lg cursor-pointer transition-colors"
+                          className="flex items-center p-2 hover:bg-[#EAF8FC] rounded-lg cursor-pointer transition-colors"
                           onClick={() => handleProductClick(product)}
                         >
-                          <div className="w-12 h-12 bg-white/10 rounded-lg flex-shrink-0 overflow-hidden border border-[#D53E0F]/30 relative">
+                          <div className="w-12 h-12 bg-[#EAF8FC] rounded-lg flex-shrink-0 overflow-hidden border border-[#B8DCE7] relative">
                             {product.image ? (
                               <Image
                                 src={getImageUrl(product.image) || ''}
@@ -827,26 +826,26 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                                 sizes="48px"
                               />
                             ) : (
-                              <div className="w-full h-full bg-white/10 flex items-center justify-center">
-                                <ShoppingCart className="w-6 h-6 text-[#EED9B9]/70" />
+                              <div className="w-full h-full bg-[#EAF8FC] flex items-center justify-center">
+                                <ShoppingCart className="w-6 h-6 text-[#008FB8]" />
                               </div>
                             )}
                           </div>
                           <div className="ml-3 flex-1 min-w-0">
-                            <p className="text-sm font-medium text-[#EED9B9] truncate">{product.name}</p>
+                            <p className="text-sm font-medium text-[#063B5C] truncate">{product.name}</p>
                             <div className="flex items-center justify-between">
-                              <p className="text-xs text-[#D53E0F]">{product.category}</p>
-                              <p className="text-[#EED9B9] font-medium text-sm">₹{product.basePrice}</p>
+                              <p className="text-xs text-[#008FB8]">{product.category}</p>
+                              <p className="text-[#063B5C] font-medium text-sm">₹{product.basePrice}</p>
                             </div>
                           </div>
                         </div>
                       ))}
                     </div>
                     <div
-                      className="border-t border-[#D53E0F]/30 p-3 bg-white/5 hover:bg-white/10 cursor-pointer text-center rounded-b-lg transition-all duration-300"
+                      className="border-t border-[#B8DCE7] p-3 bg-[#F8FCFD] hover:bg-[#EAF8FC] cursor-pointer text-center rounded-b-lg transition-all duration-300"
                       onClick={handleViewAllResults}
                     >
-                      <p className="text-sm font-medium text-[#EED9B9] hover:text-[#D53E0F]">
+                      <p className="text-sm font-medium text-[#008FB8]">
                         View all results for &quot;{searchQuery}&quot;
                       </p>
                     </div>
@@ -859,10 +858,10 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
       )}
 
       {/* Bottom Navigation Bar - Mobile Only */}
-      <div className="fixed bottom-0 left-0 right-0 bg-[#5E0006] border-t border-[#D53E0F]/30 shadow-lg z-40 lg:hidden">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#B8DCE7] shadow-lg z-40 lg:hidden">
         <div className="w-full px-2">
           <div className="flex items-center justify-between h-14">
-            <Link href="/" className="flex flex-col items-center justify-center flex-1 p-1 transition-colors cursor-pointer min-w-0 text-[#EED9B9]/80 hover:text-[#D53E0F]">
+            <Link href="/" className="flex flex-col items-center justify-center flex-1 p-1 transition-colors cursor-pointer min-w-0 text-[#063B5C] hover:text-[#008FB8]">
               <svg className="w-4 h-4 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
               </svg>
@@ -871,7 +870,7 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
 
             <button 
               onClick={handleSearchClick}
-              className="flex flex-col items-center justify-center flex-1 p-1 transition-colors cursor-pointer min-w-0 text-[#EED9B9]/80 hover:text-[#D53E0F]"
+              className="flex flex-col items-center justify-center flex-1 p-1 transition-colors cursor-pointer min-w-0 text-[#063B5C] hover:text-[#008FB8]"
             >
               <Search className="w-4 h-4 mb-0.5" />
               <span className="text-[10px] font-medium truncate w-full text-center">Search</span>
@@ -879,18 +878,18 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
 
             <button
               onClick={openCartDrawer}
-              className="flex flex-col items-center justify-center flex-1 p-1 transition-colors relative cursor-pointer min-w-0 text-[#EED9B9]/80 hover:text-[#D53E0F]"
+              className="flex flex-col items-center justify-center flex-1 p-1 transition-colors relative cursor-pointer min-w-0 text-[#063B5C] hover:text-[#008FB8]"
             >
               <ShoppingCart className="w-4 h-4 mb-0.5" />
               {cartCount > 0 && (
-                <span className="absolute -top-1 right-4 bg-[#D53E0F] text-[#EED9B9] rounded-full h-4 w-4 flex items-center justify-center text-[9px] font-bold border border-white/30">
+                <span className="absolute -top-1 right-4 bg-[#008FB8] text-white rounded-full h-4 w-4 flex items-center justify-center text-[9px] font-bold border border-white/30">
                   {cartCount > 9 ? '9+' : cartCount}
                 </span>
               )}
               <span className="text-[10px] font-medium truncate w-full text-center">Cart</span>
             </button>
 
-            <Link href="/about" className="flex flex-col items-center justify-center flex-1 p-1 transition-colors cursor-pointer min-w-0 text-[#EED9B9]/80 hover:text-[#D53E0F]">
+            <Link href="/about" className="flex flex-col items-center justify-center flex-1 p-1 transition-colors cursor-pointer min-w-0 text-[#063B5C] hover:text-[#008FB8]">
               <svg className="w-4 h-4 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -898,14 +897,14 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
             </Link>
 
             {isAuthenticated ? (
-              <Link href="/profile" className="flex flex-col items-center justify-center flex-1 p-1 transition-colors cursor-pointer min-w-0 text-[#EED9B9]/80 hover:text-[#D53E0F]">
-                <div className="w-4 h-4 rounded-full bg-gradient-to-br from-[#D53E0F] to-[#9B0F06] flex items-center justify-center text-[9px] font-bold mb-0.5 text-[#EED9B9] border border-white/30">
+              <Link href="/profile" className="flex flex-col items-center justify-center flex-1 p-1 transition-colors cursor-pointer min-w-0 text-[#063B5C] hover:text-[#008FB8]">
+                <div className="w-4 h-4 rounded-full bg-gradient-to-br from-[#00A9E0] to-[#008FB8] flex items-center justify-center text-[9px] font-bold mb-0.5 text-white border border-white/30">
                   {getUserInitial()}
                 </div>
                 <span className="text-[10px] font-medium truncate w-full text-center">Account</span>
               </Link>
             ) : (
-              <Link href="/login" className="flex flex-col items-center justify-center flex-1 p-1 transition-colors cursor-pointer min-w-0 text-[#EED9B9]/80 hover:text-[#D53E0F]">
+              <Link href="/login" className="flex flex-col items-center justify-center flex-1 p-1 transition-colors cursor-pointer min-w-0 text-[#063B5C] hover:text-[#008FB8]">
                 <User className="w-4 h-4 mb-0.5" />
                 <span className="text-[10px] font-medium truncate w-full text-center">Login</span>
               </Link>

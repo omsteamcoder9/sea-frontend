@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 export default function HomeHeroBanner() {
   // Static banner data
   const banner = {
-    title: "Sea Food",
+    title: "Meenavan Fresh",
     subtitle: "Fresh Catch Daily",
     description: "Explore the Freshest MeenavanFresh Delivered to Your Doorstep",
     leftImage: "/images/d1.jpg",
@@ -26,7 +26,7 @@ export default function HomeHeroBanner() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6 }}
-      className="flex flex-col w-full overflow-hidden rounded-2xl shadow-lg bg-gradient-to-r from-[#5E0006] to-[#9B0F06]"
+      className="flex flex-col w-full overflow-hidden rounded-2xl shadow-lg bg-gradient-to-r from-[#064B6A] to-[#008FB8]"
     >
       
       {/* LEFT IMAGE - Top on mobile, left on desktop */}
@@ -84,7 +84,7 @@ export default function HomeHeroBanner() {
             w-full
             ${leftImageUrl ? 'md:w-1/3' : 'md:w-1/2'}
             ${rightImageUrl ? 'md:w-1/3' : 'md:w-1/2'}
-            text-[#EED9B9]
+            text-[#EAF8FC]
             flex flex-col justify-center items-center
             px-6 md:px-8
             py-8 md:py-0
@@ -93,7 +93,7 @@ export default function HomeHeroBanner() {
             min-h-[280px] md:min-h-[320px]
           `}
         >
-          <div className="absolute inset-0 bg-gradient-to-tr from-[#EED9B9]/10 to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-tr from-[#EAF8FC]/10 to-transparent pointer-events-none" />
 
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
@@ -111,7 +111,7 @@ export default function HomeHeroBanner() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.5, duration: 0.5 }}
-              className="text-sm md:text-base mt-1 opacity-90 relative z-10 font-medium text-[#EED9B9]"
+              className="text-sm md:text-base mt-1 opacity-90 relative z-10 font-medium text-[#EAF8FC]"
             >
               {banner.subtitle}
             </motion.p>
@@ -123,7 +123,7 @@ export default function HomeHeroBanner() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.6, duration: 0.5 }}
-              className="text-sm md:text-base lg:text-lg mt-3 md:mt-4 max-w-xs md:max-w-sm relative z-10 text-[#EED9B9]"
+              className="text-sm md:text-base lg:text-lg mt-3 md:mt-4 max-w-xs md:max-w-sm relative z-10 text-[#EAF8FC]"
             >
               {banner.description}
             </motion.p>
@@ -146,7 +146,7 @@ export default function HomeHeroBanner() {
                   viewport={{ once: true }}
                   transition={{ delay: 0.8 + (i * 0.1), duration: 0.3 }}
                   whileHover={{ scale: 1.05, y: -2 }}
-                  className="px-3 py-1.5 md:px-4 md:py-2 bg-[#9B0F06]/20 rounded-full backdrop-blur-sm text-xs md:text-sm font-medium text-[#EED9B9] hover:bg-[#9B0F06]/30 transition-all cursor-default"
+                  className="px-3 py-1.5 md:px-4 md:py-2 bg-[#00A9E0]/20 rounded-full backdrop-blur-sm text-xs md:text-sm font-medium text-[#EAF8FC] hover:bg-[#00A9E0]/30 transition-all cursor-default"
                 >
                   {stat}
                 </motion.span>
@@ -200,7 +200,7 @@ export default function HomeHeroBanner() {
       
       {/* Show fallback if no images */}
       {!leftImageUrl && !rightImageUrl && (
-        <div className="hidden md:block md:w-2/3 bg-gradient-to-r from-[#5E0006] to-[#9B0F06]" />
+        <div className="hidden md:block md:w-2/3 bg-gradient-to-r from-[#064B6A] to-[#008FB8]" />
       )}
     </motion.div>
   );

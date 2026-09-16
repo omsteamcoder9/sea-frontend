@@ -540,7 +540,7 @@ export default function CheckoutPage() {
         key: razorpayOrder.key || paymentSettings.razorpayKeyId,
         amount: razorpayOrder.amount,
         currency: razorpayOrder.currency || 'INR',
-        name: 'Beauty Care',
+        name: 'Meenavan Fresh',
         description: 'Order Payment',
         image: '/logo2.png',
         order_id: razorpayOrder.id,

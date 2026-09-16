@@ -81,13 +81,13 @@ export default function ContactForm() {
   // Don't render form until mounted on client
   if (!isMounted) {
     return (
-      <div className="max-w-2xl mx-auto p-6 rounded-lg border" style={{ borderColor: '#9B0F06' }}>
+      <div className="max-w-2xl mx-auto p-6 sm:p-8 rounded-2xl bg-white shadow-lg">
         <div className="animate-pulse">
-          <div className="h-8 rounded mb-6" style={{ backgroundColor: 'rgba(155, 15, 6, 0.1)' }}></div>
+          <div className="h-8 rounded mb-6" style={{ backgroundColor: 'rgba(0, 143, 184, 0.1)' }}></div>
           <div className="space-y-4">
-            <div className="h-4 rounded" style={{ backgroundColor: 'rgba(155, 15, 6, 0.05)' }}></div>
-            <div className="h-4 rounded" style={{ backgroundColor: 'rgba(155, 15, 6, 0.05)' }}></div>
-            <div className="h-24 rounded" style={{ backgroundColor: 'rgba(155, 15, 6, 0.05)' }}></div>
+            <div className="h-4 rounded" style={{ backgroundColor: 'rgba(0, 143, 184, 0.05)' }}></div>
+            <div className="h-4 rounded" style={{ backgroundColor: 'rgba(0, 143, 184, 0.05)' }}></div>
+            <div className="h-24 rounded" style={{ backgroundColor: 'rgba(0, 143, 184, 0.05)' }}></div>
           </div>
         </div>
       </div>
@@ -95,8 +95,8 @@ export default function ContactForm() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-6 rounded-lg border" style={{ borderColor: '#9B0F06' }}>
-      <h2 className="text-3xl font-bold mb-6 text-center" style={{ color: '#5E0006' }}>Get In Touch</h2>
+    <div className="max-w-2xl mx-auto p-6 sm:p-8 rounded-2xl bg-white shadow-lg">
+      <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-center" style={{ color: '#063B5C' }}>Get In Touch</h2>
       
       {message && (
         <div
@@ -112,7 +112,7 @@ export default function ContactForm() {
             <span>{message.text}</span>
             <button 
               onClick={() => setMessage(null)}
-              className="ml-4 text-gray-500 hover:text-gray-700"
+              className="ml-4 text-[#315A6E] hover:text-[#063B5C]"
               aria-label="Close"
             >
               ✕
@@ -121,11 +121,11 @@ export default function ContactForm() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium mb-2" style={{ color: '#5E0006' }}>
-              Full Name <span className="text-gray-400 text-xs">(optional)</span>
+            <label htmlFor="name" className="block text-sm font-medium mb-2" style={{ color: '#063B5C' }}>
+              Full Name <span className="text-[#315A6E]/60 text-xs">(optional)</span>
             </label>
             <input
               type="text"
@@ -133,15 +133,15 @@ export default function ContactForm() {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B0F06] focus:border-[#9B0F06] transition-all duration-200"
-              style={{ backgroundColor: 'white', borderColor: 'rgba(155, 15, 6, 0.2)' }}
+              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#008FB8] focus:border-[#008FB8] transition-all duration-200"
+              style={{ backgroundColor: 'white', borderColor: 'rgba(0, 143, 184, 0.2)' }}
               placeholder="Enter your full name"
             />
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium mb-2" style={{ color: '#5E0006' }}>
-              Email Address <span className="text-gray-400 text-xs">(optional)</span>
+            <label htmlFor="email" className="block text-sm font-medium mb-2" style={{ color: '#063B5C' }}>
+              Email Address <span className="text-[#315A6E]/60 text-xs">(optional)</span>
             </label>
             <input
               type="email"
@@ -149,16 +149,16 @@ export default function ContactForm() {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B0F06] focus:border-[#9B0F06] transition-all duration-200"
-              style={{ backgroundColor: 'white', borderColor: 'rgba(155, 15, 6, 0.2)' }}
+              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#008FB8] focus:border-[#008FB8] transition-all duration-200"
+              style={{ backgroundColor: 'white', borderColor: 'rgba(0, 143, 184, 0.2)' }}
               placeholder="Enter your email address"
             />
           </div>
         </div>
 
         <div>
-          <label htmlFor="phone" className="block text-sm font-medium mb-2" style={{ color: '#5E0006' }}>
-            Phone Number <span className="text-gray-400 text-xs">(optional)</span>
+          <label htmlFor="phone" className="block text-sm font-medium mb-2" style={{ color: '#063B5C' }}>
+            Phone Number <span className="text-[#315A6E]/60 text-xs">(optional)</span>
           </label>
           <input
             type="tel"
@@ -166,15 +166,15 @@ export default function ContactForm() {
             name="phone"
             value={formData.phone}
             onChange={handleChange}
-            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B0F06] focus:border-[#9B0F06] transition-all duration-200"
-            style={{ backgroundColor: 'white', borderColor: 'rgba(155, 15, 6, 0.2)' }}
+            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#008FB8] focus:border-[#008FB8] transition-all duration-200"
+            style={{ backgroundColor: 'white', borderColor: 'rgba(0, 143, 184, 0.2)' }}
             placeholder="Enter your phone number"
           />
         </div>
 
         <div>
-          <label htmlFor="subject" className="block text-sm font-medium mb-2" style={{ color: '#5E0006' }}>
-            Subject <span style={{ color: '#D53E0F' }}>*</span>
+          <label htmlFor="subject" className="block text-sm font-medium mb-2" style={{ color: '#063B5C' }}>
+            Subject <span style={{ color: '#00A9E0' }}>*</span>
           </label>
           <input
             type="text"
@@ -183,15 +183,15 @@ export default function ContactForm() {
             value={formData.subject}
             onChange={handleChange}
             required
-            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B0F06] focus:border-[#9B0F06] transition-all duration-200"
-            style={{ backgroundColor: 'white', borderColor: 'rgba(155, 15, 6, 0.2)' }}
+            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#008FB8] focus:border-[#008FB8] transition-all duration-200"
+            style={{ backgroundColor: 'white', borderColor: 'rgba(0, 143, 184, 0.2)' }}
             placeholder="What is this regarding?"
           />
         </div>
 
         <div>
-          <label htmlFor="message" className="block text-sm font-medium mb-2" style={{ color: '#5E0006' }}>
-            Message <span style={{ color: '#D53E0F' }}>*</span>
+          <label htmlFor="message" className="block text-sm font-medium mb-2" style={{ color: '#063B5C' }}>
+            Message <span style={{ color: '#00A9E0' }}>*</span>
           </label>
           <textarea
             id="message"
@@ -200,8 +200,8 @@ export default function ContactForm() {
             onChange={handleChange}
             required
             rows={6}
-            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B0F06] focus:border-[#9B0F06] transition-all duration-200 resize-vertical"
-            style={{ backgroundColor: 'white', borderColor: 'rgba(155, 15, 6, 0.2)' }}
+            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#008FB8] focus:border-[#008FB8] transition-all duration-200 resize-vertical"
+            style={{ backgroundColor: 'white', borderColor: 'rgba(0, 143, 184, 0.2)' }}
             placeholder="Tell us how we can help you..."
           />
         </div>
@@ -210,9 +210,9 @@ export default function ContactForm() {
           type="submit"
           disabled={isSubmitting}
           className="w-full py-3 px-6 rounded-lg font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{ backgroundColor: '#9B0F06', color: 'white' }}
-          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#5E0006'}
-          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#9B0F06'}
+          style={{ backgroundColor: '#064B6A', color: 'white' }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#008FB8'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#064B6A'}
         >
           {isSubmitting ? (
             <div className="flex items-center justify-center">

@@ -106,7 +106,7 @@ export default function CategoryCarousel({ displayCategories = [] }: CategoryCar
   };
 
   const getCategoryColor = (name: string) => {
-    const colors = ['#014F56', '#2EC4B6', '#0A7B72', '#1A9C93'];
+    const colors = ['#063B5C', '#008FB8', '#064B6A', '#00A9E0'];
     let hash = 0;
     for (let i = 0; i < name.length; i++) {
       hash = name.charCodeAt(i) + ((hash << 5) - hash);
@@ -119,7 +119,7 @@ export default function CategoryCarousel({ displayCategories = [] }: CategoryCar
       <section className="w-full py-2 bg-white overflow-hidden">
         <div className="container mx-auto px-2">
           <div className="flex justify-center items-center h-16">
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#014F56]"></div>
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#008FB8]"></div>
           </div>
         </div>
       </section>
@@ -156,7 +156,7 @@ export default function CategoryCarousel({ displayCategories = [] }: CategoryCar
                   className="flex-shrink-0 w-14 sm:w-16 md:w-20 group cursor-pointer"
                   onClick={() => handleCategoryClick(category)}
                 >
-                  <div className="bg-white rounded-md p-1 hover:bg-gray-50 transition-all duration-150">
+                  <div className="bg-white rounded-md p-1 hover:bg-[#F8FCFD] transition-all duration-150">
                     {/* Tiny Circular Icon */}
                     <div 
                       className="relative aspect-square rounded-full overflow-hidden mb-0.5 flex items-center justify-center"
@@ -193,7 +193,7 @@ export default function CategoryCarousel({ displayCategories = [] }: CategoryCar
                     </div>
 
                     {/* Tiny Category Name */}
-                    <h3 className="text-center text-gray-600 text-[10px] truncate leading-tight">
+                    <h3 className="text-center text-[#315A6E] text-[10px] truncate leading-tight">
                       {category.name.length > 8 ? category.name.slice(0, 6) + '..' : category.name}
                     </h3>
                   </div>

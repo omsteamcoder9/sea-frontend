@@ -157,7 +157,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         const guestId = getOrCreateGuestId();
         
         // Guest cart logic - also sync with backend via API
-        const guestCart = { ...cart };
+        const guestCart = { ...cart, items: [...cart.items] };
         
         const existingItemIndex = guestCart.items.findIndex(item => {
           const productId = typeof item.product === 'string' ? item.product : (item.product as any)?._id;
@@ -168,7 +168,10 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         });
         
         if (existingItemIndex > -1) {
-          guestCart.items[existingItemIndex].quantity += quantity;
+          guestCart.items[existingItemIndex] = {
+            ...guestCart.items[existingItemIndex],
+            quantity: guestCart.items[existingItemIndex].quantity + quantity
+          };
         } else {
           let variantImage = '';
           if (selectedVariant?.images && selectedVariant.images.length > 0) {
@@ -200,8 +203,9 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         guestCart.totalPrice = guestCart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         guestCart.updatedAt = new Date().toISOString();
         
-        setCart(guestCart);
+        // ✅ Save to localStorage FIRST, then update state
         saveGuestCart(guestCart);
+        setCart(guestCart);
         
         // Also try to sync with backend (optional - creates backend guest cart)
         try {
@@ -244,23 +248,27 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       setLoading(true);
       
       if (isGuest) {
-        const guestCart = { ...cart };
+        const guestCart = { ...cart, items: [...cart.items] };
         const itemIndex = guestCart.items.findIndex(item => item._id === itemId);
         
         if (itemIndex > -1) {
           if (quantity <= 0) {
             guestCart.items.splice(itemIndex, 1);
           } else {
-            guestCart.items[itemIndex].quantity = quantity;
-            guestCart.items[itemIndex].updatedAt = new Date().toISOString();
+            guestCart.items[itemIndex] = {
+              ...guestCart.items[itemIndex],
+              quantity,
+              updatedAt: new Date().toISOString()
+            };
           }
           
           guestCart.totalItems = guestCart.items.reduce((sum, item) => sum + item.quantity, 0);
           guestCart.totalPrice = guestCart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
           guestCart.updatedAt = new Date().toISOString();
           
-          setCart(guestCart);
+          // ✅ Save to localStorage FIRST, then update state
           saveGuestCart(guestCart);
+          setCart(guestCart);
         }
       } else {
         await cartAPI.updateCartItem(itemId, { quantity });
@@ -281,15 +289,18 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       setLoading(true);
       
       if (isGuest) {
-        const guestCart = { ...cart };
-        guestCart.items = guestCart.items.filter(item => item._id !== itemId);
+        const guestCart = {
+          ...cart,
+          items: cart.items.filter(item => item._id !== itemId)
+        };
         
         guestCart.totalItems = guestCart.items.reduce((sum, item) => sum + item.quantity, 0);
         guestCart.totalPrice = guestCart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         guestCart.updatedAt = new Date().toISOString();
         
-        setCart(guestCart);
+        // ✅ Save to localStorage FIRST, then update state
         saveGuestCart(guestCart);
+        setCart(guestCart);
       } else {
         await cartAPI.removeFromCart(itemId);
         const updatedCart = await cartAPI.getCart();
@@ -309,10 +320,16 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       setLoading(true);
       
       if (isGuest) {
-        const emptyCart = { ...initialCart };
-        emptyCart.updatedAt = new Date().toISOString();
-        setCart(emptyCart);
+        const emptyCart: Cart = {
+          ...initialCart,
+          updatedAt: new Date().toISOString()
+        };
+        
+        // ✅ Save to localStorage FIRST (synchronous), then update state
         saveGuestCart(emptyCart);
+        setCart(emptyCart);
+        
+        console.log('🛒 Guest cart cleared');
       } else {
         await cartAPI.clearCart();
         const updatedCart = await cartAPI.getCart();
