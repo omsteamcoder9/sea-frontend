@@ -185,8 +185,8 @@ export default function ProductCard({ product }: ProductCardProps) {
       onClick={handleCardClick}
       className="group w-full max-w-[320px] sm:max-w-[340px] md:max-w-[360px] lg:max-w-[380px] xl:max-w-[400px] 2xl:max-w-[420px] mx-auto bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_8px_24px_-8px_rgba(6,59,92,0.12)] hover:shadow-[0_30px_60px_-15px_rgba(0,143,184,0.25)] border border-[#EAF8FC] transition-all duration-500 cursor-pointer"
     >
-      {/* IMAGE SECTION */}
-      <div className="relative aspect-[4/3] bg-[#F8FCFD] overflow-hidden m-1.5 sm:m-2 rounded-xl sm:rounded-2xl">
+      {/* IMAGE SECTION — full bleed, no padding */}
+      <div className="relative aspect-[4/3] bg-[#F8FCFD] overflow-hidden">
         <div className="relative w-full h-full">
           <Image
             src={imageUrl}
@@ -212,6 +212,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
         )}
       </div>
+
 {/* CONTENT SECTION - OPTIMIZED FOR MOBILE */}
 <div className="px-2.5 xs:px-3 sm:px-4 md:px-5 py-2.5 xs:py-3 sm:py-4 md:py-5">
   {/* Category/Weight */}

@@ -86,6 +86,7 @@ export interface CreateOrderRequest {
   paymentId?: string;
   skipCartClear?: boolean;
   products?: any[];
+  deliveryMode?: 'karaikudi' | 'other';  // ✅ NEW
 }
 
 export interface OrdersResponse {

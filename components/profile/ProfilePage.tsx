@@ -239,12 +239,12 @@ const handleViewPDF = async (orderId: string) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
+      <div className="min-h-screen bg-[#F8FCFD] py-12">
         <div className="container mx-auto px-4">
           <div className="flex justify-center items-center py-12">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#9B0F06] mx-auto"></div>
-              <p className="mt-4 text-gray-600">Loading your orders...</p>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#008FB8] mx-auto"></div>
+              <p className="mt-4 text-[#315A6E]">Loading your orders...</p>
             </div>
           </div>
         </div>
@@ -254,13 +254,13 @@ const handleViewPDF = async (orderId: string) => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
+      <div className="min-h-screen bg-[#F8FCFD] py-12">
         <div className="container mx-auto px-4">
-          <div className="bg-white rounded-lg shadow-md p-8 text-center border border-gray-300">
+          <div className="bg-white rounded-lg shadow-md p-8 text-center border border-[#B8DCE7]">
             <div className="text-red-600 mb-4 font-medium">{error}</div>
             <button 
               onClick={() => window.location.reload()}
-              className="bg-[#9B0F06] text-white px-6 py-3 rounded-lg hover:bg-[#5E0006] transition-all duration-200 font-medium cursor-pointer"
+              className="bg-[#064B6A] text-white px-6 py-3 rounded-lg hover:bg-[#008FB8] transition-all duration-200 font-medium cursor-pointer"
             >
               Try Again
             </button>
@@ -271,27 +271,27 @@ const handleViewPDF = async (orderId: string) => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-[#F8FCFD] py-12">
       <div className="container mx-auto px-4">
         {/* Header Section */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">My Profile</h1>
-          <p className="text-gray-600 mt-1">Manage your account and orders</p>
+          <h1 className="text-3xl font-bold text-[#063B5C]">My Profile</h1>
+          <p className="text-[#315A6E] mt-1">Manage your account and orders</p>
         </div>
 
         {activeOrders.length === 0 && cancelledOrders.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-md p-8 text-center border border-gray-300">
+          <div className="bg-white rounded-lg shadow-md p-8 text-center border border-[#B8DCE7]">
             <div className="max-w-md mx-auto">
-              <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-20 h-20 bg-[#EAF8FC] rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg className="w-10 h-10 text-[#315A6E]/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                 </svg>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">No orders yet</h3>
-              <p className="text-gray-600 mb-6">Start shopping to see your orders here</p>
+              <h3 className="text-2xl font-bold text-[#063B5C] mb-2">No orders yet</h3>
+              <p className="text-[#315A6E] mb-6">Start shopping to see your orders here</p>
               <button
                 onClick={() => router.push('/products')}
-                className="bg-[#9B0F06] text-white px-6 py-3 rounded-lg hover:bg-[#5E0006] transition-all duration-200 font-medium cursor-pointer"
+                className="bg-[#064B6A] text-white px-6 py-3 rounded-lg hover:bg-[#008FB8] transition-all duration-200 font-medium cursor-pointer"
               >
                 Start Shopping
               </button>
@@ -303,24 +303,24 @@ const handleViewPDF = async (orderId: string) => {
             <div className="lg:col-span-1 space-y-6">
               <div className="sticky top-6 space-y-6">
                 {/* Profile Summary Card */}
-                <div className="bg-white rounded-lg shadow-md p-6 border border-gray-300">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Profile Summary</h3>
+                <div className="bg-white rounded-lg shadow-md p-6 border border-[#B8DCE7]">
+                  <h3 className="text-lg font-semibold text-[#063B5C] mb-4">Profile Summary</h3>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Active Orders</span>
-                      <span className="font-semibold text-gray-900">{activeOrders.length}</span>
+                      <span className="text-[#315A6E]">Active Orders</span>
+                      <span className="font-semibold text-[#063B5C]">{activeOrders.length}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Cancelled Orders</span>
-                      <span className="font-semibold text-gray-900">{cancelledOrders.length}</span>
+                      <span className="text-[#315A6E]">Cancelled Orders</span>
+                      <span className="font-semibold text-[#063B5C]">{cancelledOrders.length}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Total Orders</span>
-                      <span className="font-semibold text-gray-900">{orders.length}</span>
+                      <span className="text-[#315A6E]">Total Orders</span>
+                      <span className="font-semibold text-[#063B5C]">{orders.length}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Total Spent</span>
-                      <span className="font-semibold text-gray-900">
+                      <span className="text-[#315A6E]">Total Spent</span>
+                      <span className="font-semibold text-[#063B5C]">
                         ₹{orders.reduce((total, order) => total + calculateOrderTotal(order), 0).toFixed(2)}
                       </span>
                     </div>
@@ -328,15 +328,15 @@ const handleViewPDF = async (orderId: string) => {
                 </div>
 
                 {/* Quick Actions */}
-                <div className="bg-white rounded-lg shadow-md p-6 border border-gray-300">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                <div className="bg-white rounded-lg shadow-md p-6 border border-[#B8DCE7]">
+                  <h3 className="text-lg font-semibold text-[#063B5C] mb-4">Quick Actions</h3>
                   <div className="space-y-3">
                     {cancelledOrders.length > 0 && (
                       <button
                         onClick={() => setShowCancelledOrdersModal(true)}
-                        className="w-full px-4 py-3 bg-gray-50 text-gray-700 rounded-lg hover:bg-gray-100 font-medium transition-colors text-left flex items-center gap-3 border border-gray-300 cursor-pointer"
+                        className="w-full px-4 py-3 bg-[#F8FCFD] text-[#315A6E] rounded-lg hover:bg-[#EAF8FC] font-medium transition-colors text-left flex items-center gap-3 border border-[#B8DCE7] cursor-pointer"
                       >
-                        <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 text-[#315A6E]/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
                         View Cancelled Orders ({cancelledOrders.length})
@@ -344,9 +344,9 @@ const handleViewPDF = async (orderId: string) => {
                     )}
                     <button
                       onClick={() => router.push('/products')}
-                      className="w-full px-4 py-3 bg-gray-50 text-gray-700 rounded-lg hover:bg-gray-100 font-medium transition-colors text-left flex items-center gap-3 border border-gray-300 cursor-pointer"
+                      className="w-full px-4 py-3 bg-[#F8FCFD] text-[#315A6E] rounded-lg hover:bg-[#EAF8FC] font-medium transition-colors text-left flex items-center gap-3 border border-[#B8DCE7] cursor-pointer"
                     >
-                      <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-[#315A6E]/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                       </svg>
                       Continue Shopping
@@ -358,19 +358,19 @@ const handleViewPDF = async (orderId: string) => {
 
             {/* Main Content - Active Orders */}
             <div className="lg:col-span-3">
-              <div className="bg-white rounded-lg shadow-md border border-gray-300 overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-300 bg-gray-50">
+              <div className="bg-white rounded-lg shadow-md border border-[#B8DCE7] overflow-hidden">
+                <div className="px-6 py-4 border-b border-[#B8DCE7] bg-[#F8FCFD]">
                   <div className="flex justify-between items-center">
                     <div>
-                      <h2 className="text-xl font-semibold text-gray-900">Active Orders</h2>
-                      <p className="text-gray-600 mt-1 text-sm">
+                      <h2 className="text-xl font-semibold text-[#063B5C]">Active Orders</h2>
+                      <p className="text-[#315A6E] mt-1 text-sm">
                         {activeOrders.length} {activeOrders.length === 1 ? 'active order' : 'active orders'}
                       </p>
                     </div>
                     {cancelledOrders.length > 0 && (
                       <button
                         onClick={() => setShowCancelledOrdersModal(true)}
-                        className="text-[#9B0F06] hover:text-[#5E0006] font-medium text-sm flex items-center gap-2 cursor-pointer"
+                        className="text-[#008FB8] hover:text-[#064B6A] font-medium text-sm flex items-center gap-2 cursor-pointer"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -383,22 +383,22 @@ const handleViewPDF = async (orderId: string) => {
                 
                 {activeOrders.length === 0 ? (
                   <div className="p-8 text-center">
-                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-16 h-16 bg-[#EAF8FC] rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg className="w-8 h-8 text-[#315A6E]/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No active orders</h3>
-                    <p className="text-gray-600 mb-4">All your current orders are completed or cancelled</p>
+                    <h3 className="text-lg font-semibold text-[#063B5C] mb-2">No active orders</h3>
+                    <p className="text-[#315A6E] mb-4">All your current orders are completed or cancelled</p>
                     <button
                       onClick={() => router.push('/products')}
-                      className="bg-[#9B0F06] text-white px-6 py-2 rounded-lg hover:bg-[#5E0006] transition-all duration-200 font-medium cursor-pointer"
+                      className="bg-[#064B6A] text-white px-6 py-2 rounded-lg hover:bg-[#008FB8] transition-all duration-200 font-medium cursor-pointer"
                     >
                       Start Shopping
                     </button>
                   </div>
                 ) : (
-                  <div className="divide-y divide-gray-200">
+                  <div className="divide-y divide-[#B8DCE7]">
                     {activeOrders.map((order) => {
                       const orderTotal = calculateOrderTotal(order);
                       const subtotal = calculateSubtotal(order.products || []);
@@ -406,12 +406,12 @@ const handleViewPDF = async (orderId: string) => {
                       return (
                         <div
                           key={order._id}
-                          className="p-6 hover:bg-gray-50 transition-all duration-200 group"
+                          className="p-6 hover:bg-[#F8FCFD] transition-all duration-200 group"
                         >
                           <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
                             <div className="flex-1">
                               <div className="flex flex-col lg:flex-row lg:items-center gap-3 mb-3">
-                                <h3 className="text-lg font-semibold text-gray-900">
+                                <h3 className="text-lg font-semibold text-[#063B5C]">
                                   Order #{order.orderId || order._id?.slice(-8)}
                                 </h3>
                                 <div className="flex flex-wrap gap-2">
@@ -420,26 +420,26 @@ const handleViewPDF = async (orderId: string) => {
                                 </div>
                               </div>
                               
-                              <p className="text-gray-600 mb-3 text-sm">
+                              <p className="text-[#315A6E] mb-3 text-sm">
                                 Placed on {formatDate(order.createdAt)}
                               </p>
                               
                               <div className="flex flex-wrap items-center gap-3 text-sm">
-                                <span className="text-gray-600">{order.products?.length || 0} items</span>
-                                <span className="text-gray-400">•</span>
-                                <span className="font-semibold text-gray-900">
+                                <span className="text-[#315A6E]">{order.products?.length || 0} items</span>
+                                <span className="text-[#315A6E]/50">•</span>
+                                <span className="font-semibold text-[#063B5C]">
                                   ₹{orderTotal.toFixed(2)}
                                 </span>
                                 {orderTotal > 0 && subtotal > 0 && orderTotal !== subtotal && (
                                   <>
-                                    <span className="text-gray-400">•</span>
-                                    <span className="text-gray-500 line-through text-xs">
+                                    <span className="text-[#315A6E]/50">•</span>
+                                    <span className="text-[#315A6E]/60 line-through text-xs">
                                       ₹{subtotal.toFixed(2)}
                                     </span>
                                   </>
                                 )}
-                                <span className="text-gray-400">•</span>
-                                <span className="text-gray-600 capitalize">{order.paymentMethod}</span>
+                                <span className="text-[#315A6E]/50">•</span>
+                                <span className="text-[#315A6E] capitalize">{order.paymentMethod}</span>
                               </div>
 
                               {/* Order Items Preview */}
@@ -448,22 +448,22 @@ const handleViewPDF = async (orderId: string) => {
                                   const itemTotal = getItemTotal(item);
                                   
                                   return (
-                                    <div key={index} className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 border border-gray-300">
-                                      <span className="text-sm text-gray-700">
+                                    <div key={index} className="flex items-center gap-2 bg-[#F8FCFD] rounded-lg px-3 py-2 border border-[#B8DCE7]">
+                                      <span className="text-sm text-[#315A6E]">
                                         {getProductDisplayName(item)}
                                       </span>
-                                      <span className="text-xs text-gray-500 bg-white px-1 rounded border">
+                                      <span className="text-xs text-[#315A6E]/70 bg-white px-1 rounded border border-[#B8DCE7]">
                                         x{item.quantity}
                                       </span>
-                                      <span className="text-xs font-semibold text-gray-900">
+                                      <span className="text-xs font-semibold text-[#063B5C]">
                                         ₹{itemTotal.toFixed(2)}
                                       </span>
                                     </div>
                                   );
                                 })}
                                 {order.products && order.products.length > 3 && (
-                                  <div className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 border border-gray-300">
-                                    <span className="text-sm text-gray-700">
+                                  <div className="flex items-center gap-2 bg-[#F8FCFD] rounded-lg px-3 py-2 border border-[#B8DCE7]">
+                                    <span className="text-sm text-[#315A6E]">
                                       +{order.products.length - 3} more
                                     </span>
                                   </div>
@@ -498,11 +498,11 @@ const handleViewPDF = async (orderId: string) => {
                               <button 
                                 onClick={() => handleViewPDF(order._id)}
                                 disabled={pdfLoading}
-                                className="border border-[#9B0F06] text-[#9B0F06] px-4 py-2 rounded-lg hover:bg-[#9B0F06] hover:text-white transition-colors font-medium text-sm flex items-center gap-2 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                                className="border border-[#008FB8] text-[#008FB8] px-4 py-2 rounded-lg hover:bg-[#008FB8] hover:text-white transition-colors font-medium text-sm flex items-center gap-2 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                               >
                                 {pdfLoading ? (
                                   <>
-                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#9B0F06]"></div>
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#008FB8]"></div>
                                     Loading...
                                   </>
                                 ) : (
@@ -529,17 +529,17 @@ const handleViewPDF = async (orderId: string) => {
         {/* Cancel Order Confirmation Modal */}
         {showCancelModal && selectedOrder && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 border border-gray-300">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 border border-[#B8DCE7]">
+              <h3 className="text-lg font-semibold text-[#063B5C] mb-4">
                 Cancel Order #{selectedOrder.orderId || selectedOrder._id?.slice(-8)}
               </h3>
               
-              <p className="text-gray-600 mb-4">
+              <p className="text-[#315A6E] mb-4">
                 Are you sure you want to cancel this order? This action cannot be undone.
               </p>
 
               <div className="mb-4">
-                <label htmlFor="cancellationReason" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="cancellationReason" className="block text-sm font-medium text-[#315A6E] mb-2">
                   Reason for cancellation (optional)
                 </label>
                 <textarea
@@ -547,7 +547,7 @@ const handleViewPDF = async (orderId: string) => {
                   value={cancellationReason}
                   onChange={(e) => setCancellationReason(e.target.value)}
                   placeholder="Please provide a reason for cancellation..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#9B0F06] focus:border-[#9B0F06] transition-all duration-200"
+                  className="w-full px-3 py-2 border border-[#B8DCE7] rounded-md focus:outline-none focus:ring-2 focus:ring-[#008FB8] focus:border-[#008FB8] transition-all duration-200"
                   rows={3}
                 />
               </div>
@@ -559,7 +559,7 @@ const handleViewPDF = async (orderId: string) => {
                     setSelectedOrder(null);
                     setCancellationReason('');
                   }}
-                  className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                  className="px-4 py-2 text-[#315A6E] border border-[#B8DCE7] rounded-lg hover:bg-[#F8FCFD] transition-colors cursor-pointer"
                   disabled={cancellingOrderId !== null}
                 >
                   Keep Order
@@ -586,14 +586,14 @@ const handleViewPDF = async (orderId: string) => {
         {/* PDF Modal */}
         {showPDFModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col border border-gray-300">
-              <div className="px-6 py-4 border-b border-gray-300 bg-gray-50 flex justify-between items-center flex-shrink-0">
-                <h3 className="text-xl font-semibold text-gray-900">Order Receipt</h3>
+            <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col border border-[#B8DCE7]">
+              <div className="px-6 py-4 border-b border-[#B8DCE7] bg-[#F8FCFD] flex justify-between items-center flex-shrink-0">
+                <h3 className="text-xl font-semibold text-[#063B5C]">Order Receipt</h3>
                 <div className="flex items-center gap-3">
                   <a
                     href={pdfUrl}
                     download={`receipt-${selectedOrder?.orderId || selectedOrder?._id?.slice(-8)}.pdf`}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-[#9B0F06] text-white rounded-lg hover:bg-[#5E0006] transition-colors font-medium text-sm cursor-pointer"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-[#064B6A] text-white rounded-lg hover:bg-[#008FB8] transition-colors font-medium text-sm cursor-pointer"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -602,7 +602,7 @@ const handleViewPDF = async (orderId: string) => {
                   </a>
                   <button
                     onClick={closePDFModal}
-                    className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-white rounded-lg cursor-pointer"
+                    className="text-[#315A6E]/60 hover:text-[#063B5C] transition-colors p-2 hover:bg-white rounded-lg cursor-pointer"
                   >
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -615,8 +615,8 @@ const handleViewPDF = async (orderId: string) => {
                 {pdfLoading ? (
                   <div className="flex items-center justify-center h-full">
                     <div className="text-center">
-                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#9B0F06] mx-auto"></div>
-                      <p className="mt-4 text-gray-600">Loading PDF...</p>
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#008FB8] mx-auto"></div>
+                      <p className="mt-4 text-[#315A6E]">Loading PDF...</p>
                     </div>
                   </div>
                 ) : pdfUrl ? (
@@ -633,8 +633,8 @@ const handleViewPDF = async (orderId: string) => {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                       </div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">Failed to load PDF</h3>
-                      <p className="text-gray-600">The receipt could not be loaded. Please try again.</p>
+                      <h3 className="text-lg font-semibold text-[#063B5C] mb-2">Failed to load PDF</h3>
+                      <p className="text-[#315A6E]">The receipt could not be loaded. Please try again.</p>
                     </div>
                   </div>
                 )}
@@ -646,14 +646,14 @@ const handleViewPDF = async (orderId: string) => {
         {/* Cancelled Orders Modal */}
         {showCancelledOrdersModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden border border-gray-300">
-              <div className="px-6 py-4 border-b border-gray-300 bg-gray-50 flex justify-between items-center flex-shrink-0">
-                <h3 className="text-xl font-semibold text-gray-900">
+            <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden border border-[#B8DCE7]">
+              <div className="px-6 py-4 border-b border-[#B8DCE7] bg-[#F8FCFD] flex justify-between items-center flex-shrink-0">
+                <h3 className="text-xl font-semibold text-[#063B5C]">
                   Cancelled Orders ({cancelledOrders.length})
                 </h3>
                 <button
                   onClick={() => setShowCancelledOrdersModal(false)}
-                  className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-white rounded-lg cursor-pointer"
+                  className="text-[#315A6E]/60 hover:text-[#063B5C] transition-colors p-2 hover:bg-white rounded-lg cursor-pointer"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -664,23 +664,23 @@ const handleViewPDF = async (orderId: string) => {
               <div className="overflow-y-auto max-h-[calc(90vh-80px)]">
                 {cancelledOrders.length === 0 ? (
                   <div className="p-8 text-center">
-                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-16 h-16 bg-[#EAF8FC] rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg className="w-8 h-8 text-[#315A6E]/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No cancelled orders</h3>
-                    <p className="text-gray-600">You haven&apos;t cancelled any orders yet</p>
+                    <h3 className="text-lg font-semibold text-[#063B5C] mb-2">No cancelled orders</h3>
+                    <p className="text-[#315A6E]">You haven&apos;t cancelled any orders yet</p>
                   </div>
                 ) : (
-                  <div className="divide-y divide-gray-200">
+                  <div className="divide-y divide-[#B8DCE7]">
                     {cancelledOrders.map((order) => {
                       const orderTotal = calculateOrderTotal(order);
                       
                       return (
                         <div
                           key={order._id}
-                          className="p-6 hover:bg-gray-50 cursor-pointer transition-all duration-200"
+                          className="p-6 hover:bg-[#F8FCFD] cursor-pointer transition-all duration-200"
                           onClick={() => {
                             setSelectedOrder(order);
                             setShowCancelledOrdersModal(false);
@@ -689,7 +689,7 @@ const handleViewPDF = async (orderId: string) => {
                           <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
                             <div className="flex-1">
                               <div className="flex flex-col lg:flex-row lg:items-center gap-3 mb-3">
-                                <h3 className="text-lg font-semibold text-gray-900">
+                                <h3 className="text-lg font-semibold text-[#063B5C]">
                                   Order #{order.orderId || order._id?.slice(-8)}
                                 </h3>
                                 <div className="flex flex-wrap gap-2">
@@ -698,18 +698,18 @@ const handleViewPDF = async (orderId: string) => {
                                 </div>
                               </div>
                               
-                              <p className="text-gray-600 mb-3 text-sm">
+                              <p className="text-[#315A6E] mb-3 text-sm">
                                 Cancelled on {formatDate(order.updatedAt || order.createdAt)}
                               </p>
                               
                               <div className="flex flex-wrap items-center gap-3 text-sm">
-                                <span className="text-gray-600">{order.products?.length || 0} items</span>
-                                <span className="text-gray-400">•</span>
-                                <span className="font-semibold text-gray-900">
+                                <span className="text-[#315A6E]">{order.products?.length || 0} items</span>
+                                <span className="text-[#315A6E]/50">•</span>
+                                <span className="font-semibold text-[#063B5C]">
                                   ₹{orderTotal.toFixed(2)}
                                 </span>
-                                <span className="text-gray-400">•</span>
-                                <span className="text-gray-600 capitalize">{order.paymentMethod}</span>
+                                <span className="text-[#315A6E]/50">•</span>
+                                <span className="text-[#315A6E] capitalize">{order.paymentMethod}</span>
                               </div>
 
                               {/* Order Items Preview */}
@@ -718,22 +718,22 @@ const handleViewPDF = async (orderId: string) => {
                                   const itemTotal = getItemTotal(item);
                                   
                                   return (
-                                    <div key={index} className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 border border-gray-300">
-                                      <span className="text-sm text-gray-700">
+                                    <div key={index} className="flex items-center gap-2 bg-[#F8FCFD] rounded-lg px-3 py-2 border border-[#B8DCE7]">
+                                      <span className="text-sm text-[#315A6E]">
                                         {getProductDisplayName(item)}
                                       </span>
-                                      <span className="text-xs text-gray-500 bg-white px-1 rounded border">
+                                      <span className="text-xs text-[#315A6E]/70 bg-white px-1 rounded border border-[#B8DCE7]">
                                         x{item.quantity}
                                       </span>
-                                      <span className="text-xs font-semibold text-gray-900">
+                                      <span className="text-xs font-semibold text-[#063B5C]">
                                         ₹{itemTotal.toFixed(2)}
                                       </span>
                                     </div>
                                   );
                                 })}
                                 {order.products && order.products.length > 3 && (
-                                  <div className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 border border-gray-300">
-                                    <span className="text-sm text-gray-700">
+                                  <div className="flex items-center gap-2 bg-[#F8FCFD] rounded-lg px-3 py-2 border border-[#B8DCE7]">
+                                    <span className="text-sm text-[#315A6E]">
                                       +{order.products.length - 3} more
                                     </span>
                                   </div>
@@ -747,7 +747,7 @@ const handleViewPDF = async (orderId: string) => {
                                   e.stopPropagation();
                                   handleViewPDF(order._id);
                                 }}
-                                className="border border-[#9B0F06] text-[#9B0F06] px-4 py-2 rounded-lg hover:bg-[#9B0F06] hover:text-white transition-colors font-medium text-sm flex items-center gap-2 whitespace-nowrap cursor-pointer"
+                                className="border border-[#008FB8] text-[#008FB8] px-4 py-2 rounded-lg hover:bg-[#008FB8] hover:text-white transition-colors font-medium text-sm flex items-center gap-2 whitespace-nowrap cursor-pointer"
                               >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
