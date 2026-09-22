@@ -7,7 +7,24 @@ import { useState, useEffect, useRef } from 'react';
 import { quickSearchProducts } from '@/lib/productService';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { ShoppingCart, Menu, X, User, Search, Instagram, Twitter, Facebook, Youtube, Linkedin, Phone, Mail, ChevronDown } from 'lucide-react';
+import {
+  ShoppingCart,
+  Menu,
+  X,
+  User,
+  Search,
+  Phone,
+  Mail,
+  ChevronDown,
+} from 'lucide-react';
+
+import {
+  FaFacebookF,
+  FaTwitter,
+  FaInstagram,
+  FaYoutube,
+  FaLinkedinIn,
+} from 'react-icons/fa';
 import { Category } from '@/types/category';
 import CartDrawer from '@/components/CartDrawer';
 import { settingsAPI } from '@/lib/settings-api';
@@ -319,28 +336,23 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
               <div className="flex items-center gap-3">
                 {socialMedia.facebook && (
                   <a href={socialMedia.facebook} target="_blank" rel="noopener noreferrer" className="hover:text-[#00A9E0] transition-all duration-300">
-                    <Facebook className="w-[12px] h-[12px] cursor-pointer" />
-                  </a>
+<FaFacebookF className="w-[12px] h-[12px] cursor-pointer" />                  </a>
                 )}
                 {socialMedia.twitter && (
                   <a href={socialMedia.twitter} target="_blank" rel="noopener noreferrer" className="hover:text-[#00A9E0] transition-all duration-300">
-                    <Twitter className="w-[12px] h-[12px] cursor-pointer" />
-                  </a>
+<FaTwitter className="w-[12px] h-[12px] cursor-pointer" />                  </a>
                 )}
                 {socialMedia.instagram && (
                   <a href={socialMedia.instagram} target="_blank" rel="noopener noreferrer" className="hover:text-[#00A9E0] transition-all duration-300">
-                    <Instagram className="w-[12px] h-[12px] cursor-pointer" />
-                  </a>
+<FaInstagram className="w-[12px] h-[12px] cursor-pointer" />                  </a>
                 )}
                 {socialMedia.youtube && (
                   <a href={socialMedia.youtube} target="_blank" rel="noopener noreferrer" className="hover:text-[#00A9E0] transition-all duration-300">
-                    <Youtube className="w-[12px] h-[12px] cursor-pointer" />
-                  </a>
+<FaYoutube className="w-[12px] h-[12px] cursor-pointer" />                  </a>
                 )}
                 {socialMedia.linkedin && (
                   <a href={socialMedia.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-[#00A9E0] transition-all duration-300">
-                    <Linkedin className="w-[12px] h-[12px] cursor-pointer" />
-                  </a>
+<FaLinkedinIn className="w-[12px] h-[12px] cursor-pointer" />                  </a>
                 )}
               </div>
             </div>

@@ -1,56 +1,65 @@
 "use client";
 
-import { motion } from 'framer-motion';
-import { 
-  Facebook, 
-  Twitter, 
-  Instagram, 
-  Youtube, 
-  Linkedin
-} from 'lucide-react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { useState, useEffect } from 'react';
-import { settingsAPI } from '@/lib/settings-api';
+import { motion } from "framer-motion";
+import {
+  Mail,
+  Phone,
+  MapPin,
+} from "lucide-react";
+import {
+  FaFacebookF,
+  FaTwitter,
+  FaInstagram,
+  FaYoutube,
+  FaLinkedinIn,
+} from "react-icons/fa";
+import Link from "next/link";
+import Image from "next/image";
+import { useState, useEffect } from "react";
+import { settingsAPI } from "@/lib/settings-api";
 
 export default function Footer() {
-  const [siteName, setSiteName] = useState('Sea Food');
-  const [siteDescription, setSiteDescription] = useState('');
-  const [contactEmail, setContactEmail] = useState('support@MeenavanFresh.com');
-  const [contactNumber, setContactNumber] = useState('+91 98765 43210');
-  const [companyAddress, setCompanyAddress] = useState('Mumbai, India');
-  const [footerText, setFooterText] = useState('');
+  const [siteName, setSiteName] = useState("Sea Food");
+  const [siteDescription, setSiteDescription] = useState("");
+  const [contactEmail, setContactEmail] = useState(
+    "support@MeenavanFresh.com"
+  );
+  const [contactNumber, setContactNumber] = useState("+91 98765 43210");
+  const [companyAddress, setCompanyAddress] = useState("Mumbai, India");
+  const [footerText, setFooterText] = useState("");
+
   const [socialMedia, setSocialMedia] = useState({
-    facebook: '',
-    instagram: '',
-    twitter: '',
-    youtube: '',
-    linkedin: ''
+    facebook: "",
+    instagram: "",
+    twitter: "",
+    youtube: "",
+    linkedin: "",
   });
 
   const [loading, setLoading] = useState(true);
 
-  // Split site name for logo display
   const getLogoLines = () => {
-    if (!siteName || siteName.trim() === '') {
-      return { first: '', second: '' };
+    if (!siteName || siteName.trim() === "") {
+      return { first: "", second: "" };
     }
-    
-    const nameParts = siteName.trim().split(' ');
+
+    const nameParts = siteName.trim().split(" ");
+
     if (nameParts.length > 1) {
-      return { 
-        first: nameParts[0], 
-        second: nameParts.slice(1).join(' ') 
+      return {
+        first: nameParts[0],
+        second: nameParts.slice(1).join(" "),
       };
     }
-    
-    return { 
-      first: nameParts[0], 
-      second: '' 
+
+    return {
+      first: nameParts[0],
+      second: "",
     };
   };
 
-  const { first: logoFirstLine, second: logoSecondLine } = getLogoLines();
+  const { first: logoFirstLine, second: logoSecondLine } =
+    getLogoLines();
 
   useEffect(() => {
     fetchSettings();
@@ -59,14 +68,14 @@ export default function Footer() {
   const fetchSettings = async () => {
     try {
       const response = await settingsAPI.getPublicSettings();
+
       if (response.success && response.data) {
         const data = response.data;
-        
+
         if (data.siteName) {
           setSiteName(data.siteName);
         }
 
-        // Dynamic description from siteDescription
         if (data.siteDescription) {
           setSiteDescription(data.siteDescription);
         }
@@ -89,80 +98,120 @@ export default function Footer() {
 
         if (data.socialMedia) {
           setSocialMedia({
-            facebook: data.socialMedia.facebook || '',
-            instagram: data.socialMedia.instagram || '',
-            twitter: data.socialMedia.twitter || '',
-            youtube: data.socialMedia.youtube || '',
-            linkedin: data.socialMedia.linkedin || ''
+            facebook: data.socialMedia.facebook || "",
+            instagram: data.socialMedia.instagram || "",
+            twitter: data.socialMedia.twitter || "",
+            youtube: data.socialMedia.youtube || "",
+            linkedin: data.socialMedia.linkedin || "",
           });
         }
 
         if (data.facebookUrl && !data.socialMedia?.facebook) {
-          setSocialMedia(prev => ({ ...prev, facebook: data.facebookUrl || '' }));
+          setSocialMedia((prev) => ({
+            ...prev,
+            facebook: data.facebookUrl || "",
+          }));
         }
 
         if (data.instagramUrl && !data.socialMedia?.instagram) {
-          setSocialMedia(prev => ({ ...prev, instagram: data.instagramUrl || '' }));
+          setSocialMedia((prev) => ({
+            ...prev,
+            instagram: data.instagramUrl || "",
+          }));
         }
 
         if (data.twitterUrl && !data.socialMedia?.twitter) {
-          setSocialMedia(prev => ({ ...prev, twitter: data.twitterUrl || '' }));
+          setSocialMedia((prev) => ({
+            ...prev,
+            twitter: data.twitterUrl || "",
+          }));
         }
 
         if (data.youtubeUrl && !data.socialMedia?.youtube) {
-          setSocialMedia(prev => ({ ...prev, youtube: data.youtubeUrl || '' }));
+          setSocialMedia((prev) => ({
+            ...prev,
+            youtube: data.youtubeUrl || "",
+          }));
         }
 
         if (data.linkedinUrl && !data.socialMedia?.linkedin) {
-          setSocialMedia(prev => ({ ...prev, linkedin: data.linkedinUrl || '' }));
+          setSocialMedia((prev) => ({
+            ...prev,
+            linkedin: data.linkedinUrl || "",
+          }));
         }
       }
     } catch (error) {
-      console.error('Error fetching footer settings:', error);
+      console.error("Error fetching footer settings:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const socialConfigs = [
-    { key: 'facebook', icon: Facebook, url: socialMedia.facebook, label: 'Facebook' },
-    { key: 'twitter', icon: Twitter, url: socialMedia.twitter, label: 'Twitter' },
-    { key: 'instagram', icon: Instagram, url: socialMedia.instagram, label: 'Instagram' },
-    { key: 'youtube', icon: Youtube, url: socialMedia.youtube, label: 'YouTube' },
-    { key: 'linkedin', icon: Linkedin, url: socialMedia.linkedin, label: 'LinkedIn' },
+    {
+      key: "facebook",
+      icon: FaFacebookF,
+      url: socialMedia.facebook,
+      label: "Facebook",
+    },
+    {
+      key: "twitter",
+      icon: FaTwitter,
+      url: socialMedia.twitter,
+      label: "Twitter",
+    },
+    {
+      key: "instagram",
+      icon: FaInstagram,
+      url: socialMedia.instagram,
+      label: "Instagram",
+    },
+    {
+      key: "youtube",
+      icon: FaYoutube,
+      url: socialMedia.youtube,
+      label: "YouTube",
+    },
+    {
+      key: "linkedin",
+      icon: FaLinkedinIn,
+      url: socialMedia.linkedin,
+      label: "LinkedIn",
+    },
   ];
 
   const activeSocialLinks = socialConfigs.filter(
-    social => social.url && social.url.trim() !== ''
+    (social) => social.url && social.url.trim() !== ""
   );
 
   const navLinks = [
-    { title: 'Home', href: '/' },
-    { title: 'About', href: '/about' },
-    { title: 'Contact', href: '/contact' },
+    { title: "Home", href: "/" },
+    { title: "About", href: "/about" },
+    { title: "Contact", href: "/contact" },
   ];
 
   const legalLinks = [
-    { title: 'Terms', href: '/terms' },
-    { title: 'Privacy Policy', href: '/privacy' },
+    { title: "Terms", href: "/terms" },
+    { title: "Privacy Policy", href: "/privacy" },
   ];
 
-  const copyrightText = footerText || `© ${new Date().getFullYear()} ${siteName}. All rights reserved.`;
+  const copyrightText =
+    footerText ||
+    `© ${new Date().getFullYear()} ${siteName}. All rights reserved.`;
 
   if (loading) {
     return (
-      <footer 
-        className="pt-12 pb-8" 
-        style={{ 
-          backgroundColor: '#F8FCFD', 
-          color: '#315A6E' 
+      <footer
+        className="pt-12 pb-8"
+        style={{
+          backgroundColor: "#F8FCFD",
+          color: "#315A6E",
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-center items-center h-40">
-            <div 
-              className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#008FB8]"
-            ></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#008FB8]" />
           </div>
         </div>
       </footer>
@@ -170,18 +219,18 @@ export default function Footer() {
   }
 
   return (
-    <footer 
-      className="pt-12 pb-8" 
-      style={{ 
-        backgroundColor: '#ebf7f9', 
-        color: '#315A6E' 
+    <footer
+      className="pt-12 pb-8"
+      style={{
+        backgroundColor: "#ebf7f9",
+        color: "#315A6E",
       }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
 
-          {/* About Section with Logo */}
+          {/* About Section */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -190,7 +239,6 @@ export default function Footer() {
           >
             <div className="flex items-center gap-3 mb-4">
 
-              {/* Logo Image */}
               <div className="relative w-16 h-16 lg:w-20 lg:h-20 flex-shrink-0">
                 <Image
                   src="/images/logo.png"
@@ -200,28 +248,22 @@ export default function Footer() {
                 />
               </div>
 
-              {/* Logo Text - Matching Header Style */}
               <div className="flex flex-col justify-center">
-                <span 
-                  className="text-[25px] sm:text-[25px] lg:text-[28px] font-black tracking-[2px] lg:tracking-[3px] text-[#063B5C] leading-none"
-                >
+                <span className="text-[25px] sm:text-[25px] lg:text-[28px] font-black tracking-[2px] lg:tracking-[3px] text-[#063B5C] leading-none">
                   {logoFirstLine}
                 </span>
 
                 {logoSecondLine && (
-                  <span 
-                    className="text-[18px] sm:text-[18px] lg:text-[16px] font-bold tracking-[1px] text-[#008FB8] leading-none ml-4 sm:ml-3 lg:ml-5"
-                  >
+                  <span className="text-[18px] sm:text-[18px] lg:text-[16px] font-bold tracking-[1px] text-[#008FB8] leading-none ml-4 sm:ml-3 lg:ml-5">
                     {logoSecondLine}
                   </span>
                 )}
               </div>
             </div>
 
-            {/* Dynamic Description */}
-            <p 
-              className="text-sm leading-relaxed font-medium" 
-              style={{ color: '#315A6E' }}
+            <p
+              className="text-sm leading-relaxed font-medium"
+              style={{ color: "#315A6E" }}
             >
               {siteDescription}
             </p>
@@ -238,9 +280,12 @@ export default function Footer() {
                       target="_blank"
                       rel="noopener noreferrer"
                       whileHover={{ y: -3, scale: 1.1 }}
-                      transition={{ type: "spring", stiffness: 400 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                      }}
                       className="transition-colors hover:text-[#00A9E0]"
-                      style={{ color: '#008FB8' }}
+                      style={{ color: "#008FB8" }}
                       aria-label={social.label}
                     >
                       <Icon size={18} />
@@ -251,31 +296,34 @@ export default function Footer() {
             )}
           </motion.div>
 
-          {/* Quick Links Section - Matching Header Nav Style */}
+          {/* Quick Links */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
           >
-            <h4 
-              className="font-extrabold text-[12px] tracking-[2px] uppercase mb-4" 
-              style={{ color: '#063B5C' }}
+            <h4
+              className="font-extrabold text-[12px] tracking-[2px] uppercase mb-4"
+              style={{ color: "#063B5C" }}
             >
               Quick Links
             </h4>
 
             <ul className="space-y-2 text-sm">
               {navLinks.map((link) => (
-                <motion.li 
+                <motion.li
                   key={link.title}
                   whileHover={{ x: 3 }}
-                  transition={{ type: "spring", stiffness: 400 }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 400,
+                  }}
                 >
-                  <Link 
-                    href={link.href} 
+                  <Link
+                    href={link.href}
                     className="text-[12px] font-extrabold tracking-[1px] transition-colors hover:text-[#008FB8]"
-                    style={{ color: '#063B5C' }}
+                    style={{ color: "#063B5C" }}
                   >
                     {link.title.toUpperCase()}
                   </Link>
@@ -284,31 +332,34 @@ export default function Footer() {
             </ul>
           </motion.div>
 
-          {/* Legal Section - Matching Header Nav Style */}
+          {/* Legal */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.3 }}
           >
-            <h4 
-              className="font-extrabold text-[12px] tracking-[2px] uppercase mb-4" 
-              style={{ color: '#063B5C' }}
+            <h4
+              className="font-extrabold text-[12px] tracking-[2px] uppercase mb-4"
+              style={{ color: "#063B5C" }}
             >
               Legal
             </h4>
 
             <ul className="space-y-2 text-sm">
               {legalLinks.map((link) => (
-                <motion.li 
+                <motion.li
                   key={link.title}
                   whileHover={{ x: 3 }}
-                  transition={{ type: "spring", stiffness: 400 }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 400,
+                  }}
                 >
-                  <Link 
-                    href={link.href} 
+                  <Link
+                    href={link.href}
                     className="text-[12px] font-extrabold tracking-[1px] transition-colors hover:text-[#008FB8]"
-                    style={{ color: '#063B5C' }}
+                    style={{ color: "#063B5C" }}
                   >
                     {link.title.toUpperCase()}
                   </Link>
@@ -317,16 +368,16 @@ export default function Footer() {
             </ul>
           </motion.div>
 
-          {/* Contact Info Section - Matching Header Style */}
+          {/* Contact */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.4 }}
           >
-            <h4 
-              className="font-extrabold text-[12px] tracking-[2px] uppercase mb-4" 
-              style={{ color: '#063B5C' }}
+            <h4
+              className="font-extrabold text-[12px] tracking-[2px] uppercase mb-4"
+              style={{ color: "#063B5C" }}
             >
               Contact Us
             </h4>
@@ -334,79 +385,42 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
 
               <li className="flex items-start space-x-2">
-                <svg 
-                  className="w-4 h-4 mt-0.5 flex-shrink-0" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                  style={{ color: '#008FB8' }}
-                >
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={2} 
-                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" 
-                  />
-                </svg>
+                <Mail
+                  className="w-4 h-4 mt-0.5 flex-shrink-0"
+                  style={{ color: "#008FB8" }}
+                />
 
-                <span 
+                <span
                   className="text-[12px] font-semibold tracking-[0.5px]"
-                  style={{ color: '#315A6E' }}
+                  style={{ color: "#315A6E" }}
                 >
                   {contactEmail}
                 </span>
               </li>
 
               <li className="flex items-start space-x-2">
-                <svg 
-                  className="w-4 h-4 mt-0.5 flex-shrink-0" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                  style={{ color: '#008FB8' }}
-                >
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={2} 
-                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" 
-                  />
-                </svg>
+                <Phone
+                  className="w-4 h-4 mt-0.5 flex-shrink-0"
+                  style={{ color: "#008FB8" }}
+                />
 
-                <span 
+                <span
                   className="text-[12px] font-semibold tracking-[0.5px]"
-                  style={{ color: '#315A6E' }}
+                  style={{ color: "#315A6E" }}
                 >
                   {contactNumber}
                 </span>
               </li>
 
               <li className="flex items-start space-x-2">
-                <svg 
-                  className="w-4 h-4 mt-0.5 flex-shrink-0" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                  style={{ color: '#008FB8' }}
-                >
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={2} 
-                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" 
-                  />
+                <MapPin
+                  className="w-4 h-4 mt-0.5 flex-shrink-0"
+                  style={{ color: "#008FB8" }}
+                />
 
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={2} 
-                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" 
-                  />
-                </svg>
-
-                <span 
+                <span
                   className="text-[12px] font-semibold tracking-[0.5px]"
-                  style={{ color: '#315A6E' }}
+                  style={{ color: "#315A6E" }}
                 >
                   {companyAddress}
                 </span>
@@ -414,22 +428,23 @@ export default function Footer() {
 
             </ul>
           </motion.div>
+
         </div>
 
-        {/* Copyright Section */}
-        <motion.div 
+        {/* Copyright */}
+        <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.5 }}
           className="pt-8 mt-8"
-          style={{ 
-            borderTop: '1px solid #B8DCE7' 
+          style={{
+            borderTop: "1px solid #B8DCE7",
           }}
         >
-          <p 
+          <p
             className="text-[10px] xs:text-[11px] sm:text-xs md:text-sm lg:text-base text-center px-2 font-semibold tracking-[0.5px]"
-            style={{ color: '#315A6E' }}
+            style={{ color: "#315A6E" }}
           >
             {copyrightText}
           </p>
