@@ -1,13 +1,12 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createOrder, getWards } from '@/lib/order-api';
 import { createRazorpayOrder, verifyPayment } from '@/lib/payment-api';
-import { Ward } from '@/types/order';
 
 declare global {
   interface Window {
@@ -23,7 +22,6 @@ interface RazorpayOptions {
   currency: string;
   name: string;
   description: string;
-  image: string;
   order_id: string;
   handler: (response: RazorpayResponse) => Promise<void> | void;
   prefill: { name: string; email: string; contact: string };
@@ -48,6 +46,7 @@ interface RazorpayErrorResponse {
 }
 
 interface FormData {
+  name: string;              // ✅ NEW
   email: string;
   phone: string;
   street: string;
@@ -81,6 +80,7 @@ export default function CheckoutPage() {
   const router = useRouter();
 
   const [formData, setFormData] = useState<FormData>({
+    name: '',                  // ✅ NEW
     email: '',
     phone: '',
     street: '',
@@ -92,8 +92,6 @@ export default function CheckoutPage() {
     selectedStreet: '',
   });
 
-  const [wards, setWards] = useState<Ward[]>([]);
-  const [streetsForSelectedWard, setStreetsForSelectedWard] = useState<string[]>([]);
   const [loadingWards, setLoadingWards] = useState(true);
   const [loading, setLoading] = useState(false);
   const [paymentLoading, setPaymentLoading] = useState(false);
@@ -111,16 +109,7 @@ export default function CheckoutPage() {
   });
   const [settingsLoading, setSettingsLoading] = useState(true);
 
-  const [streetSuggestions, setStreetSuggestions] = useState<string[]>([]);
-  const [showStreetSuggestions, setShowStreetSuggestions] = useState(false);
-  const [isStreetFocused, setIsStreetFocused] = useState(false);
-  const streetBoxRef = useRef<HTMLDivElement>(null);
-
   const [wardInput, setWardInput] = useState('');
-  const [wardSuggestions, setWardSuggestions] = useState<Ward[]>([]);
-  const [showWardSuggestions, setShowWardSuggestions] = useState(false);
-  const [isWardFocused, setIsWardFocused] = useState(false);
-  const wardBoxRef = useRef<HTMLDivElement>(null);
 
   const [buyNowItem, setBuyNowItem] = useState<any>(null);
   const [isBuyNowMode, setIsBuyNowMode] = useState(false);
@@ -137,7 +126,6 @@ export default function CheckoutPage() {
     setPopup({ isOpen: true, type: 'success', title: 'Success!', message });
   };
 
-  // ✅ Hard redirect to home (bypasses Next.js router cache)
   const hardRedirectHome = () => {
     if (typeof window !== 'undefined') {
       window.location.href = '/';
@@ -151,28 +139,12 @@ export default function CheckoutPage() {
   const loadWards = async () => {
     try {
       setLoadingWards(true);
-      const wardData = await getWards();
-      setWards(wardData);
+      await getWards();
     } catch (error) {
-      console.error('❌ Error loading wards:', error);
-      showErrorPopup('Failed to load ward data. Please refresh the page.');
+      console.error('❌ Error loading ward data:', error);
     } finally {
       setLoadingWards(false);
     }
-  };
-
-  useEffect(() => {
-    if (formData.selectedWardId) {
-      const streets = getStreetsForWard(formData.selectedWardId);
-      setStreetsForSelectedWard(streets);
-    } else {
-      setStreetsForSelectedWard([]);
-    }
-  }, [formData.selectedWardId]);
-
-  const getStreetsForWard = (wardId: number): string[] => {
-    const ward = wards.find(w => w.wardId === wardId);
-    return ward?.streets || [];
   };
 
   useEffect(() => {
@@ -183,8 +155,11 @@ export default function CheckoutPage() {
       if (user.email && !formData.email) {
         setFormData(prev => ({ ...prev, email: user.email || '' }));
       }
+      if (user.name && !formData.name) {                  // ✅ NEW
+        setFormData(prev => ({ ...prev, name: user.name || '' }));
+      }
     }
-  }, [user, formData.phone, formData.email]);
+  }, [user, formData.phone, formData.email, formData.name]);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
@@ -230,125 +205,18 @@ export default function CheckoutPage() {
     }
   };
 
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (streetBoxRef.current && !streetBoxRef.current.contains(e.target as Node)) {
-        setShowStreetSuggestions(false);
-        setIsStreetFocused(false);
-      }
-      if (wardBoxRef.current && !wardBoxRef.current.contains(e.target as Node)) {
-        setShowWardSuggestions(false);
-        setIsWardFocused(false);
-      }
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleWardInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAreaInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setWardInput(value);
-
-    const term = value.trim().toLowerCase();
-    if (!term) {
-      setWardSuggestions([]);
-      setShowWardSuggestions(false);
-      return;
-    }
-
-    const matches = wards.filter(w =>
-      w.wardName.toLowerCase().includes(term)
-    ).slice(0, 10);
-
-    setWardSuggestions(matches);
-    setShowWardSuggestions(matches.length > 0);
-  };
-
-  const handleWardFocus = () => {
-    setIsWardFocused(true);
-    if (wardInput.trim() && wardSuggestions.length > 0) {
-      setShowWardSuggestions(true);
-    }
-  };
-
-  const handleWardSuggestionClick = (ward: Ward) => {
-    setFormData(prev => ({
-      ...prev,
-      selectedWardId: ward.wardId,
-      street: '',
-      selectedStreet: '',
-    }));
-    setWardInput(ward.wardName);
-    setShowWardSuggestions(false);
-    setWardSuggestions([]);
-    setIsWardFocused(false);
-    setStreetSuggestions([]);
-    setShowStreetSuggestions(false);
   };
 
   const handleClearWard = () => {
     setWardInput('');
-    setFormData(prev => ({
-      ...prev,
-      selectedWardId: null,
-      street: '',
-      selectedStreet: '',
-    }));
-    setWardSuggestions([]);
-    setShowWardSuggestions(false);
-    setStreetSuggestions([]);
-    setShowStreetSuggestions(false);
-  };
-
-  const handleStreetInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setFormData(prev => ({ ...prev, street: value, selectedStreet: '' }));
-
-    const term = value.trim().toLowerCase();
-    if (!term) {
-      setStreetSuggestions([]);
-      setShowStreetSuggestions(false);
-      return;
-    }
-
-    const pool = formData.selectedWardId
-      ? streetsForSelectedWard
-      : wards.flatMap(w => w.streets);
-
-    const matches = pool
-      .filter(s => s.toLowerCase().includes(term))
-      .slice(0, 10);
-
-    setStreetSuggestions(matches);
-    setShowStreetSuggestions(matches.length > 0);
-  };
-
-  const handleStreetFocus = () => {
-    setIsStreetFocused(true);
-    if (formData.street.trim() && streetSuggestions.length > 0) {
-      setShowStreetSuggestions(true);
-    }
-  };
-
-  const handleStreetSuggestionClick = (street: string) => {
-    const ward = wards.find(w => w.streets.includes(street));
-    setFormData(prev => ({
-      ...prev,
-      street,
-      selectedStreet: street,
-      selectedWardId: ward ? ward.wardId : prev.selectedWardId,
-    }));
-    if (ward) {
-      setWardInput(ward.wardName);
-    }
-    setShowStreetSuggestions(false);
-    setStreetSuggestions([]);
-    setIsStreetFocused(false);
   };
 
   const loadRazorpayScript = (): Promise<boolean> => {
@@ -385,7 +253,7 @@ export default function CheckoutPage() {
       setLoading(true);
       setAuthError('');
 
-      if (!formData.phone || !formData.street || !formData.city ||
+      if (!formData.name || !formData.phone || !formData.street || !formData.city ||
           !formData.state || !formData.postalCode) {
         showErrorPopup('Please fill all the required fields before placing order.');
         setLoading(false);
@@ -401,6 +269,7 @@ export default function CheckoutPage() {
 
       const orderData: any = {
         shippingAddress: {
+          name: formData.name,               // ✅ NEW
           email: formData.email,
           street: formData.street,
           city: formData.city,
@@ -410,7 +279,7 @@ export default function CheckoutPage() {
           phone: formData.phone,
         },
         paymentMethod: 'cod',
-        typedArea: wardInput,
+        typedArea: wardInput.trim(),
       };
 
       if (isBuyNowMode) {
@@ -438,7 +307,6 @@ export default function CheckoutPage() {
       }, 2000);
 
     } catch (error: any) {
-      // ✅ Cart empty → redirect home
       if (error.code === 'CART_EMPTY' || error.message === 'Cart is empty') {
         hardRedirectHome();
         return;
@@ -446,7 +314,7 @@ export default function CheckoutPage() {
 
       let errorMessage = 'Unable to place your order. Please try again.';
       if (error.code === 'STREET_NOT_FOUND') {
-        errorMessage = 'We could not verify your street address. Please pick a suggestion or select a valid street.';
+        errorMessage = 'We could not verify your street address. Please check and try again.';
       } else if (error.code === 'DELIVERY_AREA_NOT_AVAILABLE') {
         errorMessage = 'Sorry, we currently deliver only to Karaikudi and surrounding areas. Please check your city.';
       } else if (error.code === 'INSUFFICIENT_STOCK') {
@@ -475,7 +343,7 @@ export default function CheckoutPage() {
         return;
       }
 
-      if (!formData.phone || !formData.street || !formData.city ||
+      if (!formData.name || !formData.phone || !formData.street || !formData.city ||
           !formData.state || !formData.postalCode) {
         showErrorPopup('Please fill all the required fields before proceeding to payment.');
         setPaymentLoading(false);
@@ -505,6 +373,7 @@ export default function CheckoutPage() {
 
       const orderData: any = {
         shippingAddress: {
+          name: formData.name,               // ✅ NEW
           email: formData.email,
           street: formData.street,
           city: formData.city,
@@ -514,7 +383,7 @@ export default function CheckoutPage() {
           phone: formData.phone,
         },
         paymentMethod: 'razorpay',
-        typedArea: wardInput,
+        typedArea: wardInput.trim(),
       };
 
       if (isBuyNowMode) {
@@ -539,7 +408,6 @@ export default function CheckoutPage() {
         currency: razorpayOrder.currency || 'INR',
         name: 'Meenavan Fresh',
         description: 'Order Payment',
-        image: '/logo2.png',
         order_id: razorpayOrder.id,
         handler: async (response: RazorpayResponse) => {
           try {
@@ -557,18 +425,16 @@ export default function CheckoutPage() {
                 window.location.href = `/order-success?orderId=${orderId}`;
               }, 2000);
             } else {
-              // ✅ Payment verification failed → redirect home
               hardRedirectHome();
             }
           } catch (error) {
             console.error('Verification error:', error);
-            // ✅ Verification error → redirect home
             hardRedirectHome();
           }
           setPaymentLoading(false);
         },
         prefill: {
-          name: user?.name || 'Customer',
+          name: formData.name || user?.name || 'Customer',   // ✅ typed name first
           email: formData.email,
           contact: formData.phone,
         },
@@ -576,9 +442,7 @@ export default function CheckoutPage() {
         theme: { color: '#064B6A' },
         modal: {
           ondismiss: () => {
-            console.log('🚪 Razorpay modal dismissed — redirecting home');
             setPaymentLoading(false);
-            // ✅ ALWAYS redirect home on cancel
             hardRedirectHome();
           },
         },
@@ -589,14 +453,12 @@ export default function CheckoutPage() {
       razorpay.on('payment.failed', function (response: RazorpayErrorResponse) {
         console.error('❌ Payment failed:', response.error);
         setPaymentLoading(false);
-        // ✅ ALWAYS redirect home on failure
         hardRedirectHome();
       });
 
       razorpay.open();
 
     } catch (error: any) {
-      // ✅ Cart empty → redirect home
       if (error.code === 'CART_EMPTY' || error.message === 'Cart is empty') {
         hardRedirectHome();
         return;
@@ -605,7 +467,7 @@ export default function CheckoutPage() {
       console.error('Razorpay error:', error);
       let errorMessage = 'Payment initialization failed. Please try again or use Cash on Delivery.';
       if (error.code === 'STREET_NOT_FOUND') {
-        errorMessage = 'We could not verify your street address. Please pick a suggestion or select a valid street.';
+        errorMessage = 'We could not verify your street address. Please check and try again.';
       } else if (error.code === 'DELIVERY_AREA_NOT_AVAILABLE') {
         errorMessage = 'Sorry, we currently deliver only to Karaikudi and surrounding areas. Please check your city.';
       } else if (error.message) {
@@ -627,7 +489,7 @@ export default function CheckoutPage() {
       <div className="min-h-screen bg-[#F8FCFD] flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#008FB8] mx-auto mb-4"></div>
-          <p className="text-[#315A6E]">{loadingWards ? 'Loading ward data...' : 'Loading payment methods...'}</p>
+          <p className="text-[#315A6E]">{loadingWards ? 'Loading data...' : 'Loading payment methods...'}</p>
         </div>
       </div>
     );
@@ -722,6 +584,20 @@ export default function CheckoutPage() {
               <h2 className="text-lg sm:text-xl font-semibold text-[#063B5C] mb-4 sm:mb-6">Shipping Information</h2>
 
               <div className="space-y-3 sm:space-y-4">
+                {/* ✅ Full Name */}
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-[#315A6E] mb-1">Full Name *</label>
+                  <input
+                    type="text"
+                    name="name"
+                    required
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 text-sm sm:text-base border border-[#B8DCE7] rounded-md focus:outline-none focus:ring-2 focus:ring-[#008FB8]"
+                    placeholder="Enter your full name"
+                  />
+                </div>
+
                 <div>
                   <label className="block text-xs sm:text-sm font-medium text-[#315A6E] mb-1">Email Address (Optional)</label>
                   <input
@@ -747,17 +623,16 @@ export default function CheckoutPage() {
                   />
                 </div>
 
-                <div ref={wardBoxRef} className="relative">
+                <div className="relative">
                   <label className="block text-xs sm:text-sm font-medium text-[#315A6E] mb-1">
-                    Area
+                    Area Name
                   </label>
                   <div className="relative">
                     <input
                       type="text"
                       autoComplete="off"
                       value={wardInput}
-                      onChange={handleWardInputChange}
-                      onFocus={handleWardFocus}
+                      onChange={handleAreaInputChange}
                       className="w-full px-3 py-2 pr-9 text-sm sm:text-base border border-[#B8DCE7] rounded-md focus:outline-none focus:ring-2 focus:ring-[#008FB8]"
                       placeholder="Type your area"
                     />
@@ -772,24 +647,9 @@ export default function CheckoutPage() {
                       </button>
                     )}
                   </div>
-
-                  {isWardFocused && showWardSuggestions && wardSuggestions.length > 0 && (
-                    <div className="absolute z-20 left-0 right-0 mt-1 bg-white border border-[#B8DCE7] rounded-md shadow-lg max-h-60 overflow-y-auto">
-                      {wardSuggestions.map((ward) => (
-                        <button
-                          key={ward.wardId}
-                          type="button"
-                          onClick={() => handleWardSuggestionClick(ward)}
-                          className="w-full text-left px-3 py-2 text-sm text-[#063B5C] hover:bg-[#008FB8]/10 border-b border-[#B8DCE7] last:border-b-0"
-                        >
-                          {ward.wardName}
-                        </button>
-                      ))}
-                    </div>
-                  )}
                 </div>
 
-                <div ref={streetBoxRef} className="relative">
+                <div className="relative">
                   <label className="block text-xs sm:text-sm font-medium text-[#315A6E] mb-1">
                     Street Address *
                   </label>
@@ -799,31 +659,15 @@ export default function CheckoutPage() {
                     required
                     autoComplete="off"
                     value={formData.street}
-                    onChange={handleStreetInputChange}
-                    onFocus={handleStreetFocus}
+                    onChange={handleInputChange}
                     className="w-full px-3 py-2 text-sm sm:text-base border border-[#B8DCE7] rounded-md focus:outline-none focus:ring-2 focus:ring-[#008FB8]"
                     placeholder="Type your street"
                   />
-
-                  {isStreetFocused && showStreetSuggestions && streetSuggestions.length > 0 && (
-                    <div className="absolute z-20 left-0 right-0 mt-1 bg-white border border-[#B8DCE7] rounded-md shadow-lg max-h-60 overflow-y-auto">
-                      {streetSuggestions.map((street, idx) => (
-                        <button
-                          key={idx}
-                          type="button"
-                          onClick={() => handleStreetSuggestionClick(street)}
-                          className="w-full text-left px-3 py-2 text-sm text-[#063B5C] hover:bg-[#008FB8]/10 border-b border-[#B8DCE7] last:border-b-0"
-                        >
-                          {street}
-                        </button>
-                      ))}
-                    </div>
-                  )}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                   <div>
-                    <label className="block text-xs sm:text-sm font-medium text-[#315A6E] mb-1">City *</label>
+                    <label className="block text-xs sm:text-sm font-medium text-[#315A6E] mb-1">City/Town *</label>
                     <input
                       type="text"
                       name="city"
@@ -902,7 +746,7 @@ export default function CheckoutPage() {
                   ))}
                 </div>
 
-                <div className="">
+                <div className="space-y-2">
                   <div className="flex justify-between text-sm sm:text-base text-[#315A6E]">
                     <span>Subtotal</span>
                     <span>₹{subtotal.toFixed(2)}</span>

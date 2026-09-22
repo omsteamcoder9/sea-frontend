@@ -24,17 +24,20 @@ export interface Order {
   _id: string;
   orderId: string;
   sNo: number;
-  
+
+  name: string;              // ✅ customer name (top-level)
+
   user: string | {
     _id: string;
     name: string;
     email: string;
     phone?: string;
   };
-  
+
   products: OrderItem[];
-  
+
   shippingAddress: {
+    name: string;            // ✅ NEW
     street: string;
     city: string;
     state: string;
@@ -43,37 +46,38 @@ export interface Order {
     phone: string;
     email: string;
   };
-  
+
   wardId?: number | null;
   wardName?: string | null;
   deliveryZone?: string;
-  
+
   paymentMethod: 'cod' | 'razorpay' | 'card';
   paymentId?: string;
   paymentStatus: 'pending' | 'completed' | 'failed' | 'refunded';
   paidAt?: string;
-  
+
   refundStatus?: 'pending' | 'completed' | 'failed' | 'not_applicable';
   refundMessage?: string;
   refundedAt?: string | null;
-  
+
   totalAmount: number;
   shippingFee: number;
   taxAmount: number;
   discountAmount: number;
   finalAmount: number;
-  
+
   orderStatus: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   cancelledAt?: string;
   cancellationReason?: string;
   deliveredAt?: string;
-  
+
   createdAt: string;
   updatedAt: string;
 }
 
 export interface CreateOrderRequest {
   shippingAddress: {
+    name: string;            // ✅ NEW
     street: string;
     city: string;
     state: string;
@@ -86,7 +90,8 @@ export interface CreateOrderRequest {
   paymentId?: string;
   skipCartClear?: boolean;
   products?: any[];
-  deliveryMode?: 'karaikudi' | 'other';  // ✅ NEW
+  deliveryMode?: 'karaikudi' | 'other';
+  typedArea?: string;        // ✅ used by backend for ward matching
 }
 
 export interface OrdersResponse {
@@ -107,7 +112,7 @@ export interface OrderResponse {
   requiresPayment?: boolean;
 }
 
-// ✅ NEW: Ward Types
+// ✅ Ward Types
 export interface Ward {
   wardId: number;
   wardName: string;
