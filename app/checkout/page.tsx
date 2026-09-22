@@ -623,35 +623,11 @@ export default function CheckoutPage() {
                   />
                 </div>
 
-                <div className="relative">
-                  <label className="block text-xs sm:text-sm font-medium text-[#315A6E] mb-1">
-                    Area Name
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      autoComplete="off"
-                      value={wardInput}
-                      onChange={handleAreaInputChange}
-                      className="w-full px-3 py-2 pr-9 text-sm sm:text-base border border-[#B8DCE7] rounded-md focus:outline-none focus:ring-2 focus:ring-[#008FB8]"
-                      placeholder="Type your area"
-                    />
-                    {wardInput && (
-                      <button
-                        type="button"
-                        onClick={handleClearWard}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-lg leading-none"
-                        aria-label="Clear area"
-                      >
-                        ×
-                      </button>
-                    )}
-                  </div>
-                </div>
+     
 
                 <div className="relative">
                   <label className="block text-xs sm:text-sm font-medium text-[#315A6E] mb-1">
-                    Street Address *
+                    Door no, Area, Street *
                   </label>
                   <input
                     type="text"
