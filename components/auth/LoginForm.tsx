@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -21,6 +21,13 @@ export default function LoginForm() {
   const [resendMessage, setResendMessage] = useState<string | null>(null);
 
   const returnTo = searchParams.get('returnTo');
+  const phoneFromUrl = searchParams.get('phone');
+
+  useEffect(() => {
+    if (phoneFromUrl) {
+      setPhoneNumber(phoneFromUrl);
+    }
+  }, [phoneFromUrl]);
 
   const formatPhoneNumber = (value: string) => {
     const cleaned = value.replace(/\D/g, '');
@@ -92,17 +99,13 @@ export default function LoginForm() {
     try {
       const result = await sendOtp(phoneNumber);
       
-      // ✅ If user doesn't exist, redirect to signup (NO OTP sent)
+      // ✅ If user doesn't exist, redirect to signup silently (NO OTP sent)
       if (!result.exists) {
-        setResendMessage('No account found. Redirecting to signup...');
-        setTimeout(() => {
-          router.push(`/signup?phone=${phoneNumber}`);
-        }, 1500);
+        router.push(`/signup?phone=${phoneNumber}`);
         return;
       }
       
       // ✅ User exists - proceed with OTP verification
-      // ✅ FIX: Only set sessionId if it exists, otherwise use null
       if (result.sessionId) {
         setSessionId(result.sessionId);
       } else {
@@ -143,15 +146,12 @@ export default function LoginForm() {
     try {
       const result = await sendOtp(phoneNumber);
       
+      // ✅ If user doesn't exist, redirect to signup silently
       if (!result.exists) {
-        setResendMessage('No account found. Redirecting to signup...');
-        setTimeout(() => {
-          router.push(`/signup?phone=${phoneNumber}`);
-        }, 1500);
+        router.push(`/signup?phone=${phoneNumber}`);
         return;
       }
       
-      // ✅ FIX: Only set sessionId if it exists
       if (result.sessionId) {
         setSessionId(result.sessionId);
       } else {
@@ -249,14 +249,8 @@ export default function LoginForm() {
         {!sessionId ? (
           <form onSubmit={handleSendOtp} className="px-8 py-8 bg-white">
             {resendMessage && (
-              <div className={`mb-4 p-3 rounded-xl ${
-                resendMessage.includes('No account') 
-                  ? 'bg-yellow-50 border border-yellow-200' 
-                  : 'bg-green-50 border border-green-200'
-              }`}>
-                <p className={`text-sm text-center ${
-                  resendMessage.includes('No account') ? 'text-yellow-700' : 'text-green-700'
-                }`}>
+              <div className="mb-4 p-3 rounded-xl bg-green-50 border border-green-200">
+                <p className="text-sm text-center text-green-700">
                   {resendMessage}
                 </p>
               </div>
@@ -299,6 +293,7 @@ export default function LoginForm() {
                     placeholder="9876543210"
                     disabled={isLoadingState}
                     maxLength={10}
+                    autoFocus={!phoneFromUrl}
                   />
                 </motion.div>
               </div>

@@ -60,6 +60,23 @@ export default function ProductGrid({ category, search, limit, hideFilters = fal
     }
   }, [hideFilters]);
 
+  // ✅ FIX: Sync `category` and `search` props into filters whenever they change.
+  // This makes header category clicks work even when already on /products.
+  useEffect(() => {
+    setFilters(prev => {
+      const newCategory = category || '';
+      const newSearch = search || '';
+      if (prev.category === newCategory && prev.search === newSearch) {
+        return prev; // no change → avoid re-render loop
+      }
+      return {
+        ...prev,
+        category: newCategory,
+        search: newSearch,
+      };
+    });
+  }, [category, search]);
+
   const parsePriceRange = (range: string): { minPrice?: number; maxPrice?: number } => {
     if (!range) return {};
     if (range === 'above-600') return { minPrice: 600 };

@@ -99,17 +99,13 @@ export default function SignupForm() {
     try {
       const result = await sendSignupOtp(phoneNumber);
       
-      // ✅ If user already exists and is active, redirect to login
+      // ✅ If user already exists and is active, redirect to login silently
       if (result.exists && result.isActive) {
-        setResendMessage('Account already exists. Redirecting to login...');
-        setTimeout(() => {
-          router.push(`/login?phone=${phoneNumber}`);
-        }, 1500);
+        router.push(`/login?phone=${phoneNumber}`);
         return;
       }
       
       // ✅ New user or inactive user - proceed with OTP verification
-      // ✅ FIX: Only set sessionId if it exists, otherwise show error
       if (result.sessionId) {
         setSessionId(result.sessionId);
       } else {
@@ -150,15 +146,12 @@ export default function SignupForm() {
     try {
       const result = await sendSignupOtp(phoneNumber);
       
+      // ✅ If user already exists and is active, redirect to login silently
       if (result.exists && result.isActive) {
-        setResendMessage('Account already exists. Redirecting to login...');
-        setTimeout(() => {
-          router.push(`/login?phone=${phoneNumber}`);
-        }, 1500);
+        router.push(`/login?phone=${phoneNumber}`);
         return;
       }
       
-      // ✅ FIX: Only set sessionId if it exists
       if (result.sessionId) {
         setSessionId(result.sessionId);
       } else {
@@ -251,14 +244,8 @@ export default function SignupForm() {
         {!sessionId ? (
           <form onSubmit={handleSendOtp} className="px-8 py-8 bg-white">
             {resendMessage && (
-              <div className={`mb-4 p-3 rounded-xl ${
-                resendMessage.includes('already exists') 
-                  ? 'bg-yellow-50 border border-yellow-200' 
-                  : 'bg-green-50 border border-green-200'
-              }`}>
-                <p className={`text-sm text-center ${
-                  resendMessage.includes('already exists') ? 'text-yellow-700' : 'text-green-700'
-                }`}>
+              <div className="mb-4 p-3 rounded-xl bg-green-50 border border-green-200">
+                <p className="text-sm text-center text-green-700">
                   {resendMessage}
                 </p>
               </div>
