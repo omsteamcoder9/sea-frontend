@@ -26,32 +26,32 @@ interface MobileFloatingButtonProps {
 // Helper function to get correct image URL
 const getImageUrl = (imagePath: string | undefined): string => {
   if (!imagePath) return '/placeholder-image.jpg';
-  
+
   if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
     return imagePath;
   }
-  
+
   const imgBaseUrl = process.env.NEXT_PUBLIC_IMG_URL || '';
-  
+
   let cleanPath = imagePath;
   if (cleanPath.startsWith('/')) {
     cleanPath = cleanPath.slice(1);
   }
-  
+
   if (cleanPath.startsWith('uploads/')) {
     cleanPath = cleanPath.replace('uploads/', '');
   }
-  
+
   const imageUrl = `${imgBaseUrl}/${cleanPath}`;
-  
+
   return imageUrl;
 };
 
-const MobileFloatingButton = ({ 
-  product, 
+const MobileFloatingButton = ({
+  product,
   selectedVariant,
-  isVisible, 
-  onAddToCart 
+  isVisible,
+  onAddToCart
 }: MobileFloatingButtonProps) => {
   const router = useRouter();
   const { user } = useAuth();
@@ -59,17 +59,17 @@ const MobileFloatingButton = ({
   const [addingToBuy, setAddingToBuy] = useState(false);
   const [showAddedMessage, setShowAddedMessage] = useState(false);
   const [quantity, setQuantity] = useState(1);
-  
+
   const currentStock = selectedVariant ? selectedVariant.stock : (product?.stock || 0);
   const isOutOfStock = currentStock <= 0;
-  
+
   const handleCartClick = async () => {
     if (isOutOfStock || !product) return;
-    
+
     try {
       setAddingToCart(true);
       await onAddToCart(quantity, selectedVariant);
-      
+
       setShowAddedMessage(true);
       setTimeout(() => {
         setShowAddedMessage(false);
@@ -80,10 +80,10 @@ const MobileFloatingButton = ({
       setAddingToCart(false);
     }
   };
-  
+
   const handleBuyClick = async () => {
     if (isOutOfStock || !product) return;
-    
+
     try {
       setAddingToBuy(true);
       const buyNowData = {
@@ -95,7 +95,7 @@ const MobileFloatingButton = ({
         variantName: selectedVariant?.variantName || selectedVariant?.name || null
       };
       sessionStorage.setItem('buyNowItem', JSON.stringify(buyNowData));
-      
+
       if (!user) {
         sessionStorage.setItem('redirectAfterLogin', '/checkout?buyNow=true');
         router.push('/signup?returnTo=/checkout&buyNow=true');
@@ -142,7 +142,7 @@ const MobileFloatingButton = ({
             </button>
           </div>
         </div>
-        
+
         {/* ACTION BUTTONS ROW */}
         <div className="flex items-stretch h-10">
           <button
@@ -180,7 +180,7 @@ const MobileFloatingButton = ({
               </>
             )}
           </button>
-          
+
           <button
             onClick={handleBuyClick}
             disabled={isOutOfStock || addingToBuy}
@@ -224,9 +224,9 @@ const MobileFloatingButton = ({
 const ProductStructuredData = ({ product, selectedVariant }: { product: Product, selectedVariant: ProductVariant | null }) => {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || '';
   const storeName = process.env.NEXT_PUBLIC_SITE_NAME || '';
-  
+
   const displayPrice = selectedVariant ? selectedVariant.price : (product?.basePrice || 0);
-  
+
   let displayImageUrl = '';
   if (selectedVariant && selectedVariant.images && selectedVariant.images.length > 0 && selectedVariant.images[0]?.image) {
     displayImageUrl = getImageUrl(selectedVariant.images[0].image);
@@ -235,9 +235,9 @@ const ProductStructuredData = ({ product, selectedVariant }: { product: Product,
   } else {
     displayImageUrl = `${siteUrl}/og-image.png`;
   }
-  
+
   const displayStock = selectedVariant ? selectedVariant.stock : (product?.stock || 0);
-  
+
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -312,10 +312,10 @@ const ProductStructuredData = ({ product, selectedVariant }: { product: Product,
 // Helper function to format weight display
 const formatWeightDisplay = (weight: number, unit: string): string => {
   if (!weight || weight <= 0) return '';
-  
+
   let displayWeight = weight;
   let displayUnit = unit;
-  
+
   if (unit === 'gram' && weight >= 1000) {
     displayWeight = weight / 1000;
     displayUnit = 'kg';
@@ -323,11 +323,11 @@ const formatWeightDisplay = (weight: number, unit: string): string => {
     displayWeight = weight / 1000;
     displayUnit = 'liter';
   }
-  
+
   const formattedWeight = Number.isInteger(displayWeight) 
     ? displayWeight.toString()
     : parseFloat(displayWeight.toFixed(2)).toString();
-  
+
   return `${formattedWeight} ${displayUnit}`;
 };
 
@@ -346,7 +346,7 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
     if (product?.variants && product.variants.length > 0) {
       const defaultVariant = product.variants.find(v => v.isDefault) || product.variants[0];
       setSelectedVariant(defaultVariant);
-      
+
       if (defaultVariant.images && defaultVariant.images.length > 0) {
         setCurrentImages(defaultVariant.images);
       }
@@ -356,7 +356,7 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
   const handleVariantSelect = (variant: ProductVariant) => {
     setSelectedVariant(variant);
     setSelectedImageIndex(0);
-    
+
     if (variant.images && variant.images.length > 0) {
       setCurrentImages(variant.images);
     } else {
@@ -373,11 +373,11 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
       const currentScrollY = window.scrollY;
       const windowHeight = window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight;
-      
+
       const isScrollingUp = currentScrollY < lastScrollY;
       const isPastThreshold = currentScrollY > 100;
       const isNotAtBottom = currentScrollY < documentHeight - windowHeight - 100;
-      
+
       setShowFloatingButton(isScrollingUp && isPastThreshold && isNotAtBottom);
       setLastScrollY(currentScrollY);
     }
@@ -395,7 +395,7 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
       alert('Product not found');
       return;
     }
-    
+
     try {
       await addToCart(product, quantity, variant || undefined);
     } catch (error) {
@@ -409,7 +409,7 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
       alert('Product not found');
       return;
     }
-    
+
     try {
       const buyNowData = {
         product: product,
@@ -420,7 +420,7 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
         variantName: selectedVariant?.variantName || selectedVariant?.name || null
       };
       sessionStorage.setItem('buyNowItem', JSON.stringify(buyNowData));
-      
+
       if (!user) {
         sessionStorage.setItem('redirectAfterLogin', '/checkout?buyNow=true');
         router.push('/signup?returnTo=/checkout&buyNow=true');
@@ -435,19 +435,15 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
 
   const currentStock = selectedVariant ? selectedVariant.stock : (product?.stock || 0);
   const displayPrice = selectedVariant ? selectedVariant.price : (product?.basePrice || 0);
-  const originalPrice = selectedVariant?.originalPrice || product?.originalPrice;
-  const discountPercentage = originalPrice && displayPrice < originalPrice 
-    ? Math.round(((originalPrice - displayPrice) / originalPrice) * 100) 
-    : selectedVariant?.discountPercentage || 0;
 
   const getSpecifications = () => {
     const specs = (product as any)?.specifications;
     if (!specs || !Array.isArray(specs)) return [];
-    
+
     if (specs.length > 0 && typeof specs[0] === 'object' && 'key' in specs[0]) {
       return specs;
     }
-    
+
     return [];
   };
 
@@ -468,7 +464,7 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
   return (
     <>
       <ProductStructuredData product={product} selectedVariant={selectedVariant} />
-      
+
       <div className="min-h-screen bg-white pb-9 lg:pb-0">
         <div className="mx-auto">
           <div className="bg-white">
@@ -505,7 +501,7 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
                             target.src = '/placeholder-image.jpg';
                           }}
                         />
-                        
+
                         {currentImages.length > 1 && (
                           <button
                             onClick={() => handleImageThumbnailClick(Math.min(currentImages.length - 1, selectedImageIndex + 1))}
@@ -540,18 +536,18 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
             else if (width < 768) visibleCount = 5;
             else visibleCount = 5;
           }
-          
+
           let startIndex = selectedImageIndex - Math.floor(visibleCount / 2);
           if (startIndex < 0) startIndex = 0;
           if (startIndex > currentImages.length - visibleCount) {
             startIndex = Math.max(0, currentImages.length - visibleCount);
           }
-          
+
           const visibleThumbnails = currentImages.slice(startIndex, startIndex + visibleCount);
-          
+
           return visibleThumbnails.map((img, localIndex) => {
             const actualIndex = startIndex + localIndex;
-            
+
             return (
               <button
                 key={actualIndex}
@@ -582,7 +578,7 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
                     <span className="text-[#315A6E]/60 text-[6px] xs:text-[8px] sm:text-xs">Image {actualIndex + 1}</span>
                   </div>
                 )}
-                
+
                 {selectedImageIndex === actualIndex && (
                   <div className="absolute inset-0 bg-[#008FB8]/10 flex items-center justify-center">
                     <div className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 rounded-full bg-[#008FB8] flex items-center justify-center">
@@ -625,7 +621,7 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
                         if (variant.weight && variant.weightUnit) {
                           let displayWeight = variant.weight;
                           let displayUnit = variant.weightUnit;
-                          
+
                           if (variant.weightUnit === 'gram' && variant.weight >= 1000) {
                             displayWeight = variant.weight / 1000;
                             displayUnit = 'kg';
@@ -633,16 +629,16 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
                             displayWeight = variant.weight / 1000;
                             displayUnit = 'liter';
                           }
-                          
+
                           const formattedWeight = Number.isInteger(displayWeight) 
                             ? displayWeight.toString()
                             : parseFloat(displayWeight.toFixed(2)).toString();
-                          
+
                           weightDisplay = `${formattedWeight} ${displayUnit}`;
                         } else {
                           weightDisplay = (variant.variantName || variant.name || '').replace(/^pack\s*/i, '');
                         }
-                        
+
                         return (
                           <button
                             key={variant._id || variant.variantName || variant.name}
@@ -676,19 +672,6 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
                     <span className="text-xl sm:text-2xl font-bold text-[#063B5C]">
                       ₹{displayPrice.toLocaleString('en-IN')}
                     </span>
-                    {originalPrice && originalPrice > displayPrice && (
-                      <>
-                        <span 
-                          className="text-lg text-[#315A6E]/60 line-through"
-                          style={{ textDecorationThickness: '2px' }}
-                        >
-                          ₹{originalPrice.toLocaleString('en-IN')}
-                        </span>
-                        <span className="text-sm font-bold" style={{ color: '#008FB8' }}>
-                          {discountPercentage}% OFF
-                        </span>
-                      </>
-                    )}
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="px-2 py-0.5 rounded-full text-xs" style={{ backgroundColor: 'rgba(0, 143, 184, 0.1)', color: '#008FB8' }}>
@@ -711,7 +694,7 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
             onQuantityChange={setQuantity}
           />
         </div>
-        
+
         {/* Buy Now Button - Exact same size as AddToCart */}
         <div className="flex-1">
           <button
@@ -734,7 +717,7 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
         </div>
       </div>
     </div>
-    
+
     {/* Mobile Add to Cart & Buy Now - Single Row - Same Size */}
     <div className="lg:hidden">
       <div className="flex gap-2">
@@ -747,7 +730,7 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
             onQuantityChange={setQuantity}
           />
         </div>
-        
+
         {/* Buy Now Button - 50% width - Same size as AddToCart */}
         <div className="flex-1">
           <button
@@ -841,7 +824,7 @@ export default function ClientProductDetail({ product, randomProducts }: ClientP
             </div>
           )}
         </div>
-        
+
         {/* Mobile Floating Button */}
         {product && (
           <MobileFloatingButton 

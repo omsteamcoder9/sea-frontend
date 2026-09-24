@@ -47,6 +47,21 @@ const getItemTotal = (item: OrderItem): number => {
   return price * item.quantity;
 };
 
+// ✅ Format amount with Indian commas: 5600 → 5,600.00
+const formatAmount = (amount: number): string => {
+  return new Intl.NumberFormat('en-IN', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount);
+};
+
+// ✅ Format weight (e.g. 250g, 1kg) — returns null if no weight
+const formatWeight = (item: OrderItem): string | null => {
+  if (!item.weight || item.weight <= 0) return null;
+  const unit = item.weightUnit === 'gram' ? 'g' : item.weightUnit === 'kg' ? 'kg' : (item.weightUnit || 'g');
+  return `${item.weight}${unit}`;
+};
+
 export default function UserProfile() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [activeOrders, setActiveOrders] = useState<Order[]>([]);
@@ -68,22 +83,22 @@ export default function UserProfile() {
       try {
         setLoading(true);
         setError(null);
-        
+
         console.log('🔄 Fetching user orders...');
         // ✅ CORRECT: No token argument - function gets it internally
         const userOrders = await getUserOrders();
-        
+
         console.log('📦 Orders fetched:', userOrders);
-        
+
         setOrders(userOrders);
-        
+
         // Separate active and cancelled orders
         const nonCancelledOrders = userOrders.filter(order => order.orderStatus !== 'cancelled');
         const cancelledOrdersList = userOrders.filter(order => order.orderStatus === 'cancelled');
-        
+
         setActiveOrders(nonCancelledOrders);
         setCancelledOrders(cancelledOrdersList);
-        
+
       } catch (err: unknown) {
         console.error('Error fetching orders:', err);
         setError(err instanceof Error ? err.message : 'Failed to load orders.');
@@ -100,7 +115,7 @@ export default function UserProfile() {
       // ✅ CORRECT: Only one argument - orderId (token from localStorage)
       const order = await getOrderById(orderId);
       setSelectedOrder(order);
-      
+
     } catch (err: unknown) {
       console.error('Error fetching order details:', err);
       setError(`Failed to load order details: ${err instanceof Error ? err.message : 'Unknown error'}`);
@@ -119,30 +134,30 @@ export default function UserProfile() {
       setCancellingOrderId(selectedOrder._id);
       // ✅ CORRECT: Two arguments (orderId, cancellationReason) - no token
       await cancelOrder(selectedOrder._id, cancellationReason);
-      
+
       // Update the orders state
-      const updatedOrders = orders.map(order => 
-        order._id === selectedOrder._id 
+      const updatedOrders = orders.map(order =>
+        order._id === selectedOrder._id
           ? { ...order, orderStatus: 'cancelled' as const }
           : order
       );
       setOrders(updatedOrders);
-      
+
       // Move from active to cancelled
-      setActiveOrders(prevOrders => 
+      setActiveOrders(prevOrders =>
         prevOrders.filter(order => order._id !== selectedOrder._id)
       );
-      
+
       setCancelledOrders(prevOrders => [
         { ...selectedOrder, orderStatus: 'cancelled' },
         ...prevOrders
       ]);
-      
+
       // Close modal and reset state
       setShowCancelModal(false);
       setSelectedOrder(null);
       setCancellationReason('');
-      
+
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to cancel order');
       console.error('Error cancelling order:', err);
@@ -150,43 +165,45 @@ export default function UserProfile() {
       setCancellingOrderId(null);
     }
   };
-const handleViewPDF = async (orderId: string) => {
-  try {
-    setPdfLoading(true);
-    const token = localStorage.getItem('otp_auth_token');
-    if (!token) {
-      setError('Please log in to view receipt');
-      setPdfLoading(false);
-      return;
-    }
 
-    // Use env as is (http://localhost:5000) and add /api in the path
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-    const pdfEndpoint = `${apiUrl}/api/orders/${orderId}/receipt/pdf`;
-    
-    const response = await fetch(pdfEndpoint, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch PDF');
+  const handleViewPDF = async (orderId: string) => {
+    try {
+      setPdfLoading(true);
+      const token = localStorage.getItem('otp_auth_token');
+      if (!token) {
+        setError('Please log in to view receipt');
+        setPdfLoading(false);
+        return;
+      }
+
+      // Use env as is (http://localhost:5000) and add /api in the path
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      const pdfEndpoint = `${apiUrl}/api/orders/${orderId}/receipt/pdf`;
+
+      const response = await fetch(pdfEndpoint, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch PDF');
+      }
+
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+
+      setPdfUrl(blobUrl);
+      setShowPDFModal(true);
+
+    } catch (err: unknown) {
+      console.error('Error opening PDF:', err);
+      setError('Failed to load PDF. Please try again.');
+    } finally {
+      setPdfLoading(false);
     }
-    
-    const blob = await response.blob();
-    const blobUrl = URL.createObjectURL(blob);
-    
-    setPdfUrl(blobUrl);
-    setShowPDFModal(true);
-    
-  } catch (err: unknown) {
-    console.error('Error opening PDF:', err);
-    setError('Failed to load PDF. Please try again.');
-  } finally {
-    setPdfLoading(false);
-  }
-};
+  };
+
   const closePDFModal = () => {
     if (pdfUrl) {
       URL.revokeObjectURL(pdfUrl);
@@ -219,7 +236,7 @@ const handleViewPDF = async (orderId: string) => {
 
     const typeColors = type === 'order' ? statusColors.order : statusColors.payment;
     const colorClass = typeColors[status as keyof typeof typeColors] || 'bg-gray-100 text-gray-800 border border-gray-200';
-    
+
     return (
       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${colorClass}`}>
         {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -258,7 +275,7 @@ const handleViewPDF = async (orderId: string) => {
         <div className="container mx-auto px-4">
           <div className="bg-white rounded-lg shadow-md p-8 text-center border border-[#B8DCE7]">
             <div className="text-red-600 mb-4 font-medium">{error}</div>
-            <button 
+            <button
               onClick={() => window.location.reload()}
               className="bg-[#064B6A] text-white px-6 py-3 rounded-lg hover:bg-[#008FB8] transition-all duration-200 font-medium cursor-pointer"
             >
@@ -321,7 +338,7 @@ const handleViewPDF = async (orderId: string) => {
                     <div className="flex justify-between items-center">
                       <span className="text-[#315A6E]">Total Spent</span>
                       <span className="font-semibold text-[#063B5C]">
-                        ₹{orders.reduce((total, order) => total + calculateOrderTotal(order), 0).toFixed(2)}
+                        ₹{formatAmount(orders.reduce((total, order) => total + calculateOrderTotal(order), 0))}
                       </span>
                     </div>
                   </div>
@@ -380,7 +397,7 @@ const handleViewPDF = async (orderId: string) => {
                     )}
                   </div>
                 </div>
-                
+
                 {activeOrders.length === 0 ? (
                   <div className="p-8 text-center">
                     <div className="w-16 h-16 bg-[#EAF8FC] rounded-full flex items-center justify-center mx-auto mb-4">
@@ -402,7 +419,7 @@ const handleViewPDF = async (orderId: string) => {
                     {activeOrders.map((order) => {
                       const orderTotal = calculateOrderTotal(order);
                       const subtotal = calculateSubtotal(order.products || []);
-                      
+
                       return (
                         <div
                           key={order._id}
@@ -419,22 +436,22 @@ const handleViewPDF = async (orderId: string) => {
                                   {getStatusBadge(order.paymentStatus, 'payment')}
                                 </div>
                               </div>
-                              
+
                               <p className="text-[#315A6E] mb-3 text-sm">
                                 Placed on {formatDate(order.createdAt)}
                               </p>
-                              
+
                               <div className="flex flex-wrap items-center gap-3 text-sm">
                                 <span className="text-[#315A6E]">{order.products?.length || 0} items</span>
                                 <span className="text-[#315A6E]/50">•</span>
                                 <span className="font-semibold text-[#063B5C]">
-                                  ₹{orderTotal.toFixed(2)}
+                                  ₹{formatAmount(orderTotal)}
                                 </span>
                                 {orderTotal > 0 && subtotal > 0 && orderTotal !== subtotal && (
                                   <>
                                     <span className="text-[#315A6E]/50">•</span>
                                     <span className="text-[#315A6E]/60 line-through text-xs">
-                                      ₹{subtotal.toFixed(2)}
+                                      ₹{formatAmount(subtotal)}
                                     </span>
                                   </>
                                 )}
@@ -446,17 +463,20 @@ const handleViewPDF = async (orderId: string) => {
                               <div className="mt-4 flex flex-wrap gap-3">
                                 {order.products?.slice(0, 3).map((item, index) => {
                                   const itemTotal = getItemTotal(item);
-                                  
+                                  const weight = formatWeight(item);
+
                                   return (
                                     <div key={index} className="flex items-center gap-2 bg-[#F8FCFD] rounded-lg px-3 py-2 border border-[#B8DCE7]">
                                       <span className="text-sm text-[#315A6E]">
                                         {getProductDisplayName(item)}
+                                        {weight && <span className="text-[#315A6E]/70"> ({weight})</span>}
                                       </span>
+                                      {/* ✅ Quantity shown */}
                                       <span className="text-xs text-[#315A6E]/70 bg-white px-1 rounded border border-[#B8DCE7]">
-                                        x{item.quantity}
+                                        Quantity: {item.quantity}
                                       </span>
                                       <span className="text-xs font-semibold text-[#063B5C]">
-                                        ₹{itemTotal.toFixed(2)}
+                                        ₹{formatAmount(itemTotal)}
                                       </span>
                                     </div>
                                   );
@@ -474,7 +494,7 @@ const handleViewPDF = async (orderId: string) => {
                             {/* Action Buttons */}
                             <div className="flex flex-col gap-2 lg:items-end">
                               {canCancelOrder(order) && (
-                                <button 
+                                <button
                                   onClick={() => handleCancelOrder(order)}
                                   disabled={cancellingOrderId === order._id}
                                   className="border border-red-600 text-red-600 px-4 py-2 rounded-lg hover:bg-red-600 hover:text-white transition-colors font-medium text-sm flex items-center gap-2 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
@@ -494,8 +514,8 @@ const handleViewPDF = async (orderId: string) => {
                                   )}
                                 </button>
                               )}
-                              
-                              <button 
+
+                              <button
                                 onClick={() => handleViewPDF(order._id)}
                                 disabled={pdfLoading}
                                 className="border border-[#008FB8] text-[#008FB8] px-4 py-2 rounded-lg hover:bg-[#008FB8] hover:text-white transition-colors font-medium text-sm flex items-center gap-2 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
@@ -533,7 +553,7 @@ const handleViewPDF = async (orderId: string) => {
               <h3 className="text-lg font-semibold text-[#063B5C] mb-4">
                 Cancel Order #{selectedOrder.orderId || selectedOrder._id?.slice(-8)}
               </h3>
-              
+
               <p className="text-[#315A6E] mb-4">
                 Are you sure you want to cancel this order? This action cannot be undone.
               </p>
@@ -610,7 +630,7 @@ const handleViewPDF = async (orderId: string) => {
                   </button>
                 </div>
               </div>
-              
+
               <div className="flex-1 overflow-hidden min-h-[500px]">
                 {pdfLoading ? (
                   <div className="flex items-center justify-center h-full">
@@ -660,7 +680,7 @@ const handleViewPDF = async (orderId: string) => {
                   </svg>
                 </button>
               </div>
-              
+
               <div className="overflow-y-auto max-h-[calc(90vh-80px)]">
                 {cancelledOrders.length === 0 ? (
                   <div className="p-8 text-center">
@@ -676,7 +696,7 @@ const handleViewPDF = async (orderId: string) => {
                   <div className="divide-y divide-[#B8DCE7]">
                     {cancelledOrders.map((order) => {
                       const orderTotal = calculateOrderTotal(order);
-                      
+
                       return (
                         <div
                           key={order._id}
@@ -697,16 +717,16 @@ const handleViewPDF = async (orderId: string) => {
                                   {getStatusBadge(order.paymentStatus, 'payment')}
                                 </div>
                               </div>
-                              
+
                               <p className="text-[#315A6E] mb-3 text-sm">
                                 Cancelled on {formatDate(order.updatedAt || order.createdAt)}
                               </p>
-                              
+
                               <div className="flex flex-wrap items-center gap-3 text-sm">
                                 <span className="text-[#315A6E]">{order.products?.length || 0} items</span>
                                 <span className="text-[#315A6E]/50">•</span>
                                 <span className="font-semibold text-[#063B5C]">
-                                  ₹{orderTotal.toFixed(2)}
+                                  ₹{formatAmount(orderTotal)}
                                 </span>
                                 <span className="text-[#315A6E]/50">•</span>
                                 <span className="text-[#315A6E] capitalize">{order.paymentMethod}</span>
@@ -716,17 +736,20 @@ const handleViewPDF = async (orderId: string) => {
                               <div className="mt-4 flex flex-wrap gap-3">
                                 {order.products?.slice(0, 3).map((item, index) => {
                                   const itemTotal = getItemTotal(item);
-                                  
+                                  const weight = formatWeight(item);
+
                                   return (
                                     <div key={index} className="flex items-center gap-2 bg-[#F8FCFD] rounded-lg px-3 py-2 border border-[#B8DCE7]">
                                       <span className="text-sm text-[#315A6E]">
                                         {getProductDisplayName(item)}
+                                        {weight && <span className="text-[#315A6E]/70"> ({weight})</span>}
                                       </span>
+                                      {/* ✅ Quantity shown */}
                                       <span className="text-xs text-[#315A6E]/70 bg-white px-1 rounded border border-[#B8DCE7]">
-                                        x{item.quantity}
+                                        Quantity: {item.quantity}
                                       </span>
                                       <span className="text-xs font-semibold text-[#063B5C]">
-                                        ₹{itemTotal.toFixed(2)}
+                                        ₹{formatAmount(itemTotal)}
                                       </span>
                                     </div>
                                   );
@@ -742,7 +765,7 @@ const handleViewPDF = async (orderId: string) => {
                             </div>
 
                             <div className="flex flex-col gap-2 lg:items-end">
-                              <button 
+                              <button
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleViewPDF(order._id);
