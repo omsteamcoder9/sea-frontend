@@ -8,6 +8,9 @@ import { motion, AnimatePresence } from "framer-motion"
 export default function TestimonialsSection() {
   const [currentIndex, setCurrentIndex] = useState(0)
 
+  // 🎯 Static images base URL (R2)
+  const STATIC_URL = process.env.NEXT_PUBLIC_STATIC_URL
+
   const testimonials = [
     {
       name: "Rajesh Kumar",
@@ -252,7 +255,7 @@ export default function TestimonialsSection() {
               className="relative rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl"
             >
               <Image
-                src="/images/h1.jpg"
+                src={`${STATIC_URL}/h1.webp`}
                 alt="Happy customers with fresh MeenavanFresh from Sea Food"
                 width={600}
                 height={500}

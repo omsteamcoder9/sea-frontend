@@ -47,6 +47,9 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
   const { isAuthenticated, user, logout } = useAuth();
   const { cart } = useCart();
   const router = useRouter();
+
+  const STATIC_URL = process.env.NEXT_PUBLIC_STATIC_URL;
+  const IMG_URL = process.env.NEXT_PUBLIC_IMG_URL;
   
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -57,7 +60,6 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
   const [isSearching, setIsSearching] = useState(false);
   const [isShopDropdownOpen, setIsShopDropdownOpen] = useState(false);
   
-  // Site settings state
   const [siteName, setSiteName] = useState('Sea Food');
   const [contactEmail, setContactEmail] = useState('contact@MeenavanFresh.com');
   const [contactNumber, setContactNumber] = useState('+91 98765 43210');
@@ -71,18 +73,16 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
   
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const mobileSearchInputRef = useRef<HTMLInputElement>(null);
   const profileDropdownRef = useRef<HTMLDivElement>(null);
   const shopDropdownRef = useRef<HTMLDivElement>(null);
   
   const categoryNames = categories.map(cat => cat.name);
   const cartCount = cart?.totalItems || 0;
 
-  // Get first 3 categories to show directly
   const displayedCategories = categories.slice(0, 3);
-  // Get remaining categories for dropdown
   const dropdownCategories = categories.slice(3);
 
-  // Fetch settings on component mount
   useEffect(() => {
     fetchSettings();
   }, []);
@@ -93,15 +93,9 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
       if (response.success && response.data) {
         const data = response.data;
         
-        if (data.siteName) {
-          setSiteName(data.siteName);
-        }
-        if (data.contactEmail) {
-          setContactEmail(data.contactEmail);
-        }
-        if (data.contactNumber) {
-          setContactNumber(data.contactNumber);
-        }
+        if (data.siteName) setSiteName(data.siteName);
+        if (data.contactEmail) setContactEmail(data.contactEmail);
+        if (data.contactNumber) setContactNumber(data.contactNumber);
         if (data.socialMedia) {
           setSocialMedia({
             facebook: data.socialMedia.facebook || '',
@@ -111,34 +105,19 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
             linkedin: data.socialMedia.linkedin || ''
           });
         }
-        if (data.facebookUrl) {
-          setSocialMedia(prev => ({ ...prev, facebook: data.facebookUrl || '' }));
-        }
-        if (data.instagramUrl) {
-          setSocialMedia(prev => ({ ...prev, instagram: data.instagramUrl || '' }));
-        }
-        if (data.twitterUrl) {
-          setSocialMedia(prev => ({ ...prev, twitter: data.twitterUrl || '' }));
-        }
-        if (data.youtubeUrl) {
-          setSocialMedia(prev => ({ ...prev, youtube: data.youtubeUrl || '' }));
-        }
-        if (data.linkedinUrl) {
-          setSocialMedia(prev => ({ ...prev, linkedin: data.linkedinUrl || '' }));
-        }
+        if (data.facebookUrl) setSocialMedia(prev => ({ ...prev, facebook: data.facebookUrl || '' }));
+        if (data.instagramUrl) setSocialMedia(prev => ({ ...prev, instagram: data.instagramUrl || '' }));
+        if (data.twitterUrl) setSocialMedia(prev => ({ ...prev, twitter: data.twitterUrl || '' }));
+        if (data.youtubeUrl) setSocialMedia(prev => ({ ...prev, youtube: data.youtubeUrl || '' }));
+        if (data.linkedinUrl) setSocialMedia(prev => ({ ...prev, linkedin: data.linkedinUrl || '' }));
       }
     } catch (error) {
       console.error('Error fetching settings:', error);
     }
   };
 
-  const openCartDrawer = () => {
-    setIsCartDrawerOpen(true);
-  };
-
-  const closeCartDrawer = () => {
-    setIsCartDrawerOpen(false);
-  };
+  const openCartDrawer = () => setIsCartDrawerOpen(true);
+  const closeCartDrawer = () => setIsCartDrawerOpen(false);
 
   const getUserInitial = () => {
     if (!user) return 'U';
@@ -203,9 +182,6 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
 
   const handleSearchClick = () => {
     setShowSearch(true);
-    setTimeout(() => {
-      searchInputRef.current?.focus();
-    }, 100);
   };
 
   const handleProductClick = (product: SearchProduct) => {
@@ -284,13 +260,32 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
     };
   }, [isShopDropdownOpen]);
 
-  const getImageUrl = (imagePath: string | null) => {
-    if (!imagePath) return null;
-    const filename = imagePath.split('/').pop();
-    return `${process.env.NEXT_PUBLIC_IMG_URL}/${filename}`;
+  // 🎯 Auto-focus search input when search opens (desktop or mobile)
+  useEffect(() => {
+    if (showSearch) {
+      const t = setTimeout(() => {
+        const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
+        const input = isMobile ? mobileSearchInputRef.current : searchInputRef.current;
+        input?.focus();
+      }, 50);
+      return () => clearTimeout(t);
+    }
+  }, [showSearch]);
+
+  // 🎯 Resolve any image path to a full URL
+  const resolveImagePath = (path: string) => {
+    if (!path) return null;
+    if (path.startsWith('http://') || path.startsWith('https://')) return path;
+    const clean = path.startsWith('/') ? path.slice(1) : path;
+    return `${IMG_URL}/${clean}`;
   };
 
-  // Split site name for logo display
+  // 🎯 Each product uses ONLY its own image. Returns null if it has none.
+  const getImageUrl = (imagePath: string | null) => {
+    if (!imagePath || imagePath.trim() === '') return null;
+    return resolveImagePath(imagePath);
+  };
+
   const getLogoLines = () => {
     if (!siteName || siteName.trim() === '') {
       return { first: '', second: '' };
@@ -298,16 +293,10 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
     
     const nameParts = siteName.trim().split(' ');
     if (nameParts.length > 1) {
-      return { 
-        first: nameParts[0], 
-        second: nameParts.slice(1).join(' ') 
-      };
+      return { first: nameParts[0], second: nameParts.slice(1).join(' ') };
     }
     
-    return { 
-      first: nameParts[0], 
-      second: '' 
-    };
+    return { first: nameParts[0], second: '' };
   };
 
   const { first: logoFirstLine, second: logoSecondLine } = getLogoLines();
@@ -336,23 +325,28 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
               <div className="flex items-center gap-3">
                 {socialMedia.facebook && (
                   <a href={socialMedia.facebook} target="_blank" rel="noopener noreferrer" className="hover:text-[#00A9E0] transition-all duration-300">
-<FaFacebookF className="w-[12px] h-[12px] cursor-pointer" />                  </a>
+                    <FaFacebookF className="w-[12px] h-[12px] cursor-pointer" />
+                  </a>
                 )}
                 {socialMedia.twitter && (
                   <a href={socialMedia.twitter} target="_blank" rel="noopener noreferrer" className="hover:text-[#00A9E0] transition-all duration-300">
-<FaTwitter className="w-[12px] h-[12px] cursor-pointer" />                  </a>
+                    <FaTwitter className="w-[12px] h-[12px] cursor-pointer" />
+                  </a>
                 )}
                 {socialMedia.instagram && (
                   <a href={socialMedia.instagram} target="_blank" rel="noopener noreferrer" className="hover:text-[#00A9E0] transition-all duration-300">
-<FaInstagram className="w-[12px] h-[12px] cursor-pointer" />                  </a>
+                    <FaInstagram className="w-[12px] h-[12px] cursor-pointer" />
+                  </a>
                 )}
                 {socialMedia.youtube && (
                   <a href={socialMedia.youtube} target="_blank" rel="noopener noreferrer" className="hover:text-[#00A9E0] transition-all duration-300">
-<FaYoutube className="w-[12px] h-[12px] cursor-pointer" />                  </a>
+                    <FaYoutube className="w-[12px] h-[12px] cursor-pointer" />
+                  </a>
                 )}
                 {socialMedia.linkedin && (
                   <a href={socialMedia.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-[#00A9E0] transition-all duration-300">
-<FaLinkedinIn className="w-[12px] h-[12px] cursor-pointer" />                  </a>
+                    <FaLinkedinIn className="w-[12px] h-[12px] cursor-pointer" />
+                  </a>
                 )}
               </div>
             </div>
@@ -365,13 +359,11 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
         <div className="w-full lg:max-w-[1350px] lg:mx-auto">
           <div className="flex items-center justify-between lg:grid lg:grid-cols-[220px_1fr_320px] h-[60px] lg:h-[72px] px-3 lg:px-0 md:mr-1">
             
-            {/* LEFT LOGO */}
             <div className="flex items-center bg-transparent">
               <Link href="/" className="flex items-center gap-2">
-                {/* Logo Image */}
                 <div className="relative w-15 h-15 lg:w-20 lg:h-20 flex-shrink-0 mt-2 lg:mt-0 lg:ml-10">
                   <Image
-                    src="/images/logo.png"
+                    src={`${STATIC_URL}/logoo.webp`}
                     alt={siteName}
                     fill
                     priority
@@ -379,7 +371,6 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                   />
                 </div>
                 
-                {/* Logo Text */}
                 <div className="flex flex-col justify-center">
                   <span className="text-[16px] sm:text-[18px] lg:text-[26px] font-black tracking-[2px] lg:tracking-[3px] text-[#063B5C] leading-none">
                     {logoFirstLine}
@@ -393,7 +384,6 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
               </Link>
             </div>
 
-            {/* CENTER MENU - Desktop only */}
             <div className="hidden lg:flex items-center justify-center bg-transparent md:ml-40">
               <nav className="hidden xl:flex items-center gap-8">
                 <Link
@@ -451,7 +441,6 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
               </nav>
             </div>
 
-            {/* RIGHT AREA */}
             <div className="bg-transparent flex items-center justify-end gap-3 lg:gap-6 h-full">
               {!showSearch ? (
                 <div className="flex items-center gap-3 lg:gap-6">
@@ -476,7 +465,7 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
 
                   {!isAuthenticated ? (
                     <Link href="/login" className="hidden lg:block">
-                      <button className="border  border-[#008FB8] bg-[#EAF8FC] h-[40px] px-6 text-[#063B5C] text-[11px] font-black tracking-[1.5px] uppercase hover:bg-[#008FB8] hover:text-white transition-all duration-300 rounded-full cursor-pointer">
+                      <button className="border border-[#008FB8] bg-[#EAF8FC] h-[40px] px-6 text-[#063B5C] text-[11px] font-black tracking-[1.5px] uppercase hover:bg-[#008FB8] hover:text-white transition-all duration-300 rounded-full cursor-pointer">
                         LOGIN
                       </button>
                     </Link>
@@ -577,18 +566,19 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                                 className="flex items-center p-2 hover:bg-[#EAF8FC] rounded-lg cursor-pointer transition-colors"
                                 onClick={() => handleProductClick(product)}
                               >
+                                {/* 🎯 Each product shows ONLY its own image */}
                                 <div className="w-10 h-10 bg-[#EAF8FC] rounded-md flex-shrink-0 overflow-hidden relative">
-                                  {product.image ? (
+                                  {getImageUrl(product.image) ? (
                                     <Image
-                                      src={getImageUrl(product.image) || ''}
+                                      src={getImageUrl(product.image)!}
                                       className="w-full h-full object-cover"
                                       alt={product.name}
                                       fill
                                       sizes="40px"
                                     />
                                   ) : (
-                                    <div className="w-full h-full bg-[#EAF8FC] flex items-center justify-center">
-                                      <ShoppingCart className="w-5 h-5 text-[#008FB8]" />
+                                    <div className="w-full h-full flex items-center justify-center text-[#008FB8]">
+                                      <ShoppingCart className="w-4 h-4" />
                                     </div>
                                   )}
                                 </div>
@@ -640,7 +630,7 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                 <Link href="/" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2">
                   <div className="relative w-15 h-15">
                     <Image
-                      src="/images/logo.png"
+                      src={`${STATIC_URL}/logoo.webp`}
                       alt={siteName}
                       fill
                       className="object-contain"
@@ -659,7 +649,6 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
               </div>
               <nav className="flex-1 p-4 overflow-y-auto">
                 <div className="space-y-1">
-                  {/* HOME */}
                   <Link
                     href="/"
                     className="flex items-center gap-3 py-2.5 text-[12px] font-extrabold tracking-[1px] text-[#063B5C] hover:text-[#008FB8] transition-all"
@@ -671,7 +660,6 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                     HOME
                   </Link>
 
-                  {/* SHOP BY CATEGORY - Heading */}
                   <div className="pt-2 pb-1">
                     <p className="text-[10px] font-bold tracking-[2px] text-[#315A6E] uppercase flex items-center gap-2">
                       <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -681,7 +669,6 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                     </p>
                   </div>
 
-                  {/* CATEGORIES - Indented */}
                   <div className="pl-4 space-y-0.5">
                     {categories.map((cat) => (
                       <button
@@ -697,7 +684,6 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                     ))}
                   </div>
 
-                  {/* ABOUT */}
                   <Link
                     href="/about"
                     className="flex items-center gap-3 py-2.5 text-[12px] font-extrabold tracking-[1px] text-[#063B5C] hover:text-[#008FB8] transition-all mt-1"
@@ -709,7 +695,6 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                     ABOUT
                   </Link>
 
-                  {/* CONTACT */}
                   <Link
                     href="/contact"
                     className="flex items-center gap-3 py-2.5 text-[12px] font-extrabold tracking-[1px] text-[#063B5C] hover:text-[#008FB8] transition-all"
@@ -721,7 +706,6 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                     CONTACT
                   </Link>
 
-                  {/* LOGIN/ACCOUNT - Mobile Only */}
                   {!isAuthenticated ? (
                     <Link
                       href="/login"
@@ -771,7 +755,7 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
               <div className="flex-1 flex items-center bg-white rounded-lg px-4 py-2 border border-[#B8DCE7] shadow-sm">
                 <Search className="w-5 h-5 text-[#008FB8] mr-3 flex-shrink-0" />
                 <input
-                  ref={searchInputRef}
+                  ref={mobileSearchInputRef}
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -828,18 +812,19 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                           className="flex items-center p-2 hover:bg-[#EAF8FC] rounded-lg cursor-pointer transition-colors"
                           onClick={() => handleProductClick(product)}
                         >
+                          {/* 🎯 Each product shows ONLY its own image */}
                           <div className="w-12 h-12 bg-[#EAF8FC] rounded-lg flex-shrink-0 overflow-hidden border border-[#B8DCE7] relative">
-                            {product.image ? (
+                            {getImageUrl(product.image) ? (
                               <Image
-                                src={getImageUrl(product.image) || ''}
+                                src={getImageUrl(product.image)!}
                                 className="w-full h-full object-cover"
                                 alt={product.name}
                                 fill
                                 sizes="48px"
                               />
                             ) : (
-                              <div className="w-full h-full bg-[#EAF8FC] flex items-center justify-center">
-                                <ShoppingCart className="w-6 h-6 text-[#008FB8]" />
+                              <div className="w-full h-full flex items-center justify-center text-[#008FB8]">
+                                <ShoppingCart className="w-5 h-5" />
                               </div>
                             )}
                           </div>

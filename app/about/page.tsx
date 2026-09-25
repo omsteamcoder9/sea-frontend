@@ -12,6 +12,7 @@ interface TeamMember {
 
 const AboutPage: React.FC = () => {
   const storeName = process.env.NEXT_PUBLIC_SITE_NAME || 'Sea Food';
+  const STATIC_URL = process.env.NEXT_PUBLIC_STATIC_URL;
   
   const teamMembers: TeamMember[] = [
     {
@@ -19,21 +20,21 @@ const AboutPage: React.FC = () => {
       name: 'Sea Food Team',
       role: 'Founders',
       bio: `Our team has over 15 years of experience in the MeenavanFresh industry and founded ${storeName} with a vision to provide the freshest, highest-quality MeenavanFresh directly from the ocean to your table.`,
-      image: '/images/m1.png'
+      image: `${STATIC_URL}/m1.webp`
     },
     {
       id: 2,
       name: 'Sourcing Experts',
       role: 'MeenavanFresh Specialists',
       bio: `Our sourcing experts work directly with the finest fishing communities to ensure we get the highest quality catch - fresh fish, prawns, crabs, and more, delivered daily.`,
-      image: '/images/m1.png'
+      image: `${STATIC_URL}/m1.webp`
     },
     {
       id: 3,
       name: 'Quality Team',
       role: 'Freshness Assurance',
       bio: 'Our quality team ensures every MeenavanFresh item meets the highest standards of freshness, sustainability, and safety through rigorous temperature control and careful handling.',
-      image: '/images/m1.png'
+      image: `${STATIC_URL}/m1.webp`
     }
   ];
 
@@ -75,7 +76,7 @@ const AboutPage: React.FC = () => {
               <div className="absolute -inset-2 md:-inset-4 bg-gradient-to-r from-[#008FB8]/5 via-[#008FB8]/5 to-[#064B6A]/5 rounded-2xl md:rounded-3xl rotate-3 transition-transform group-hover:rotate-1 duration-500" />
               <div className="relative h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px] rounded-xl md:rounded-2xl overflow-hidden shadow-xl md:shadow-2xl border border-[#B8DCE7]/50">
                   <Image
-                  src="/images/about.jpg"
+                  src={`${STATIC_URL}/aboutt.webp`}
                   alt="Fresh Premium MeenavanFresh - Fish, Prawns, Crabs, Lobsters"
                   fill
                   className="object-cover transition-transform duration-1000 group-hover:scale-105"
@@ -201,7 +202,7 @@ const AboutPage: React.FC = () => {
             <div className="relative h-[300px] sm:h-[350px] md:h-[400px] lg:h-full lg:min-h-[400px] w-full lg:w-1/2 overflow-hidden">
               <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-l from-[#008FB8]/50 to-transparent z-10" />
               <Image
-                src="/images/abot1.jpg"
+                src={`${STATIC_URL}/abot1.webp`}
                 alt="Fresh Premium MeenavanFresh - Fish, Prawns, Crabs, Lobsters"
                 fill
                 className="object-cover transition-transform duration-[3000ms] group-hover:scale-105"

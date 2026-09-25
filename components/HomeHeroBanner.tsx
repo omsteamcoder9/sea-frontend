@@ -5,13 +5,16 @@ import Link from "next/link";
 import { motion } from 'framer-motion';
 
 export default function HomeHeroBanner() {
+  // 🎯 Static images base URL (R2)
+  const STATIC_URL = process.env.NEXT_PUBLIC_STATIC_URL;
+
   // Static banner data
   const banner = {
     title: "Meenavan Fresh",
     subtitle: "Fresh Catch Daily",
     description: "Explore the Freshest MeenavanFresh Delivered to Your Doorstep",
-    leftImage: "/images/d1.jpg",
-    rightImage: "/images/d2.jpg",
+    leftImage: `${STATIC_URL}/d1.webp`,
+    rightImage: `${STATIC_URL}/d2.webp`,
     leftLink: "/products",
     rightLink: "/products",
     stats: ["Fresh Catch", "Quick Delivery", "Quality Assured"],

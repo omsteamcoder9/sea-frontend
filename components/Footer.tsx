@@ -19,6 +19,9 @@ import { useState, useEffect } from "react";
 import { settingsAPI } from "@/lib/settings-api";
 
 export default function Footer() {
+  // 🎯 Static images base URL (R2)
+  const STATIC_URL = process.env.NEXT_PUBLIC_STATIC_URL;
+
   const [siteName, setSiteName] = useState("Sea Food");
   const [siteDescription, setSiteDescription] = useState("");
   const [contactEmail, setContactEmail] = useState(
@@ -239,9 +242,10 @@ export default function Footer() {
           >
             <div className="flex items-center gap-3 mb-4">
 
+              {/* 🎯 Footer Logo Image — R2 static */}
               <div className="relative w-16 h-16 lg:w-20 lg:h-20 flex-shrink-0">
                 <Image
-                  src="/images/logo.png"
+                  src={`${STATIC_URL}/logoo.webp`}
                   alt={siteName}
                   fill
                   className="object-contain"
