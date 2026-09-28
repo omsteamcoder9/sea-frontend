@@ -197,6 +197,8 @@ export default function Footer() {
   const legalLinks = [
     { title: "Terms", href: "/terms" },
     { title: "Privacy Policy", href: "/privacy" },
+    { title: "Shipping Info", href: "/shipping" },
+    { title: "Returns", href: "/returns" },
   ];
 
   const copyrightText =

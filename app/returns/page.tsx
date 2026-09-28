@@ -3,283 +3,391 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { settingsAPI } from '@/lib/settings-api';
-import { PublicSettings } from '@/types/settings';
+import { getReturnPolicy } from '@/lib/returns-api';
+import { Return } from '@/types/returns';
 
 export default function ReturnsPage() {
-  const [settings, setSettings] = useState<PublicSettings | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState<Return | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchSettings = async () => {
+    const fetchReturnPolicy = async () => {
       try {
         setLoading(true);
-        const response = await settingsAPI.getPublicSettings();
+        const response = await getReturnPolicy();
+
         if (response.success && response.data) {
-          setSettings(response.data);
+          setData(response.data);
+        } else {
+          setError('Failed to load return policy');
         }
-      } catch (error) {
-        console.error('Error fetching settings:', error);
+      } catch (err) {
+        console.error('Error fetching return policy:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load return policy');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchSettings();
+    fetchReturnPolicy();
   }, []);
 
-  const contactEmail = settings?.contactEmail || 'support@example.com';
-  const contactNumber = settings?.contactNumber || '+1 (555) 123-4567';
-
-  // Use dynamic returns policy settings from backend with fallback values
-  const returnsPolicy = {
-    title: settings?.returnsPolicyTitle || 'No Returns & No Refunds Policy',
-    description: settings?.returnsPolicyDescription || 'We do not allow returns or refunds for any purchases made through our website. All sales are final and non-refundable. If the order is damaged or wrong product sent then we will process you with a refund.',
-    
-    returnSteps: settings?.returnProcessSteps || [
-      {
-        title: 'No Returns',
-        description: 'We do not accept returns for any purchases made through our website.',
-      },
-      {
-        title: 'No Refunds',
-        description: 'All sales are final and non-refundable.',
-      },
-      {
-        title: 'Damaged Items Only',
-        description: 'Only if the order is damaged or wrong product sent then we will process you with a refund.',
-      },
-      {
-        title: 'Contact Immediately',
-        description: 'If you receive a damaged or wrong product, contact us immediately for a refund.',
-      }
-    ],
-    
-    timeframe: settings?.returnTimeframe || '7 days for damage/wrong item claims',
-    
-    conditions: settings?.returnConditions || [
-      'Damaged items only',
-      'Wrong products only',
-      'Contact within 7 days',
-      'Provide photo evidence'
-    ],
-    
-    shippingResponsibility: settings?.customerShippingResponsibility || 'For approved damaged/wrong item cases only, we cover return shipping.',
-    
-    nonReturnableItems: settings?.nonReturnableItems || [
-      'All purchases (no returns)',
-      'No refunds for change of mind',
-      'No refunds for wrong size',
-      'No refunds for wrong color',
-      'No refunds for any other reason',
-      'All sales are final'
-    ],
-    
-    defectiveItemsNote: settings?.defectiveItemsNote || 'We do not allow returns or refunds for any purchases made through our website. All sales are final and non-refundable. If the order is damaged or wrong product sent then we will process you with a refund.',
-    
-    refundProcessingTime: settings?.refundProcessingTime || '5-10 business days',
-    refundNote: settings?.refundNote || 'Refunds only for damaged or wrong items. All other sales are final and non-refundable.',
-    refundAmountFormula: settings?.refundAmountFormula || 'Refund = Full purchase price',
-    refundAmountDescription: settings?.refundAmountDescription || 'For damaged or wrong items only: full refund including shipping.',
-    
-    exchangePolicy: settings?.exchangePolicy || 'We do not allow returns or refunds for any purchases. All sales are final. No exchanges.'
-  };
-
+  // ---------- LOADING ----------
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12">
-        <div className="container mx-auto px-4 max-w-4xl">
+      <div className="min-h-screen py-8 sm:py-12" style={{ backgroundColor: '#F8FCFD' }}>
+        <div className="container mx-auto px-3 sm:px-4 max-w-4xl">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#D97A22] mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading policy...</p>
+            <div
+              className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 mx-auto"
+              style={{ borderColor: '#008FB8' }}
+            ></div>
+            <p className="mt-4 text-sm sm:text-base" style={{ color: '#063B5C' }}>
+              Loading return policy...
+            </p>
           </div>
         </div>
       </div>
     );
   }
 
+  // ---------- ERROR ----------
+  if (error || !data) {
+    return (
+      <div className="min-h-screen py-8 sm:py-12" style={{ backgroundColor: '#F8FCFD' }}>
+        <div className="container mx-auto px-3 sm:px-4 max-w-4xl">
+          <div
+            className="rounded-lg p-5 sm:p-6 text-center"
+            style={{ backgroundColor: 'rgba(0, 143, 184, 0.1)' }}
+          >
+            <h2 className="text-lg sm:text-xl font-semibold mb-2" style={{ color: '#008FB8' }}>
+              Return Policy Not Available
+            </h2>
+            <p className="text-sm sm:text-base" style={{ color: '#063B5C' }}>
+              {error || 'No return policy found'}
+            </p>
+            <Link
+              href="/"
+              className="mt-4 inline-flex items-center justify-center w-full sm:w-auto px-4 py-2.5 rounded-lg transition-colors text-sm sm:text-base"
+              style={{ backgroundColor: '#008FB8', color: 'white' }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#064B6A')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#008FB8')}
+            >
+              Back to Home
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ---------- MAIN CONTENT ----------
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12">
-      <div className="container mx-auto px-4 max-w-4xl">
+    <div className="min-h-screen py-6 sm:py-12" style={{ backgroundColor: '#F8FCFD' }}>
+      <div className="container mx-auto px-3 sm:px-4 max-w-4xl">
+
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">{returnsPolicy.title}</h1>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            {returnsPolicy.description}
+        <div className="text-center mb-6 sm:mb-12">
+          <h1
+            className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4"
+            style={{ color: '#063B5C' }}
+          >
+            {data.title}
+          </h1>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+            {data.headerBadge && (
+              <div
+                className="px-3 py-1.5 rounded-md text-xs sm:text-sm font-medium"
+                style={{ backgroundColor: '#064B6A', color: '#EAF8FC' }}
+              >
+                {data.headerBadge}
+              </div>
+            )}
+          </div>
+          <p
+            className="text-sm sm:text-base max-w-2xl mx-auto"
+            style={{ color: '#315A6E' }}
+          >
+            {data.headerSubtitle}
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12">
-          {/* Return Process Steps */}
-          <section className="mb-10">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-6 flex items-center">
-              <div className="w-2 h-8 bg-gradient-to-r from-[#D97A22] via-[#D97A22] to-[#D97A22] mr-3 rounded-full"></div>
-              Our Strict Policy
-            </h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {returnsPolicy.returnSteps.map((step, index) => (
-                <div key={index} className="border border-gray-200 rounded-xl p-6 hover:border-[#D97A22] transition-colors">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">{step.title}</h3>
-                  <p className="text-gray-700 text-sm">{step.description}</p>
-                </div>
-              ))}
-            </div>
-          </section>
+        {/* Main Card */}
+        <div
+          className="rounded-xl sm:rounded-2xl p-4 sm:p-8 md:p-12"
+          style={{ backgroundColor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}
+        >
 
-          {/* Return Conditions */}
-          <section className="mb-10">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-6 flex items-center">
-              <div className="w-2 h-8 bg-gradient-to-r from-[#D97A22] via-[#D97A22] to-[#D97A22] mr-3 rounded-full"></div>
-              Only These Exceptions
-            </h2>
-            
-            <div className="space-y-6">
-              <div className="bg-gray-50 p-6 rounded-xl">
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">Timeframe for Claims</h3>
-                <p className="text-gray-700">
-                  Only <strong className="text-gray-800">{returnsPolicy.timeframe}</strong>. No returns or refunds for any other purchases.
-                </p>
-              </div>
-
-              <div className="bg-gray-50 p-6 rounded-xl">
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">What We Accept</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {returnsPolicy.conditions.map((requirement, index) => (
-                    <div 
-                      key={index} 
-                      className="bg-gradient-to-r from-[#D97A22] via-[#D97A22] to-[#D97A22] text-white px-3 py-2 rounded-md hover:opacity-90 transition-all duration-200 font-medium shadow text-sm text-center cursor-pointer"
+          {/* Returns Policy */}
+          {data.returnsPolicy?.title && (
+            <section className="mb-6 sm:mb-10">
+              <h2
+                className="text-lg sm:text-2xl font-semibold mb-3 sm:mb-4 flex items-center"
+                style={{ color: '#063B5C' }}
+              >
+                <div
+                  className="w-1.5 sm:w-2 h-6 sm:h-8 mr-2 sm:mr-3 rounded-full"
+                  style={{ backgroundColor: '#008FB8' }}
+                ></div>
+                Our Returns Policy
+              </h2>
+              <div
+                className="p-4 sm:p-6 rounded-lg sm:rounded-xl"
+                style={{ backgroundColor: 'rgba(0, 143, 184, 0.05)' }}
+              >
+                <div className="flex items-start mb-4">
+                  <svg
+                    className="w-8 h-8 sm:w-10 sm:h-10 mr-4 flex-shrink-0"
+                    style={{ color: '#008FB8' }}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <div>
+                    <p
+                      className="text-base sm:text-lg font-semibold mb-1"
+                      style={{ color: '#063B5C' }}
                     >
-                      {requirement}
+                      {data.returnsPolicy.title}
+                    </p>
+                    <p className="text-sm sm:text-base" style={{ color: '#315A6E' }}>
+                      {data.returnsPolicy.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* How to Return */}
+          {data.returnSteps?.length > 0 && (
+            <section className="mb-6 sm:mb-10">
+              <h2
+                className="text-lg sm:text-2xl font-semibold mb-3 sm:mb-4 flex items-center"
+                style={{ color: '#063B5C' }}
+              >
+                <div
+                  className="w-1.5 sm:w-2 h-6 sm:h-8 mr-2 sm:mr-3 rounded-full"
+                  style={{ backgroundColor: '#008FB8' }}
+                ></div>
+                How to Request a Return
+              </h2>
+              <div
+                className="p-4 sm:p-6 rounded-lg sm:rounded-xl"
+                style={{ backgroundColor: 'rgba(0, 143, 184, 0.05)' }}
+              >
+                <div className="space-y-4">
+                  {data.returnSteps.map((step, index) => (
+                    <div key={step._id || index} className="flex items-start">
+                      <div
+                        className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center mr-4 flex-shrink-0 text-sm sm:text-base font-bold"
+                        style={{ backgroundColor: '#008FB8', color: 'white' }}
+                      >
+                        {step.stepNumber}
+                      </div>
+                      <div>
+                        <p
+                          className="font-semibold text-sm sm:text-base mb-1"
+                          style={{ color: '#063B5C' }}
+                        >
+                          {step.title}
+                        </p>
+                        <p className="text-xs sm:text-sm" style={{ color: '#315A6E' }}>
+                          {step.description}
+                        </p>
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
+            </section>
+          )}
 
-              <div className="bg-gray-50 p-6 rounded-xl">
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">Shipping Costs</h3>
-                <p className="text-gray-700">
-                  {returnsPolicy.shippingResponsibility}
-                </p>
+          {/* Eligibility */}
+          {data.eligibleItems?.length > 0 && (
+            <section className="mb-6 sm:mb-10">
+              <h2
+                className="text-lg sm:text-2xl font-semibold mb-3 sm:mb-4 flex items-center"
+                style={{ color: '#063B5C' }}
+              >
+                <div
+                  className="w-1.5 sm:w-2 h-6 sm:h-8 mr-2 sm:mr-3 rounded-full"
+                  style={{ backgroundColor: '#008FB8' }}
+                ></div>
+                What's Eligible for Return?
+              </h2>
+              <div
+                className="p-4 sm:p-6 rounded-lg sm:rounded-xl"
+                style={{ backgroundColor: 'rgba(0, 143, 184, 0.05)' }}
+              >
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+                  {data.eligibleItems.map((item, index) => (
+                    <div
+                      key={index}
+                      className="px-3 py-2 rounded-md text-xs sm:text-sm"
+                      style={{
+                        backgroundColor: 'white',
+                        color: '#315A6E',
+                        borderLeft: '4px solid #008FB8',
+                      }}
+                    >
+                      • {item}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          </section>
+            </section>
+          )}
 
-          {/* Non-Returnable Items */}
-          <section className="mb-10">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-6 flex items-center">
-              <div className="w-2 h-8 bg-gradient-to-r from-[#D97A22] via-[#D97A22] to-[#D97A22] mr-3 rounded-full"></div>
-              No Returns For Any Purchases
+          {/* Non-Returnable */}
+          {data.nonEligibleItems?.length > 0 && (
+            <section className="mb-6 sm:mb-10">
+              <h2
+                className="text-lg sm:text-2xl font-semibold mb-3 sm:mb-4 flex items-center"
+                style={{ color: '#063B5C' }}
+              >
+                <div
+                  className="w-1.5 sm:w-2 h-6 sm:h-8 mr-2 sm:mr-3 rounded-full"
+                  style={{ backgroundColor: '#008FB8' }}
+                ></div>
+                What's Not Eligible?
+              </h2>
+              <div
+                className="p-4 sm:p-6 rounded-lg sm:rounded-xl"
+                style={{ backgroundColor: 'rgba(0, 143, 184, 0.05)' }}
+              >
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+                  {data.nonEligibleItems.map((item, index) => (
+                    <div
+                      key={index}
+                      className="px-3 py-2 rounded-md text-xs sm:text-sm"
+                      style={{
+                        backgroundColor: 'white',
+                        color: '#315A6E',
+                        borderLeft: '4px solid #008FB8',
+                      }}
+                    >
+                      • {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* Refund Timeline */}
+          {data.refundTimeline?.length > 0 && (
+            <section className="mb-6 sm:mb-10">
+              <h2
+                className="text-lg sm:text-2xl font-semibold mb-3 sm:mb-4 flex items-center"
+                style={{ color: '#063B5C' }}
+              >
+                <div
+                  className="w-1.5 sm:w-2 h-6 sm:h-8 mr-2 sm:mr-3 rounded-full"
+                  style={{ backgroundColor: '#008FB8' }}
+                ></div>
+                Refund Timeline
+              </h2>
+              <div
+                className="p-4 sm:p-6 rounded-lg sm:rounded-xl"
+                style={{ backgroundColor: 'rgba(0, 143, 184, 0.05)' }}
+              >
+                <div className="space-y-3">
+                  {data.refundTimeline.map((row, index) => (
+                    <div
+                      key={row._id || index}
+                      className="flex justify-between items-center px-4 py-3 rounded-md"
+                      style={{ backgroundColor: 'white' }}
+                    >
+                      <span className="text-sm sm:text-base" style={{ color: '#315A6E' }}>
+                        {row.method}
+                      </span>
+                      <span
+                        className="font-semibold text-sm sm:text-base"
+                        style={{ color: '#008FB8' }}
+                      >
+                        {row.timeline}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* Contact */}
+          <section className="mb-6 sm:mb-10">
+            <h2
+              className="text-lg sm:text-2xl font-semibold mb-3 sm:mb-4 flex items-center"
+              style={{ color: '#063B5C' }}
+            >
+              <div
+                className="w-1.5 sm:w-2 h-6 sm:h-8 mr-2 sm:mr-3 rounded-full"
+                style={{ backgroundColor: '#008FB8' }}
+              ></div>
+              {data.contact?.title || 'Need Help?'}
             </h2>
-            
-            <div className="bg-gray-50 p-6 rounded-xl">
-              <p className="text-gray-700 mb-6">
-                We do not allow returns or refunds for any purchases made through our website:
+            <div
+              className="p-4 sm:p-6 rounded-lg sm:rounded-xl"
+              style={{ backgroundColor: 'rgba(0, 143, 184, 0.05)' }}
+            >
+              <p className="text-sm sm:text-base mb-4" style={{ color: '#315A6E' }}>
+                {data.contact?.description ||
+                  'Our support team is here to help with returns, refunds, or any questions.'}
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {returnsPolicy.nonReturnableItems.map((item, index) => (
-                  <div 
-                    key={index} 
-                    className="bg-gradient-to-r from-[#D97A22] via-[#D97A22] to-[#D97A22] text-white px-3 py-2 rounded-md hover:opacity-90 transition-all duration-200 font-medium shadow text-sm text-center cursor-pointer"
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                <div
+                  className="flex items-start sm:items-center text-sm sm:text-base"
+                  style={{ color: '#315A6E' }}
+                >
+                  <svg
+                    className="w-5 h-5 mr-3 flex-shrink-0 mt-0.5 sm:mt-0"
+                    style={{ color: '#008FB8' }}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
                   >
-                    {item}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* Defective Items */}
-          <section className="mb-10">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-6 flex items-center">
-              <div className="w-2 h-8 bg-gradient-to-r from-[#D97A22] via-[#D97A22] to-[#D97A22] mr-3 rounded-full"></div>
-              Damaged or Wrong Product
-            </h2>
-            
-            <div className="bg-gray-50 p-6 rounded-xl">
-              <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Important Note</h3>
-                <p className="text-gray-700">
-                  {returnsPolicy.defectiveItemsNote}
-                </p>
-              </div>
-            </div>
-          </section>
-
-          {/* Refund Information */}
-          <section className="mb-10">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-6 flex items-center">
-              <div className="w-2 h-8 bg-gradient-to-r from-[#D97A22] via-[#D97A22] to-[#D97A22] mr-3 rounded-full"></div>
-              Refund Information (Damaged/Wrong Only)
-            </h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-gray-50 p-6 rounded-xl">
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">Processing Time</h3>
-                <p className="text-gray-700 mb-3">
-                  If approved for damaged/wrong item: <strong className="text-gray-800">{returnsPolicy.refundProcessingTime}</strong>.
-                </p>
-                <div className="bg-gray-100 p-4 rounded-lg border-l-4 border-[#D97A22]">
-                  <p className="text-sm text-gray-700">
-                    <strong>Note:</strong> {returnsPolicy.refundNote}
-                  </p>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    />
+                  </svg>
+                  <span>Contact us using the email in our website footer</span>
                 </div>
-              </div>
-
-              <div className="bg-gray-50 p-6 rounded-xl">
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">Refund Amount</h3>
-                <p className="text-gray-700">
-                  {returnsPolicy.refundAmountDescription}
-                </p>
-                <div className="mt-4 p-3 bg-gradient-to-r from-[#D97A22] via-[#D97A22] to-[#D97A22] text-white rounded-md text-center font-medium">
-                  {returnsPolicy.refundAmountFormula}
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Exchanges */}
-          <section className="mb-10">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4 flex items-center">
-              <div className="w-2 h-8 bg-gradient-to-r from-[#D97A22] via-[#D97A22] to-[#D97A22] mr-3 rounded-full"></div>
-              Exchange Policy
-            </h2>
-            <div className="bg-gray-50 p-6 rounded-xl">
-              <p className="text-gray-700">
-                {returnsPolicy.exchangePolicy}
-              </p>
-            </div>
-          </section>
-
-          {/* Contact Information */}
-          <section className="mb-10">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4 flex items-center">
-              <div className="w-2 h-8 bg-gradient-to-r from-[#D97A22] via-[#D97A22] to-[#D97A22] mr-3 rounded-full"></div>
-              Damaged or Wrong Product?
-            </h2>
-            <div className="bg-gray-50 p-6 rounded-xl">
-              <p className="text-gray-700 mb-6">
-                We do not allow returns or refunds for any purchases. All sales are final. If the order is damaged or wrong product sent then contact us immediately.
-              </p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div className="text-gray-700">
-                    <span className="text-sm font-medium block mb-1">Email:</span>
-                    <span className="text-sm">{contactEmail}</span>
-                  </div>
-                  <div className="text-gray-700">
-                    <span className="text-sm font-medium block mb-1">Phone:</span>
-                    <span className="text-sm">{contactNumber}</span>
-                  </div>
-                </div>
-                
-                <div className="flex flex-col space-y-3">
+                <div className="flex flex-col space-y-2 sm:space-y-3">
                   <Link
                     href="/contact"
-                    className="bg-gradient-to-r from-[#D97A22] via-[#D97A22] to-[#D97A22] text-white px-4 py-3 rounded-md hover:from-[#c56a1e] hover:via-[#c56a1e] hover:to-[#c56a1e] transition-all duration-200 font-medium shadow hover:shadow-lg text-center text-sm cursor-pointer"
+                    className="px-4 py-3 rounded-md transition-all duration-200 font-medium shadow text-center text-sm sm:text-base w-full"
+                    style={{ backgroundColor: '#008FB8', color: 'white' }}
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#064B6A')}
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#008FB8')}
                   >
-                    Report Damaged/Wrong Item
+                    Contact Returns Team
+                  </Link>
+                  <Link
+                    href="/shipping"
+                    className="px-4 py-3 rounded-md transition-all duration-200 font-medium shadow text-center text-sm sm:text-base w-full"
+                    style={{
+                      backgroundColor: 'white',
+                      color: '#008FB8',
+                      border: '1px solid #008FB8',
+                    }}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.backgroundColor = 'rgba(0, 143, 184, 0.05)')
+                    }
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'white')}
+                  >
+                    View Shipping Info
                   </Link>
                 </div>
               </div>
@@ -287,14 +395,31 @@ export default function ReturnsPage() {
           </section>
 
           {/* Back Button */}
-          <div className="text-center">
+          <div className="text-center mt-6 sm:mt-10">
             <Link
               href="/"
-              className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#D97A22] via-[#D97A22] to-[#D97A22] text-white font-medium rounded-lg hover:from-[#c56a1e] hover:via-[#c56a1e] hover:to-[#c56a1e] transition-all duration-200 hover:shadow-lg text-sm cursor-pointer"
+              className="inline-flex items-center justify-center w-full sm:w-auto px-6 py-3 font-medium rounded-lg transition-all duration-200 text-sm sm:text-base"
+              style={{ backgroundColor: '#064B6A', color: 'white' }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#008FB8')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#064B6A')}
             >
+              <svg
+                className="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                />
+              </svg>
               Back to Home
             </Link>
           </div>
+
         </div>
       </div>
     </div>

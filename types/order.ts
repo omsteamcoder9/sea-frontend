@@ -44,6 +44,8 @@ export interface Order {
     postalCode: string;
     country: string;
     phone: string;
+        alternatePhone?: string;   // ✅ NEW — optional
+
     email: string;
   };
 
@@ -84,6 +86,8 @@ export interface CreateOrderRequest {
     postalCode: string;
     country: string;
     phone: string;
+        alternatePhone?: string;   // ✅ NEW — optional
+
     email: string;
   };
   paymentMethod: 'cod' | 'razorpay' | 'card';
