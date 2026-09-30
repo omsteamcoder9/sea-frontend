@@ -67,10 +67,10 @@ export default function HomeClient({ categories, featuredCategories }: HomeClien
       question: "When will I receive my order?",
       answer: `We follow a next-day delivery policy. Orders placed today will be delivered tomorrow (${getTomorrowDate()}). This ensures you receive the freshest catch possible.`
     },
-    {
-      question: "Is the fish cleaned and cut before delivery?",
-      answer: "Yes, we provide fresh cleaned and cut fish as per your preference. You can choose whole fish, fillets, or curry cuts."
-    },
+{
+  question: "Is the fish cleaned and cut before delivery?",
+  answer: "No, we do not clean or cut the fish before delivery. We deliver fresh whole fish so you receive it in its natural, unprocessed form."
+},
     {
       question: "How should I store the fresh fish?",
       answer: "Store in refrigerator and consume within 24 hours for best taste. For longer storage, keep in freezer up to 2 weeks."
