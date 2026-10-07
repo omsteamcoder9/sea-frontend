@@ -1,12 +1,13 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useAuth } from '@/context/AuthContext';
-import { useCart } from '@/context/CartContext';
-import { useState, useEffect, useRef } from 'react';
-import { quickSearchProducts } from '@/lib/productService';
-import { useRouter } from 'next/navigation';
-import Image from 'next/image';
+import Link from "next/link";
+import Image from "next/image";
+import { useAuth } from "@/context/AuthContext";
+import { useCart } from "@/context/CartContext";
+import { useState, useEffect, useRef } from "react";
+import { quickSearchProducts } from "@/lib/productService";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+
 import {
   ShoppingCart,
   Menu,
@@ -16,7 +17,10 @@ import {
   Phone,
   Mail,
   ChevronDown,
-} from 'lucide-react';
+  Home,
+  Info,
+  MapPin,
+} from "lucide-react";
 
 import {
   FaFacebookF,
@@ -24,10 +28,11 @@ import {
   FaInstagram,
   FaYoutube,
   FaLinkedinIn,
-} from 'react-icons/fa';
-import { Category } from '@/types/category';
-import CartDrawer from '@/components/CartDrawer';
-import { settingsAPI } from '@/lib/settings-api';
+} from "react-icons/fa";
+
+import { Category } from "@/types/category";
+import CartDrawer from "@/components/CartDrawer";
+import { settingsAPI } from "@/lib/settings-api";
 
 interface SearchProduct {
   _id: string;
@@ -43,45 +48,75 @@ interface HeaderClientProps {
   categories: Category[];
 }
 
-export default function HeaderClient({ categories }: HeaderClientProps) {
+export default function HeaderClient({
+  categories,
+}: HeaderClientProps) {
   const { isAuthenticated, user, logout } = useAuth();
   const { cart } = useCart();
   const router = useRouter();
 
+  /* ============================================================
+     ACTIVE CATEGORY DETECTION
+  ============================================================ */
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const activeCategorySlug = searchParams.get("category");
+
   const STATIC_URL = process.env.NEXT_PUBLIC_STATIC_URL;
   const IMG_URL = process.env.NEXT_PUBLIC_IMG_URL;
-  
+
+  /* ============================================================
+     STATES
+  ============================================================ */
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isCartDrawerOpen, setIsCartDrawerOpen] = useState(false);
+
   const [showSearch, setShowSearch] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchProduct[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+
   const [isShopDropdownOpen, setIsShopDropdownOpen] = useState(false);
-  
-  const [siteName, setSiteName] = useState('Sea Food');
-  const [contactEmail, setContactEmail] = useState('contact@MeenavanFresh.com');
-  const [contactNumber, setContactNumber] = useState('+91 98765 43210');
+
+  const [siteName, setSiteName] = useState("Sea Food");
+  const [contactEmail, setContactEmail] = useState(
+    "contact@MeenavanFresh.com"
+  );
+  const [contactNumber, setContactNumber] = useState("+91 98765 43210");
+
   const [socialMedia, setSocialMedia] = useState({
-    facebook: '',
-    instagram: '',
-    twitter: '',
-    youtube: '',
-    linkedin: ''
+    facebook: "",
+    instagram: "",
+    twitter: "",
+    youtube: "",
+    linkedin: "",
   });
-  
+
+  /* ============================================================
+     REFS
+  ============================================================ */
+
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const mobileSearchInputRef = useRef<HTMLInputElement>(null);
+
   const profileDropdownRef = useRef<HTMLDivElement>(null);
   const shopDropdownRef = useRef<HTMLDivElement>(null);
-  
-  const categoryNames = categories.map(cat => cat.name);
-  const cartCount = cart?.totalItems || 0;
+
+  /* ============================================================
+     CATEGORY DATA
+  ============================================================ */
 
   const displayedCategories = categories.slice(0, 3);
   const dropdownCategories = categories.slice(3);
+
+  const cartCount = cart?.totalItems || 0;
+
+  /* ============================================================
+     FETCH SETTINGS
+  ============================================================ */
 
   useEffect(() => {
     fetchSettings();
@@ -90,60 +125,111 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
   const fetchSettings = async () => {
     try {
       const response = await settingsAPI.getPublicSettings();
+
       if (response.success && response.data) {
         const data = response.data;
-        
+
         if (data.siteName) setSiteName(data.siteName);
         if (data.contactEmail) setContactEmail(data.contactEmail);
         if (data.contactNumber) setContactNumber(data.contactNumber);
+
         if (data.socialMedia) {
           setSocialMedia({
-            facebook: data.socialMedia.facebook || '',
-            instagram: data.socialMedia.instagram || '',
-            twitter: data.socialMedia.twitter || '',
-            youtube: data.socialMedia.youtube || '',
-            linkedin: data.socialMedia.linkedin || ''
+            facebook: data.socialMedia.facebook || "",
+            instagram: data.socialMedia.instagram || "",
+            twitter: data.socialMedia.twitter || "",
+            youtube: data.socialMedia.youtube || "",
+            linkedin: data.socialMedia.linkedin || "",
           });
         }
-        if (data.facebookUrl) setSocialMedia(prev => ({ ...prev, facebook: data.facebookUrl || '' }));
-        if (data.instagramUrl) setSocialMedia(prev => ({ ...prev, instagram: data.instagramUrl || '' }));
-        if (data.twitterUrl) setSocialMedia(prev => ({ ...prev, twitter: data.twitterUrl || '' }));
-        if (data.youtubeUrl) setSocialMedia(prev => ({ ...prev, youtube: data.youtubeUrl || '' }));
-        if (data.linkedinUrl) setSocialMedia(prev => ({ ...prev, linkedin: data.linkedinUrl || '' }));
+
+        if (data.facebookUrl)
+          setSocialMedia((prev) => ({
+            ...prev,
+            facebook: data.facebookUrl || "",
+          }));
+        if (data.instagramUrl)
+          setSocialMedia((prev) => ({
+            ...prev,
+            instagram: data.instagramUrl || "",
+          }));
+        if (data.twitterUrl)
+          setSocialMedia((prev) => ({
+            ...prev,
+            twitter: data.twitterUrl || "",
+          }));
+        if (data.youtubeUrl)
+          setSocialMedia((prev) => ({
+            ...prev,
+            youtube: data.youtubeUrl || "",
+          }));
+        if (data.linkedinUrl)
+          setSocialMedia((prev) => ({
+            ...prev,
+            linkedin: data.linkedinUrl || "",
+          }));
       }
     } catch (error) {
-      console.error('Error fetching settings:', error);
+      console.error("Error fetching settings:", error);
     }
   };
 
-  const openCartDrawer = () => setIsCartDrawerOpen(true);
-  const closeCartDrawer = () => setIsCartDrawerOpen(false);
+  /* ============================================================
+     USER HELPERS
+  ============================================================ */
 
   const getUserInitial = () => {
-    if (!user) return 'U';
-    const email = (user as any)?.email || (user as any)?.phone || (user as any)?.mobile;
-    if (email && typeof email === 'string') return email.charAt(0).toUpperCase();
-    return 'U';
+    if (!user) return "U";
+    const email =
+      (user as any)?.email ||
+      (user as any)?.phone ||
+      (user as any)?.mobile;
+    if (email && typeof email === "string")
+      return email.charAt(0).toUpperCase();
+    return "U";
   };
 
   const getUserDisplayName = () => {
-    if (!user) return '';
-    return (user as any)?.name || (user as any)?.email || (user as any)?.phone || '';
+    if (!user) return "";
+    return (
+      (user as any)?.name ||
+      (user as any)?.email ||
+      (user as any)?.phone ||
+      ""
+    );
   };
 
   const getUserShortName = () => {
     const displayName = getUserDisplayName();
-    if (!displayName) return '';
-    if (displayName.includes('@')) return displayName.split('@')[0];
+    if (!displayName) return "";
+    if (displayName.includes("@")) return displayName.split("@")[0];
     return displayName;
   };
 
+  /* ============================================================
+     CATEGORY CLICK
+  ============================================================ */
+
   const handleCategoryClick = (category: Category | string) => {
-    const categorySlug = typeof category === 'string' ? category : (category.slug || category._id);
-    router.push(`/products?category=${encodeURIComponent(categorySlug)}`);
+    const categorySlug =
+      typeof category === "string"
+        ? category
+        : category.slug || category._id;
+
+    router.push(
+      `/products?category=${encodeURIComponent(categorySlug)}`
+    );
+
     setIsMenuOpen(false);
     setIsShopDropdownOpen(false);
   };
+
+  const isCategoryActive = (cat: Category) =>
+    activeCategorySlug === (cat.slug || cat._id);
+
+  /* ============================================================
+     SEARCH
+  ============================================================ */
 
   useEffect(() => {
     const performSearch = async () => {
@@ -151,201 +237,255 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
         setSearchResults([]);
         return;
       }
-
       setIsSearching(true);
       try {
         const response = await quickSearchProducts(searchQuery, 5);
-        if (response.success) {
-          setSearchResults(response.data);
-        }
+        if (response.success) setSearchResults(response.data);
       } catch (error) {
-        console.error('Search error:', error);
+        console.error("Search error:", error);
         setSearchResults([]);
       } finally {
         setIsSearching(false);
       }
     };
-
     const debounceTimer = setTimeout(performSearch, 300);
     return () => clearTimeout(debounceTimer);
   }, [searchQuery]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
-      setShowSearch(false);
-      setSearchQuery('');
-      setSearchResults([]);
-    }
+    if (!searchQuery.trim()) return;
+    router.push(
+      `/products?search=${encodeURIComponent(searchQuery.trim())}`
+    );
+    setShowSearch(false);
+    setSearchQuery("");
+    setSearchResults([]);
   };
 
-  const handleSearchClick = () => {
-    setShowSearch(true);
-  };
+  const handleSearchClick = () => setShowSearch(true);
 
   const handleProductClick = (product: SearchProduct) => {
     router.push(`/products/${product.slug}`);
     setShowSearch(false);
-    setSearchQuery('');
+    setSearchQuery("");
     setSearchResults([]);
   };
 
   const handleViewAllResults = () => {
-    if (searchQuery.trim()) {
-      router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
-      setShowSearch(false);
-      setSearchQuery('');
-      setSearchResults([]);
-    }
+    if (!searchQuery.trim()) return;
+    router.push(
+      `/products?search=${encodeURIComponent(searchQuery.trim())}`
+    );
+    setShowSearch(false);
+    setSearchQuery("");
+    setSearchResults([]);
   };
+
+  /* ============================================================
+     CLICK-OUTSIDE HANDLERS
+  ============================================================ */
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (window.innerWidth >= 1024) {
-        if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
-          setShowSearch(false);
-          setSearchQuery('');
-          setSearchResults([]);
-        }
-      }
-    };
-
-    const handleEscapeKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && showSearch) {
+      if (
+        window.innerWidth >= 1024 &&
+        searchContainerRef.current &&
+        !searchContainerRef.current.contains(event.target as Node)
+      ) {
         setShowSearch(false);
-        setSearchQuery('');
+        setSearchQuery("");
         setSearchResults([]);
       }
     };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleEscapeKey);
-    
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && showSearch) {
+        setShowSearch(false);
+        setSearchQuery("");
+        setSearchResults([]);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscapeKey);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleEscapeKey);
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscapeKey);
     };
   }, [showSearch]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target as Node)) {
+      if (
+        profileDropdownRef.current &&
+        !profileDropdownRef.current.contains(event.target as Node)
+      ) {
         setIsDropdownOpen(false);
       }
     };
-
     if (isDropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
-
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isDropdownOpen]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (shopDropdownRef.current && !shopDropdownRef.current.contains(event.target as Node)) {
+      if (
+        shopDropdownRef.current &&
+        !shopDropdownRef.current.contains(event.target as Node)
+      ) {
         setIsShopDropdownOpen(false);
       }
     };
-
     if (isShopDropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
-
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isShopDropdownOpen]);
 
-  // 🎯 Auto-focus search input when search opens (desktop or mobile)
+  /* ============================================================
+     SEARCH AUTO FOCUS
+  ============================================================ */
+
   useEffect(() => {
-    if (showSearch) {
-      const t = setTimeout(() => {
-        const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
-        const input = isMobile ? mobileSearchInputRef.current : searchInputRef.current;
-        input?.focus();
-      }, 50);
-      return () => clearTimeout(t);
-    }
+    if (!showSearch) return;
+    const timer = setTimeout(() => {
+      const isMobile =
+        typeof window !== "undefined" && window.innerWidth < 1024;
+      const input = isMobile
+        ? mobileSearchInputRef.current
+        : searchInputRef.current;
+      input?.focus();
+    }, 50);
+    return () => clearTimeout(timer);
   }, [showSearch]);
 
-  // 🎯 Resolve any image path to a full URL
+  /* ============================================================
+     IMAGE HELPERS
+  ============================================================ */
+
   const resolveImagePath = (path: string) => {
     if (!path) return null;
-    if (path.startsWith('http://') || path.startsWith('https://')) return path;
-    const clean = path.startsWith('/') ? path.slice(1) : path;
+    if (path.startsWith("http://") || path.startsWith("https://"))
+      return path;
+    const clean = path.startsWith("/") ? path.slice(1) : path;
     return `${IMG_URL}/${clean}`;
   };
 
-  // 🎯 Each product uses ONLY its own image. Returns null if it has none.
   const getImageUrl = (imagePath: string | null) => {
-    if (!imagePath || imagePath.trim() === '') return null;
+    if (!imagePath || imagePath.trim() === "") return null;
     return resolveImagePath(imagePath);
   };
 
+  /* ============================================================
+     LOGO
+  ============================================================ */
+
   const getLogoLines = () => {
-    if (!siteName || siteName.trim() === '') {
-      return { first: '', second: '' };
-    }
-    
-    const nameParts = siteName.trim().split(' ');
+    if (!siteName || siteName.trim() === "")
+      return { first: "", second: "" };
+    const nameParts = siteName.trim().split(" ");
     if (nameParts.length > 1) {
-      return { first: nameParts[0], second: nameParts.slice(1).join(' ') };
+      return {
+        first: nameParts[0],
+        second: nameParts.slice(1).join(" "),
+      };
     }
-    
-    return { first: nameParts[0], second: '' };
+    return { first: nameParts[0], second: "" };
   };
 
   const { first: logoFirstLine, second: logoSecondLine } = getLogoLines();
 
+  const categoryLabel = (name: string) => name.toUpperCase();
+
   return (
     <>
-      {/* ================= TOP HEADER ================= */}
+      {/* =========================================================
+          TOP CONTACT BAR  (lg+)
+      ========================================================= */}
+
       <div className="hidden lg:block w-full bg-[#064B6A]">
-        <div className="max-w-[1350px] mx-auto">
-          <div className="flex items-center justify-between h-[40px] px-6">
-            <div className="flex items-center gap-8 text-[#EAF8FC] text-[12px] font-semibold">
-              <div className="flex items-center gap-2">
-                <Mail className="w-[12px] h-[12px] text-[#00A9E0]" />
-                <span>{contactEmail}</span>
+        <div className="w-full max-w-[1440px] mx-auto px-4 lg:px-6 xl:px-8">
+          <div className="flex items-center justify-between h-[40px] gap-4">
+
+            <div className="flex items-center gap-4 xl:gap-7 text-[#EAF8FC] text-[11px] xl:text-[12px] font-semibold min-w-0">
+
+              <div className="flex items-center gap-2 min-w-0">
+                <Mail className="w-3 h-3 text-[#00A9E0] shrink-0" />
+                <span className="truncate max-w-[180px] xl:max-w-[260px]">
+                  {contactEmail}
+                </span>
               </div>
-              <div className="flex items-center gap-2">
-                <Phone className="w-[12px] h-[12px] text-[#00A9E0]" />
+
+              <div className="flex items-center gap-2 shrink-0">
+                <Phone className="w-3 h-3 text-[#00A9E0]" />
                 <span>{contactNumber}</span>
               </div>
+
             </div>
 
-            <div className="flex items-center gap-4 text-[#EAF8FC] text-[12px] font-semibold">
-              <a href="/contact" className="hover:text-[#00A9E0] transition-all duration-300">
+            <div className="flex items-center gap-3 xl:gap-5 text-[#EAF8FC] text-[11px] xl:text-[12px] font-semibold shrink-0">
+
+              <Link
+                href="/contact"
+                className="hover:text-[#00A9E0] transition-colors"
+              >
                 Contact
-              </a>
-              <div className="flex items-center gap-3">
+              </Link>
+
+              <div className="flex items-center gap-2 xl:gap-3">
                 {socialMedia.facebook && (
-                  <a href={socialMedia.facebook} target="_blank" rel="noopener noreferrer" className="hover:text-[#00A9E0] transition-all duration-300">
-                    <FaFacebookF className="w-[12px] h-[12px] cursor-pointer" />
+                  <a
+                    href={socialMedia.facebook}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-[#00A9E0] transition-colors"
+                  >
+                    <FaFacebookF className="w-3 h-3" />
                   </a>
                 )}
                 {socialMedia.twitter && (
-                  <a href={socialMedia.twitter} target="_blank" rel="noopener noreferrer" className="hover:text-[#00A9E0] transition-all duration-300">
-                    <FaTwitter className="w-[12px] h-[12px] cursor-pointer" />
+                  <a
+                    href={socialMedia.twitter}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-[#00A9E0] transition-colors"
+                  >
+                    <FaTwitter className="w-3 h-3" />
                   </a>
                 )}
                 {socialMedia.instagram && (
-                  <a href={socialMedia.instagram} target="_blank" rel="noopener noreferrer" className="hover:text-[#00A9E0] transition-all duration-300">
-                    <FaInstagram className="w-[12px] h-[12px] cursor-pointer" />
+                  <a
+                    href={socialMedia.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-[#00A9E0] transition-colors"
+                  >
+                    <FaInstagram className="w-3 h-3" />
                   </a>
                 )}
                 {socialMedia.youtube && (
-                  <a href={socialMedia.youtube} target="_blank" rel="noopener noreferrer" className="hover:text-[#00A9E0] transition-all duration-300">
-                    <FaYoutube className="w-[12px] h-[12px] cursor-pointer" />
+                  <a
+                    href={socialMedia.youtube}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-[#00A9E0] transition-colors"
+                  >
+                    <FaYoutube className="w-3 h-3" />
                   </a>
                 )}
                 {socialMedia.linkedin && (
-                  <a href={socialMedia.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-[#00A9E0] transition-all duration-300">
-                    <FaLinkedinIn className="w-[12px] h-[12px] cursor-pointer" />
+                  <a
+                    href={socialMedia.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-[#00A9E0] transition-colors"
+                  >
+                    <FaLinkedinIn className="w-3 h-3" />
                   </a>
                 )}
               </div>
@@ -354,29 +494,38 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
         </div>
       </div>
 
-      {/* ================= MAIN NAVBAR ================= */}
+      {/* =========================================================
+          MAIN HEADER
+      ========================================================= */}
+
       <header className="sticky top-0 z-50 w-full bg-[#F8FCFD] border-b border-[#B8DCE7] shadow-sm">
-        <div className="w-full lg:max-w-[1350px] lg:mx-auto">
-          <div className="flex items-center justify-between lg:grid lg:grid-cols-[220px_1fr_320px] h-[60px] lg:h-[72px] px-3 lg:px-0 md:mr-1">
-            
-            <div className="flex items-center bg-transparent">
-              <Link href="/" className="flex items-center gap-2">
-                <div className="relative w-15 h-15 lg:w-20 lg:h-20 flex-shrink-0 mt-2 lg:mt-0 lg:ml-10">
+        <div className="w-full max-w-[1440px] mx-auto">
+
+          <div className="relative flex items-center min-h-[64px] lg:min-h-[72px] px-3 sm:px-4 lg:px-6 xl:px-8">
+
+            {/* ================= LOGO ================= */}
+
+            <div className="flex items-center shrink-0 w-[150px] sm:w-[180px] lg:w-[200px] xl:w-[250px] min-w-0">
+
+              <Link href="/" className="flex items-center gap-2 min-w-0">
+                <div className="relative w-[44px] h-[44px] sm:w-[52px] sm:h-[52px] lg:w-[58px] lg:h-[58px] xl:w-[68px] xl:h-[68px] shrink-0">
                   <Image
                     src={`${STATIC_URL}/logoo.webp`}
                     alt={siteName}
                     fill
                     priority
+                    sizes="68px"
                     className="object-contain"
                   />
                 </div>
-                
-                <div className="flex flex-col justify-center">
-                  <span className="text-[16px] sm:text-[18px] lg:text-[26px] font-black tracking-[2px] lg:tracking-[3px] text-[#063B5C] leading-none">
+
+                <div className="flex flex-col justify-center min-w-0">
+                  <span className="text-[15px] sm:text-[17px] lg:text-[19px] xl:text-[25px] font-black tracking-[1.5px] lg:tracking-[2px] xl:tracking-[3px] text-[#063B5C] leading-none truncate">
                     {logoFirstLine}
                   </span>
+
                   {logoSecondLine && (
-                    <span className="text-[10px] mr-20 sm:text-[11px] lg:text-[16px] font-bold tracking-[1px] text-[#008FB8] leading-none md:ml-5">
+                    <span className="text-[10px] sm:text-[10px] lg:text-[11px] xl:text-[15px] font-bold tracking-[1px] text-[#008FB8] leading-none mt-1 truncate">
                       {logoSecondLine}
                     </span>
                   )}
@@ -384,107 +533,291 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
               </Link>
             </div>
 
-            <div className="hidden lg:flex items-center justify-center bg-transparent md:ml-40">
-              <nav className="hidden xl:flex items-center gap-8">
+            {/* ==================================================
+                DESKTOP NAVIGATION
+            ================================================== */}
+
+            <div className="hidden lg:flex flex-1 items-center justify-center min-w-0 px-2">
+
+              <nav className="flex items-center justify-center gap-2 lg:gap-3 xl:gap-5 2xl:gap-7 w-full min-w-0">
+
+                {/* HOME */}
                 <Link
                   href="/"
-                  className="text-[12px] font-extrabold tracking-[1px] text-[#063B5C] hover:text-[#008FB8] transition-all duration-300"
+                  className={`
+                    shrink-0
+                    text-[10px] lg:text-[11px] xl:text-[12px]
+                    font-extrabold
+                    tracking-[0.6px] lg:tracking-[0.8px]
+                    transition-colors
+                    whitespace-nowrap
+                    ${
+                      pathname === "/"
+                        ? "text-[#008FB8]"
+                        : "text-[#063B5C] hover:text-[#008FB8]"
+                    }
+                  `}
                 >
                   HOME
                 </Link>
-                {displayedCategories.map((cat) => (
-                  <button
-                    key={cat._id}
-                    onClick={() => handleCategoryClick(cat)}
-                    className="text-[12px] font-extrabold tracking-[1px] text-[#063B5C] hover:text-[#008FB8] transition-all duration-300 cursor-pointer"
-                  >
-                    {cat.name.toUpperCase()}
-                  </button>
-                ))}
-                {dropdownCategories.length > 0 && (
-                  <div ref={shopDropdownRef} className="relative">
+
+                {/* INLINE CATEGORIES */}
+                {displayedCategories.map((cat) => {
+                  const active = isCategoryActive(cat);
+                  return (
                     <button
-                      onClick={() => setIsShopDropdownOpen(!isShopDropdownOpen)}
-                      className="text-[12px] font-extrabold tracking-[1px] text-[#063B5C] hover:text-[#008FB8] transition-all duration-300 cursor-pointer flex items-center gap-1"
+                      key={cat._id}
+                      onClick={() => handleCategoryClick(cat)}
+                      className="
+                        group
+                        shrink
+                        min-w-0
+                        max-w-[85px]
+                        lg:max-w-[95px]
+                        xl:max-w-[115px]
+                        2xl:max-w-[145px]
+                        min-h-[42px]
+                        px-1
+                        flex
+                        items-center
+                        justify-center
+                        text-center
+                        cursor-pointer
+                        relative
+                      "
+                    >
+                      <span
+                        className={`
+                          text-[9px] lg:text-[10px] xl:text-[11px] 2xl:text-[12px]
+                          font-extrabold
+                          tracking-[0.5px] lg:tracking-[0.7px]
+                          leading-[1.2] lg:leading-[1.25]
+                          transition-colors
+                          whitespace-normal
+                          break-words
+                          line-clamp-2
+                          ${
+                            active
+                              ? "text-[#008FB8]"
+                              : "text-[#063B5C] group-hover:text-[#008FB8]"
+                          }
+                        `}
+                      >
+                        {categoryLabel(cat.name)}
+                      </span>
+
+                      {active && (
+                        <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-4 lg:w-5 h-[2px] bg-[#008FB8] rounded-full" />
+                      )}
+                    </button>
+                  );
+                })}
+
+                {/* SHOP DROPDOWN */}
+                {dropdownCategories.length > 0 && (
+                  <div
+                    ref={shopDropdownRef}
+                    className="relative shrink-0"
+                    onMouseEnter={() => setIsShopDropdownOpen(true)}
+                    onMouseLeave={() => setIsShopDropdownOpen(false)}
+                  >
+                    <button
+                      onClick={() =>
+                        setIsShopDropdownOpen(!isShopDropdownOpen)
+                      }
+                      aria-expanded={isShopDropdownOpen}
+                      aria-haspopup="true"
+                      className="
+                        flex items-center justify-center gap-1
+                        text-[10px] lg:text-[11px] xl:text-[12px]
+                        font-extrabold
+                        tracking-[0.6px] lg:tracking-[0.8px]
+                        text-[#063B5C]
+                        hover:text-[#008FB8]
+                        transition-colors
+                        whitespace-nowrap
+                        cursor-pointer
+                      "
                     >
                       SHOP
-                      <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isShopDropdownOpen ? 'rotate-180' : ''}`} />
+                      <ChevronDown
+                        className={`w-3 h-3 transition-transform duration-200 ${
+                          isShopDropdownOpen ? "rotate-180" : ""
+                        }`}
+                      />
                     </button>
-                    
+
                     {isShopDropdownOpen && (
-                      <div className="absolute top-full left-0 mt-2 min-w-[200px] bg-white rounded-lg shadow-2xl py-2 z-20 border border-[#B8DCE7]">
-                        {dropdownCategories.map((cat) => (
-                          <button
-                            key={cat._id}
-                            onClick={() => handleCategoryClick(cat)}
-                            className="block w-full text-left px-4 py-2.5 text-[13px] font-medium text-[#315A6E] hover:text-[#008FB8] hover:bg-[#EAF8FC] transition-all duration-200"
-                          >
-                            {cat.name}
-                          </button>
-                        ))}
+                      <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-[200px] xl:w-[220px] bg-white rounded-xl shadow-2xl border border-[#B8DCE7] overflow-hidden z-[60]">
+                        <div className="px-4 py-3 border-b border-[#EAF8FC] bg-[#F8FCFD]">
+                          <p className="text-[10px] font-bold tracking-[1.5px] uppercase text-[#315A6E]">
+                            Shop by Category
+                          </p>
+                        </div>
+
+                        <div className="p-2 max-h-[60vh] overflow-y-auto">
+                          {dropdownCategories.map((cat) => {
+                            const active = isCategoryActive(cat);
+                            return (
+                              <button
+                                key={cat._id}
+                                onClick={() => handleCategoryClick(cat)}
+                                className={`
+                                  flex items-center w-full text-left
+                                  px-3 py-2.5 rounded-lg
+                                  text-[11px] xl:text-[12px]
+                                  font-semibold
+                                  transition-colors cursor-pointer
+                                  ${
+                                    active
+                                      ? "text-[#008FB8] bg-[#EAF8FC]"
+                                      : "text-[#315A6E] hover:text-[#008FB8] hover:bg-[#EAF8FC]"
+                                  }
+                                `}
+                              >
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#008FB8] mr-2.5 shrink-0" />
+                                <span className="truncate">
+                                  {cat.name}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
                       </div>
                     )}
                   </div>
                 )}
+
+                {/* ABOUT */}
                 <Link
                   href="/about"
-                  className="text-[12px] font-extrabold tracking-[1px] text-[#063B5C] hover:text-[#008FB8] transition-all duration-300"
+                  className={`
+                    shrink-0
+                    text-[10px] lg:text-[11px] xl:text-[12px]
+                    font-extrabold
+                    tracking-[0.6px] lg:tracking-[0.8px]
+                    transition-colors
+                    whitespace-nowrap
+                    ${
+                      pathname === "/about"
+                        ? "text-[#008FB8]"
+                        : "text-[#063B5C] hover:text-[#008FB8]"
+                    }
+                  `}
                 >
                   ABOUT
                 </Link>
+
+                {/* CONTACT */}
                 <Link
                   href="/contact"
-                  className="text-[12px] font-extrabold tracking-[1px] text-[#063B5C] hover:text-[#008FB8] transition-all duration-300"
+                  className={`
+                    shrink-0
+                    text-[10px] lg:text-[11px] xl:text-[12px]
+                    font-extrabold
+                    tracking-[0.6px] lg:tracking-[0.8px]
+                    transition-colors
+                    whitespace-nowrap
+                    ${
+                      pathname === "/contact"
+                        ? "text-[#008FB8]"
+                        : "text-[#063B5C] hover:text-[#008FB8]"
+                    }
+                  `}
                 >
                   CONTACT
                 </Link>
+
               </nav>
             </div>
 
-            <div className="bg-transparent flex items-center justify-end gap-3 lg:gap-6 h-full">
+            {/* ==================================================
+                RIGHT ACTIONS
+            ================================================== */}
+
+<div className="flex items-center justify-end gap-3 sm:gap-4 xl:gap-5 shrink-0 ml-auto w-auto lg:w-[140px] xl:w-[200px] pr-1 sm:pr-2">
               {!showSearch ? (
-                <div className="flex items-center gap-3 lg:gap-6">
-                  <button 
+                <>
+                  {/* SEARCH */}
+                  <button
                     onClick={handleSearchClick}
-                    className="text-[#063B5C] hover:text-[#008FB8] transition-all duration-300"
+                    aria-label="Search"
+                    className="text-[#063B5C] hover:text-[#008FB8] transition-colors p-1"
                   >
-                    <Search className="w-[18px] h-[18px] cursor-pointer" />
+                    <Search className="w-[18px] h-[18px]" />
                   </button>
 
-                  <button 
-                    onClick={openCartDrawer}
-                    className="text-[#063B5C] hover:text-[#008FB8] transition-all duration-300 relative"
+                  {/* CART */}
+                  <button
+                    onClick={() => setIsCartDrawerOpen(true)}
+                    aria-label="Shopping cart"
+                    className="relative text-[#063B5C] hover:text-[#008FB8] transition-colors p-1"
                   >
-                    <ShoppingCart className="w-[18px] h-[18px] cursor-pointer" />
+                    <ShoppingCart className="w-[19px] h-[19px]" />
                     {cartCount > 0 && (
-                      <span className="absolute -top-2 -right-2 bg-[#008FB8] text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-bold">
-                        {cartCount > 9 ? '9+' : cartCount}
+                      <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 bg-[#008FB8] text-white rounded-full flex items-center justify-center text-[9px] font-bold">
+                        {cartCount > 9 ? "9+" : cartCount}
                       </span>
                     )}
                   </button>
 
+                  {/* LOGIN / ACCOUNT */}
                   {!isAuthenticated ? (
                     <Link href="/login" className="hidden lg:block">
-                      <button className="border border-[#008FB8] bg-[#EAF8FC] h-[40px] px-6 text-[#063B5C] text-[11px] font-black tracking-[1.5px] uppercase hover:bg-[#008FB8] hover:text-white transition-all duration-300 rounded-full cursor-pointer">
+                      <span
+                        className="
+                          inline-flex items-center justify-center
+                          h-[36px] xl:h-[38px]
+                          px-3 xl:px-5
+                          rounded-full
+                          border border-[#008FB8]
+                          bg-[#EAF8FC]
+                          text-[#063B5C]
+                          text-[10px] xl:text-[11px]
+                          font-black tracking-[1px] xl:tracking-[1.2px]
+                          hover:bg-[#008FB8] hover:text-white
+                          transition-colors whitespace-nowrap
+                        "
+                      >
                         LOGIN
-                      </button>
+                      </span>
                     </Link>
                   ) : (
-                    <div ref={profileDropdownRef} className="relative hidden lg:block cursor-pointer">
+                    <div
+                      ref={profileDropdownRef}
+                      className="relative hidden lg:block"
+                    >
                       <button
-                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                        className="border border-[#008FB8] bg-[#EAF8FC] h-[40px] px-6 text-[#063B5C] text-[11px] font-black tracking-[1.5px] uppercase hover:bg-[#008FB8] hover:text-white transition-all duration-300 rounded-full flex items-center gap-2"
+                        onClick={() =>
+                          setIsDropdownOpen(!isDropdownOpen)
+                        }
+                        className="
+                          inline-flex items-center gap-2
+                          h-[36px] xl:h-[38px]
+                          px-3 xl:px-4
+                          rounded-full
+                          border border-[#008FB8]
+                          bg-[#EAF8FC]
+                          text-[#063B5C]
+                          text-[10px]
+                          font-black tracking-[1px]
+                          hover:bg-[#008FB8] hover:text-white
+                          transition-colors
+                          max-w-[110px] xl:max-w-[130px]
+                        "
                       >
-                        <User className="w-[14px] h-[14px]" />
-                        {getUserShortName()}
+                        <User className="w-3.5 h-3.5 shrink-0" />
+                        <span className="truncate">
+                          {getUserShortName()}
+                        </span>
                       </button>
-                      
+
                       {isDropdownOpen && (
-                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-2 z-20 border border-[#B8DCE7]">
+                        <div className="absolute right-0 top-full mt-3 w-48 bg-white rounded-xl shadow-xl border border-[#B8DCE7] py-2 overflow-hidden z-[70]">
                           <Link
                             href="/profile"
-                            className="block px-4 py-2 text-sm text-[#315A6E] hover:bg-[#EAF8FC]"
                             onClick={() => setIsDropdownOpen(false)}
+                            className="block px-4 py-2.5 text-sm text-[#315A6E] hover:bg-[#EAF8FC] hover:text-[#008FB8]"
                           >
                             My Orders
                           </Link>
@@ -492,9 +825,9 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                             onClick={() => {
                               setIsDropdownOpen(false);
                               logout();
-                              router.push('/');
+                              router.push("/");
                             }}
-                            className="block w-full text-left px-4 py-2 text-sm text-[#315A6E] hover:bg-[#EAF8FC]"
+                            className="block w-full text-left px-4 py-2.5 text-sm text-[#315A6E] hover:bg-[#EAF8FC] hover:text-[#008FB8]"
                           >
                             Logout
                           </button>
@@ -502,60 +835,66 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                       )}
                     </div>
                   )}
-                </div>
+                </>
               ) : (
-              <div className="hidden lg:block">
-                <div ref={searchContainerRef} className="relative">
-                  <div className="bg-white rounded-lg shadow-xl border border-[#B8DCE7] w-64">
-                    <form onSubmit={handleSearchSubmit} className="p-2">
-                      <div className="flex items-center gap-1">
-                        <div className="flex-1 flex items-center border border-[#B8DCE7] rounded-md px-2 py-1 min-w-0">
-                          <Search className="w-3.5 h-3.5 text-[#008FB8] mr-1.5 flex-shrink-0" />
-                          <input
-                            ref={searchInputRef}
-                            type="text"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Search..."
-                            className="flex-1 text-xs focus:outline-none min-w-0 text-[#063B5C]"
-                          />
-                          {searchQuery && (
-                            <button
-                              type="button"
-                              onClick={() => setSearchQuery('')}
-                              className="text-[#315A6E] hover:text-[#063B5C] ml-1 flex-shrink-0"
-                            >
-                              <X className="w-3 h-3" />
-                            </button>
-                          )}
-                        </div>
-                        <button
-                          type="submit"
-                          className="px-2.5 py-1 bg-[#008FB8] text-white rounded-md text-[10px] font-medium hover:bg-[#00A9E0] transition-all whitespace-nowrap flex-shrink-0"
-                        >
-                          Go
-                        </button>
+                /* DESKTOP SEARCH */
+                <div
+                  ref={searchContainerRef}
+                  className="hidden lg:block relative w-[200px] xl:w-[260px]"
+                >
+                  <form
+                    onSubmit={handleSearchSubmit}
+                    className="flex items-center gap-1"
+                  >
+                    <div className="flex-1 flex items-center h-9 bg-white border border-[#B8DCE7] rounded-lg px-2.5">
+                      <Search className="w-3.5 h-3.5 text-[#008FB8] shrink-0 mr-1.5" />
+                      <input
+                        ref={searchInputRef}
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search..."
+                        className="flex-1 min-w-0 bg-transparent outline-none text-xs text-[#063B5C]"
+                      />
+                      {searchQuery && (
                         <button
                           type="button"
-                          onClick={() => {
-                            setShowSearch(false);
-                            setSearchQuery('');
-                            setSearchResults([]);
-                          }}
-                          className="p-1 text-[#315A6E] hover:text-[#063B5C] hover:bg-[#EAF8FC] rounded-md transition-all flex-shrink-0"
+                          onClick={() => setSearchQuery("")}
+                          className="ml-1"
                         >
-                          <X className="w-3.5 h-3.5" />
+                          <X className="w-3 h-3 text-[#315A6E]" />
                         </button>
-                      </div>
-                    </form>
-                  </div>
-                  
+                      )}
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="h-9 px-2.5 bg-[#008FB8] hover:bg-[#00A9E0] text-white rounded-lg text-[10px] font-bold"
+                    >
+                      Go
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowSearch(false);
+                        setSearchQuery("");
+                        setSearchResults([]);
+                      }}
+                      className="h-9 w-9 flex items-center justify-center rounded-lg hover:bg-[#EAF8FC]"
+                    >
+                      <X className="w-4 h-4 text-[#315A6E]" />
+                    </button>
+                  </form>
+
                   {(searchResults.length > 0 || isSearching) && (
-                    <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-xl border border-[#B8DCE7] max-h-96 overflow-y-auto z-50">
+                    <div className="absolute top-full right-0 mt-2 w-[300px] xl:w-[340px] bg-white rounded-xl shadow-2xl border border-[#B8DCE7] overflow-hidden z-[80]">
                       {isSearching ? (
-                        <div className="p-4 text-center text-[#315A6E]">
-                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#008FB8] mx-auto"></div>
-                          <p className="mt-2 text-xs">Searching...</p>
+                        <div className="p-6 text-center">
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#008FB8] mx-auto" />
+                          <p className="mt-2 text-xs text-[#315A6E]">
+                            Searching...
+                          </p>
                         </div>
                       ) : (
                         <>
@@ -563,289 +902,319 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
                             {searchResults.map((product) => (
                               <div
                                 key={product._id}
-                                className="flex items-center p-2 hover:bg-[#EAF8FC] rounded-lg cursor-pointer transition-colors"
                                 onClick={() => handleProductClick(product)}
+                                className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#EAF8FC] cursor-pointer"
                               >
-                                {/* 🎯 Each product shows ONLY its own image */}
-                                <div className="w-10 h-10 bg-[#EAF8FC] rounded-md flex-shrink-0 overflow-hidden relative">
+                                <div className="relative w-11 h-11 shrink-0 rounded-lg overflow-hidden bg-[#EAF8FC]">
                                   {getImageUrl(product.image) ? (
                                     <Image
                                       src={getImageUrl(product.image)!}
-                                      className="w-full h-full object-cover"
                                       alt={product.name}
                                       fill
-                                      sizes="40px"
+                                      sizes="44px"
+                                      className="object-cover"
                                     />
                                   ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-[#008FB8]">
-                                      <ShoppingCart className="w-4 h-4" />
+                                    <div className="w-full h-full flex items-center justify-center">
+                                      <ShoppingCart className="w-4 h-4 text-[#008FB8]" />
                                     </div>
                                   )}
                                 </div>
-                                <div className="ml-3 flex-1 min-w-0">
-                                  <p className="text-sm font-medium text-[#063B5C] truncate">{product.name}</p>
-                                  <p className="text-xs text-[#315A6E]">{product.category}</p>
+
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-semibold text-[#063B5C] truncate">
+                                    {product.name}
+                                  </p>
+                                  <p className="text-xs text-[#315A6E] truncate">
+                                    {product.category}
+                                  </p>
                                 </div>
-                                <p className="text-[#008FB8] font-medium text-sm flex-shrink-0 ml-2">₹{product.basePrice}</p>
+
+                                <span className="text-sm font-bold text-[#008FB8] shrink-0">
+                                  ₹{product.basePrice}
+                                </span>
                               </div>
                             ))}
                           </div>
-                          <div
-                            className="border-t border-[#B8DCE7] p-3 bg-[#F8FCFD] hover:bg-[#EAF8FC] cursor-pointer text-center rounded-b-lg"
+
+                          <button
                             onClick={handleViewAllResults}
+                            className="w-full border-t border-[#B8DCE7] bg-[#F8FCFD] hover:bg-[#EAF8FC] py-3 text-xs font-semibold text-[#008FB8]"
                           >
-                            <p className="text-sm font-medium text-[#008FB8]">
-                              View all results for &quot;{searchQuery}&quot;
-                            </p>
-                          </div>
+                            View all results for "{searchQuery}"
+                          </button>
                         </>
                       )}
                     </div>
                   )}
                 </div>
-              </div>
               )}
 
-              <button 
-                className="lg:hidden text-[#063B5C] hover:text-[#008FB8] transition-all duration-300"
+              {/* MOBILE MENU TOGGLE */}
+              <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="lg:hidden text-[#063B5C] hover:text-[#008FB8] p-1"
+                aria-label="Menu"
               >
-                {isMenuOpen ? <X className="w-[18px] h-[18px]" /> : <Menu className="w-[18px] h-[18px]" />}
+                {isMenuOpen ? (
+                  <X className="w-5 h-5" />
+                ) : (
+                  <Menu className="w-5 h-5" />
+                )}
               </button>
+
             </div>
           </div>
         </div>
       </header>
 
-      {/* Mobile Menu */}
+      {/* =========================================================
+          MOBILE MENU
+      ========================================================= */}
+
       {isMenuOpen && (
-        <div className="lg:hidden fixed inset-0 z-50">
-          <div 
+        <div className="lg:hidden fixed inset-0 z-[100]">
+          <div
             className="absolute inset-0 bg-black/50"
             onClick={() => setIsMenuOpen(false)}
           />
-          <div className="absolute top-0 left-0 h-full w-64 bg-white shadow-2xl">
-            <div className="flex flex-col h-full">
-              <div className="flex items-center justify-between p-4 border-b border-[#B8DCE7]">
-                <Link href="/" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2">
-                  <div className="relative w-15 h-15">
-                    <Image
-                      src={`${STATIC_URL}/logoo.webp`}
-                      alt={siteName}
-                      fill
-                      className="object-contain"
-                    />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[20px] font-black tracking-[2px] text-[#063B5C] leading-none">{logoFirstLine}</span>
-                    {logoSecondLine && (
-                      <span className="text-[18px] font-bold tracking-[1px] text-[#008FB8] leading-none ml-4">{logoSecondLine}</span>
-                    )}
-                  </div>
-                </Link>
-                <button onClick={() => setIsMenuOpen(false)} className="text-[#315A6E] hover:text-[#008FB8]">
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              <nav className="flex-1 p-4 overflow-y-auto">
-                <div className="space-y-1">
-                  <Link
-                    href="/"
-                    className="flex items-center gap-3 py-2.5 text-[12px] font-extrabold tracking-[1px] text-[#063B5C] hover:text-[#008FB8] transition-all"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                    </svg>
-                    HOME
-                  </Link>
 
-                  <div className="pt-2 pb-1">
-                    <p className="text-[10px] font-bold tracking-[2px] text-[#315A6E] uppercase flex items-center gap-2">
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                      </svg>
-                      Shop by Category
+          <div className="absolute top-0 left-0 h-full w-[290px] max-w-[85vw] bg-white shadow-2xl">
+            <div className="flex items-center justify-between px-4 h-[72px] border-b border-[#B8DCE7]">
+              <Link
+                href="/"
+                onClick={() => setIsMenuOpen(false)}
+                className="flex items-center gap-2 min-w-0"
+              >
+                <div className="relative w-11 h-11 shrink-0">
+                  <Image
+                    src={`${STATIC_URL}/logoo.webp`}
+                    alt={siteName}
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-base font-black tracking-[1.5px] text-[#063B5C] leading-none truncate">
+                    {logoFirstLine}
+                  </p>
+                  {logoSecondLine && (
+                    <p className="text-[10px] font-bold tracking-[1px] text-[#008FB8] mt-1 truncate">
+                      {logoSecondLine}
                     </p>
-                  </div>
-
-                  <div className="pl-4 space-y-0.5">
-                    {categories.map((cat) => (
-                      <button
-                        key={cat._id}
-                        onClick={() => handleCategoryClick(cat)}
-                        className="flex items-center gap-2.5 w-full text-left py-2 px-2 text-[11px] font-semibold tracking-[0.5px] text-[#315A6E] hover:text-[#008FB8] hover:bg-[#EAF8FC] rounded-md transition-all cursor-pointer"
-                      >
-                        <svg className="w-2.5 h-2.5 flex-shrink-0 text-[#008FB8]/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                        {cat.name.toUpperCase()}
-                      </button>
-                    ))}
-                  </div>
-
-                  <Link
-                    href="/about"
-                    className="flex items-center gap-3 py-2.5 text-[12px] font-extrabold tracking-[1px] text-[#063B5C] hover:text-[#008FB8] transition-all mt-1"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    ABOUT
-                  </Link>
-
-                  <Link
-                    href="/contact"
-                    className="flex items-center gap-3 py-2.5 text-[12px] font-extrabold tracking-[1px] text-[#063B5C] hover:text-[#008FB8] transition-all"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                    CONTACT
-                  </Link>
-
-                  {!isAuthenticated ? (
-                    <Link
-                      href="/login"
-                      className="flex items-center gap-3 py-2.5 text-[12px] font-extrabold tracking-[1px] text-[#063B5C] hover:text-[#008FB8] transition-all border-t border-[#B8DCE7] mt-2"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <User className="w-4 h-4 flex-shrink-0" />
-                      LOGIN
-                    </Link>
-                  ) : (
-                    <div className="border-t border-[#B8DCE7] mt-2 pt-2">
-                      <Link
-                        href="/profile"
-                        className="flex items-center gap-3 py-2.5 text-[12px] font-extrabold tracking-[1px] text-[#063B5C] hover:text-[#008FB8] transition-all"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        <User className="w-4 h-4 flex-shrink-0" />
-                        MY ACCOUNT
-                      </Link>
-                      <button
-                        onClick={() => {
-                          setIsMenuOpen(false);
-                          logout();
-                          router.push('/');
-                        }}
-                        className="flex items-center gap-3 w-full text-left py-2.5 text-[12px] font-extrabold tracking-[1px] text-[#063B5C] hover:text-[#008FB8] transition-all cursor-pointer"
-                      >
-                        <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
-                        LOGOUT
-                      </button>
-                    </div>
                   )}
                 </div>
-              </nav>
+              </Link>
+
+              <button
+                onClick={() => setIsMenuOpen(false)}
+                className="text-[#315A6E] shrink-0"
+                aria-label="Close menu"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
+
+            <nav className="h-[calc(100%-72px)] overflow-y-auto p-4">
+              <Link
+                href="/"
+                onClick={() => setIsMenuOpen(false)}
+                className="flex items-center gap-3 py-3 text-sm font-extrabold tracking-[1px] text-[#063B5C]"
+              >
+                <Home className="w-4 h-4 text-[#008FB8]" />
+                HOME
+              </Link>
+
+              <div className="mt-4 mb-2 px-1">
+                <p className="text-[10px] font-bold uppercase tracking-[2px] text-[#315A6E]">
+                  Shop by Category
+                </p>
+              </div>
+
+              <div className="space-y-1">
+                {categories.map((cat) => {
+                  const active = isCategoryActive(cat);
+                  return (
+                    <button
+                      key={cat._id}
+                      onClick={() => handleCategoryClick(cat)}
+                      className={`
+                        flex items-center gap-3 w-full text-left
+                        py-2.5 px-3 rounded-lg
+                        text-xs font-semibold tracking-[0.4px]
+                        transition-colors
+                        ${
+                          active
+                            ? "text-[#008FB8] bg-[#EAF8FC]"
+                            : "text-[#315A6E] hover:text-[#008FB8] hover:bg-[#EAF8FC]"
+                        }
+                      `}
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#008FB8] shrink-0" />
+                      <span className="truncate">
+                        {cat.name.toUpperCase()}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <Link
+                href="/about"
+                onClick={() => setIsMenuOpen(false)}
+                className="flex items-center gap-3 py-3 mt-4 border-t border-[#B8DCE7] text-sm font-extrabold tracking-[1px] text-[#063B5C]"
+              >
+                <Info className="w-4 h-4 text-[#008FB8]" />
+                ABOUT
+              </Link>
+
+              <Link
+                href="/contact"
+                onClick={() => setIsMenuOpen(false)}
+                className="flex items-center gap-3 py-3 text-sm font-extrabold tracking-[1px] text-[#063B5C]"
+              >
+                <MapPin className="w-4 h-4 text-[#008FB8]" />
+                CONTACT
+              </Link>
+
+              {!isAuthenticated ? (
+                <Link
+                  href="/login"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="flex items-center gap-3 py-3 border-t border-[#B8DCE7] mt-2 text-sm font-extrabold tracking-[1px] text-[#063B5C]"
+                >
+                  <User className="w-4 h-4 text-[#008FB8]" />
+                  LOGIN
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    href="/profile"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex items-center gap-3 py-3 border-t border-[#B8DCE7] mt-2 text-sm font-extrabold tracking-[1px] text-[#063B5C]"
+                  >
+                    <User className="w-4 h-4 text-[#008FB8]" />
+                    MY ACCOUNT
+                  </Link>
+                  <button
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      logout();
+                      router.push("/");
+                    }}
+                    className="flex items-center gap-3 w-full text-left py-3 text-sm font-extrabold tracking-[1px] text-[#063B5C]"
+                  >
+                    LOGOUT
+                  </button>
+                </>
+              )}
+            </nav>
           </div>
         </div>
       )}
 
-      {/* Mobile Fullscreen Search Overlay */}
+      {/* =========================================================
+          MOBILE SEARCH
+      ========================================================= */}
+
       {showSearch && (
-        <div className="lg:hidden fixed inset-0 z-50 bg-[#F8FCFD] pt-20">
-          <div className="w-full px-4">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="flex-1 flex items-center bg-white rounded-lg px-4 py-2 border border-[#B8DCE7] shadow-sm">
-                <Search className="w-5 h-5 text-[#008FB8] mr-3 flex-shrink-0" />
+        <div className="lg:hidden fixed inset-0 z-[110] bg-[#F8FCFD]">
+          <div className="pt-4 px-3 sm:px-4">
+            <div className="flex items-center gap-2">
+              <div className="flex-1 flex items-center h-12 bg-white border border-[#B8DCE7] rounded-xl px-3 shadow-sm min-w-0">
+                <Search className="w-5 h-5 text-[#008FB8] mr-2 shrink-0" />
                 <input
                   ref={mobileSearchInputRef}
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search products..."
-                  className="flex-1 bg-transparent text-[#063B5C] focus:outline-none text-base placeholder-[#315A6E]/60 w-full"
-                  autoFocus
+                  className="flex-1 min-w-0 bg-transparent outline-none text-sm text-[#063B5C]"
                 />
                 {searchQuery && (
-                  <button
-                    type="button"
-                    onClick={() => setSearchQuery('')}
-                    className="ml-2 p-1 text-[#315A6E] hover:text-[#063B5C] rounded-full hover:bg-[#EAF8FC]"
-                  >
-                    <X className="w-5 h-5" />
+                  <button onClick={() => setSearchQuery("")}>
+                    <X className="w-5 h-5 text-[#315A6E]" />
                   </button>
                 )}
               </div>
-              
+
               <button
-                type="button"
                 onClick={handleSearchSubmit}
-                className="p-3 bg-[#008FB8] hover:bg-[#00A9E0] text-white rounded-lg transition-all duration-300 flex items-center justify-center"
+                className="w-12 h-12 rounded-xl bg-[#008FB8] text-white flex items-center justify-center shrink-0"
+                aria-label="Submit search"
               >
                 <Search className="w-5 h-5" />
               </button>
-              
+
               <button
-                type="button"
                 onClick={() => {
                   setShowSearch(false);
-                  setSearchQuery('');
+                  setSearchQuery("");
                   setSearchResults([]);
                 }}
-                className="p-3 text-[#315A6E] hover:text-[#063B5C] hover:bg-[#EAF8FC] rounded-lg transition-all duration-300 border border-[#B8DCE7]"
+                className="w-12 h-12 rounded-xl border border-[#B8DCE7] text-[#315A6E] flex items-center justify-center shrink-0"
+                aria-label="Close search"
               >
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
             {(searchResults.length > 0 || isSearching) && (
-              <div className="bg-white border border-[#B8DCE7] rounded-lg shadow-2xl max-h-[60vh] overflow-y-auto">
+              <div className="mt-4 bg-white border border-[#B8DCE7] rounded-xl shadow-xl overflow-hidden max-h-[70vh] overflow-y-auto">
                 {isSearching ? (
-                  <div className="p-4 text-center text-[#315A6E]">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#008FB8] mx-auto"></div>
-                    <p className="mt-2 text-sm">Searching...</p>
+                  <div className="p-8 text-center">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#008FB8] mx-auto" />
+                    <p className="mt-2 text-sm text-[#315A6E]">
+                      Searching...
+                    </p>
                   </div>
                 ) : (
                   <>
                     <div className="p-2">
-                      <p className="text-xs text-[#008FB8] font-medium px-2 py-1 border-b border-[#B8DCE7]">Search Results</p>
                       {searchResults.map((product) => (
                         <div
                           key={product._id}
-                          className="flex items-center p-2 hover:bg-[#EAF8FC] rounded-lg cursor-pointer transition-colors"
                           onClick={() => handleProductClick(product)}
+                          className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-[#EAF8FC] cursor-pointer"
                         >
-                          {/* 🎯 Each product shows ONLY its own image */}
-                          <div className="w-12 h-12 bg-[#EAF8FC] rounded-lg flex-shrink-0 overflow-hidden border border-[#B8DCE7] relative">
+                          <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-[#EAF8FC] shrink-0">
                             {getImageUrl(product.image) ? (
                               <Image
                                 src={getImageUrl(product.image)!}
-                                className="w-full h-full object-cover"
                                 alt={product.name}
                                 fill
                                 sizes="48px"
+                                className="object-cover"
                               />
                             ) : (
-                              <div className="w-full h-full flex items-center justify-center text-[#008FB8]">
-                                <ShoppingCart className="w-5 h-5" />
+                              <div className="w-full h-full flex items-center justify-center">
+                                <ShoppingCart className="w-5 h-5 text-[#008FB8]" />
                               </div>
                             )}
                           </div>
-                          <div className="ml-3 flex-1 min-w-0">
-                            <p className="text-sm font-medium text-[#063B5C] truncate">{product.name}</p>
-                            <div className="flex items-center justify-between">
-                              <p className="text-xs text-[#008FB8]">{product.category}</p>
-                              <p className="text-[#063B5C] font-medium text-sm">₹{product.basePrice}</p>
-                            </div>
+
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-[#063B5C] truncate">
+                              {product.name}
+                            </p>
+                            <p className="text-xs text-[#315A6E] truncate">
+                              {product.category}
+                            </p>
                           </div>
+
+                          <span className="text-sm font-bold text-[#008FB8] shrink-0">
+                            ₹{product.basePrice}
+                          </span>
                         </div>
                       ))}
                     </div>
-                    <div
-                      className="border-t border-[#B8DCE7] p-3 bg-[#F8FCFD] hover:bg-[#EAF8FC] cursor-pointer text-center rounded-b-lg transition-all duration-300"
+
+                    <button
                       onClick={handleViewAllResults}
+                      className="w-full border-t border-[#B8DCE7] py-3 text-sm font-semibold text-[#008FB8] bg-[#F8FCFD]"
                     >
-                      <p className="text-sm font-medium text-[#008FB8]">
-                        View all results for &quot;{searchQuery}&quot;
-                      </p>
-                    </div>
+                      View all results
+                    </button>
                   </>
                 )}
               </div>
@@ -854,63 +1223,105 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
         </div>
       )}
 
-      {/* Bottom Navigation Bar - Mobile Only */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#B8DCE7] shadow-lg z-40 lg:hidden">
-        <div className="w-full px-2">
-          <div className="flex items-center justify-between h-14">
-            <Link href="/" className="flex flex-col items-center justify-center flex-1 p-1 transition-colors cursor-pointer min-w-0 text-[#063B5C] hover:text-[#008FB8]">
-              <svg className="w-4 h-4 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-              </svg>
-              <span className="text-[10px] font-medium truncate w-full text-center">Home</span>
-            </Link>
+      {/* =========================================================
+          MOBILE BOTTOM NAVIGATION
+      ========================================================= */}
 
-            <button 
-              onClick={handleSearchClick}
-              className="flex flex-col items-center justify-center flex-1 p-1 transition-colors cursor-pointer min-w-0 text-[#063B5C] hover:text-[#008FB8]"
-            >
-              <Search className="w-4 h-4 mb-0.5" />
-              <span className="text-[10px] font-medium truncate w-full text-center">Search</span>
-            </button>
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-[#B8DCE7] shadow-lg">
+        <div className="h-14 flex items-center">
+          <Link
+            href="/"
+            className={`flex-1 h-full flex flex-col items-center justify-center min-w-0 ${
+              pathname === "/" ? "text-[#008FB8]" : "text-[#063B5C]"
+            }`}
+          >
+            <Home className="w-4 h-4 mb-0.5" />
+            <span className="text-[10px] font-medium truncate w-full text-center px-1">
+              Home
+            </span>
+          </Link>
 
-            <button
-              onClick={openCartDrawer}
-              className="flex flex-col items-center justify-center flex-1 p-1 transition-colors relative cursor-pointer min-w-0 text-[#063B5C] hover:text-[#008FB8]"
-            >
-              <ShoppingCart className="w-4 h-4 mb-0.5" />
-              {cartCount > 0 && (
-                <span className="absolute -top-1 right-4 bg-[#008FB8] text-white rounded-full h-4 w-4 flex items-center justify-center text-[9px] font-bold border border-white/30">
-                  {cartCount > 9 ? '9+' : cartCount}
-                </span>
-              )}
-              <span className="text-[10px] font-medium truncate w-full text-center">Cart</span>
-            </button>
+          <button
+            onClick={handleSearchClick}
+            className="flex-1 h-full flex flex-col items-center justify-center text-[#063B5C] min-w-0"
+          >
+            <Search className="w-4 h-4 mb-0.5" />
+            <span className="text-[10px] font-medium truncate w-full text-center px-1">
+              Search
+            </span>
+          </button>
 
-            <Link href="/about" className="flex flex-col items-center justify-center flex-1 p-1 transition-colors cursor-pointer min-w-0 text-[#063B5C] hover:text-[#008FB8]">
-              <svg className="w-4 h-4 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span className="text-[10px] font-medium truncate w-full text-center">About</span>
-            </Link>
-
-            {isAuthenticated ? (
-              <Link href="/profile" className="flex flex-col items-center justify-center flex-1 p-1 transition-colors cursor-pointer min-w-0 text-[#063B5C] hover:text-[#008FB8]">
-                <div className="w-4 h-4 rounded-full bg-gradient-to-br from-[#00A9E0] to-[#008FB8] flex items-center justify-center text-[9px] font-bold mb-0.5 text-white border border-white/30">
-                  {getUserInitial()}
-                </div>
-                <span className="text-[10px] font-medium truncate w-full text-center">Account</span>
-              </Link>
-            ) : (
-              <Link href="/login" className="flex flex-col items-center justify-center flex-1 p-1 transition-colors cursor-pointer min-w-0 text-[#063B5C] hover:text-[#008FB8]">
-                <User className="w-4 h-4 mb-0.5" />
-                <span className="text-[10px] font-medium truncate w-full text-center">Login</span>
-              </Link>
+          <button
+            onClick={() => setIsCartDrawerOpen(true)}
+            className="relative flex-1 h-full flex flex-col items-center justify-center text-[#063B5C] min-w-0"
+          >
+            <ShoppingCart className="w-4 h-4 mb-0.5" />
+            {cartCount > 0 && (
+              <span className="absolute top-1 right-[calc(50%-18px)] w-4 h-4 rounded-full bg-[#008FB8] text-white text-[9px] flex items-center justify-center font-bold">
+                {cartCount > 9 ? "9+" : cartCount}
+              </span>
             )}
-          </div>
+            <span className="text-[10px] font-medium truncate w-full text-center px-1">
+              Cart
+            </span>
+          </button>
+
+          <Link
+            href="/about"
+            className={`flex-1 h-full flex flex-col items-center justify-center min-w-0 ${
+              pathname === "/about"
+                ? "text-[#008FB8]"
+                : "text-[#063B5C]"
+            }`}
+          >
+            <Info className="w-4 h-4 mb-0.5" />
+            <span className="text-[10px] font-medium truncate w-full text-center px-1">
+              About
+            </span>
+          </Link>
+
+          {isAuthenticated ? (
+            <Link
+              href="/profile"
+              className={`flex-1 h-full flex flex-col items-center justify-center min-w-0 ${
+                pathname === "/profile"
+                  ? "text-[#008FB8]"
+                  : "text-[#063B5C]"
+              }`}
+            >
+              <div className="w-4 h-4 rounded-full bg-[#008FB8] text-white flex items-center justify-center text-[9px] font-bold mb-0.5">
+                {getUserInitial()}
+              </div>
+              <span className="text-[10px] font-medium truncate w-full text-center px-1">
+                Account
+              </span>
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              className={`flex-1 h-full flex flex-col items-center justify-center min-w-0 ${
+                pathname === "/login"
+                  ? "text-[#008FB8]"
+                  : "text-[#063B5C]"
+              }`}
+            >
+              <User className="w-4 h-4 mb-0.5" />
+              <span className="text-[10px] font-medium truncate w-full text-center px-1">
+                Login
+              </span>
+            </Link>
+          )}
         </div>
       </div>
 
-      <CartDrawer isOpen={isCartDrawerOpen} onClose={closeCartDrawer} />
+      {/* =========================================================
+          CART DRAWER
+      ========================================================= */}
+
+      <CartDrawer
+        isOpen={isCartDrawerOpen}
+        onClose={() => setIsCartDrawerOpen(false)}
+      />
     </>
   );
 }
